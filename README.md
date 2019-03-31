@@ -26,15 +26,17 @@ var method = typeof(TestClass).GetMethod(nameof(TestClass.Process));
 var parameter = method.GetParameters().First();
 var parameterTypeWithContext = parameter.GetTypeWithContext();
 
-Console.WriteLine(parameterTypeWithContext.ToString());
+Console.WriteLine("Dictionary: " + parameterTypeWithContext.Nullability);
+Console.WriteLine("Key: " + parameterTypeWithContext.GenericArguments[0].Nullability);
+Console.WriteLine("Value: " + parameterTypeWithContext.GenericArguments[1].Nullability);
 ```
 
-This will output: 
+The output is: 
 
 ```
-Dictionary`2: NotNullable
-  string: NotNullable
-  string: Nullable
+Dictionary: NotNullable
+Key: NotNullable
+Value: Nullable
 ```
 
 ## XML Docs

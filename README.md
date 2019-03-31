@@ -6,11 +6,13 @@ Library with advanced .NET reflection APIs.
 
 ### C# 8 nullability reflection
 
-With the `TypeWithContext` class you can reflect over the nullability of properties, fields, method parameters and return types which will be available when compiling with the C# compiler in version 8+.
+With the `TypeWithContext` class you can reflect on the nullability of properties, fields, method parameters and return types which will be available when compiling with the C# 8 compiler with the Nullable Reference Types feature enabled. 
 
-Given the following test class with some C# 8 nullability annotations:
+Given the following test class with some C# 8 nullability annotations (?):
 
 ```csharp
+#nullable enable
+
 public class TestClass
 {
     public void Process(Dictionary<string, string?> dictionary)
@@ -19,7 +21,7 @@ public class TestClass
 }
 ```
 
-Now, we can load the `TypeWithContext` instance for the first method parameter and display the nullability of the types:
+To reflect on the first parameter's nullability, we can load a `TypeWithContext` instance and display the nullability of the parameter's types:
 
 ```csharp
 var method = typeof(TestClass).GetMethod(nameof(TestClass.Process));

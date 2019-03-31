@@ -4,7 +4,7 @@ Library with advanced .NET reflection APIs.
 
 ## TypeWithContext
 
-### Reflect over nullability
+### Reflect over C# 8 nullability
 
 With the `TypeWithContext` class you can reflect over the nullability of properties, fields, method parameters and return types which will be available when compiling with the C# compiler in version 8+.
 

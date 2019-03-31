@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28711.60
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Namotion.Reflection", "Namotion.Reflection\Namotion.Reflection.csproj", "{5919DC7F-5C53-4AE7-9404-BD378851C835}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Namotion.Reflection.Tests", "Namotion.Reflection.Tests\Namotion.Reflection.Tests.csproj", "{AFC02943-A167-4DFD-A747-93658C80296B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5919DC7F-5C53-4AE7-9404-BD378851C835}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5919DC7F-5C53-4AE7-9404-BD378851C835}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5919DC7F-5C53-4AE7-9404-BD378851C835}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5919DC7F-5C53-4AE7-9404-BD378851C835}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AFC02943-A167-4DFD-A747-93658C80296B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFC02943-A167-4DFD-A747-93658C80296B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFC02943-A167-4DFD-A747-93658C80296B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFC02943-A167-4DFD-A747-93658C80296B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {22BCE439-38C4-45F8-9950-65C285882E67}
+	EndGlobalSection
+EndGlobal

@@ -1,6 +1,6 @@
 # Namotion.Reflection
 
-.NET library with advanced reflection APIs.
+Library with advanced .NET reflection APIs.
 
 ## TypeWithContext
 

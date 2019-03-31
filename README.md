@@ -41,6 +41,8 @@ Key: NotNullable
 Value: Nullable
 ```
 
+For more details, see https://blog.rsuter.com/the-output-of-nullable-reference-types-and-how-to-reflect-it/
+
 ## XML Docs
 
 TODO: Move into this repo

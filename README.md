@@ -39,4 +39,13 @@ Dictionary`2: NotNullable
 
 ## XML Docs
 
-TBD
+TODO: Move into this repo
+
+https://github.com/RicoSuter/NJsonSchema/blob/master/src/NJsonSchema/Infrastructure/XmlDocumentationExtensions.cs
+
+## Other APIs
+
+TODO: Move into this repo
+
+https://github.com/RicoSuter/NJsonSchema/blob/master/src/NJsonSchema/Infrastructure/ReflectionExtensions.cs
+https://github.com/RicoSuter/NJsonSchema/blob/master/src/NJsonSchema/Infrastructure/ReflectionCache.cs

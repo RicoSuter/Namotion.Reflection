@@ -26,16 +26,16 @@ namespace Namotion.Reflection.Tests
             var typeWithContext = parameter.GetTypeWithContext();
 
             // Assert
-            Assert.Equal(Nullability.NotNull, typeWithContext.OriginalNullability);
+            Assert.Equal(Nullability.NotNull, typeWithContext.Nullability);
 
-            Assert.Equal(Nullability.NotNull, typeWithContext.GenericArguments[0].OriginalNullability);
-            Assert.Equal(Nullability.NeverNull, typeWithContext.GenericArguments[1].OriginalNullability);
+            Assert.Equal(Nullability.NotNull, typeWithContext.GenericArguments[0].Nullability);
+            Assert.Equal(Nullability.NeverNull, typeWithContext.GenericArguments[1].Nullability);
 
             Assert.Equal(Nullability.NeverNull, typeWithContext.GenericArguments[2].OriginalNullability);
             Assert.Equal(Nullability.Null, typeWithContext.GenericArguments[2].Nullability);
 
-            Assert.Equal(Nullability.NotNull, typeWithContext.GenericArguments[3].OriginalNullability);
-            Assert.Equal(Nullability.Null, typeWithContext.GenericArguments[4].OriginalNullability);
+            Assert.Equal(Nullability.NotNull, typeWithContext.GenericArguments[3].Nullability);
+            Assert.Equal(Nullability.Null, typeWithContext.GenericArguments[4].Nullability);
         }
 
         class TestFunction
@@ -57,9 +57,9 @@ namespace Namotion.Reflection.Tests
             var typeWithContext = parameter.GetTypeWithContext();
 
             // Assert
-            Assert.Equal(Nullability.NotNull, typeWithContext.OriginalNullability);
-            Assert.Equal(Nullability.NotNull, typeWithContext.GenericArguments[0].OriginalNullability);
-            Assert.Equal(Nullability.Null, typeWithContext.GenericArguments[1].OriginalNullability);
+            Assert.Equal(Nullability.NotNull, typeWithContext.Nullability);
+            Assert.Equal(Nullability.NotNull, typeWithContext.GenericArguments[0].Nullability);
+            Assert.Equal(Nullability.Null, typeWithContext.GenericArguments[1].Nullability);
         }
 
         class TestProperty
@@ -77,8 +77,8 @@ namespace Namotion.Reflection.Tests
             var typeWithContext = property.GetTypeWithContext();
 
             // Assert
-            Assert.Equal(Nullability.NotNull, typeWithContext.OriginalNullability);
-            Assert.Equal(Nullability.Null, typeWithContext.GenericArguments[0].OriginalNullability);
+            Assert.Equal(Nullability.NotNull, typeWithContext.Nullability);
+            Assert.Equal(Nullability.Null, typeWithContext.GenericArguments[0].Nullability);
         }
     }
 }

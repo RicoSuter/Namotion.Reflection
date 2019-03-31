@@ -4,7 +4,7 @@
     {
         Unknown,
         NeverNull,
-        NotNull,
-        Null
+        NotNullable,
+        Nullable
     }
 }

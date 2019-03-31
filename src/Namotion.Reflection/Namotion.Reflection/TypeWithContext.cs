@@ -29,8 +29,8 @@ namespace Namotion.Reflection
             nullableFlagsIndex++;
 
             OriginalNullability = nullableFlag == 0 ? Nullability.NeverNull :
-                nullableFlag == 1 ? Nullability.NotNull :
-                nullableFlag == 2 ? Nullability.Null :
+                nullableFlag == 1 ? Nullability.NotNullable :
+                nullableFlag == 2 ? Nullability.Nullable :
                 Nullability.Unknown;
 
             var genericArguments = new List<TypeWithContext>();
@@ -38,7 +38,7 @@ namespace Namotion.Reflection
             {
                 genericArguments.Add(new TypeWithContext(genericArgument, attributes, this, nullableFlags, ref nullableFlagsIndex));
             }
-            GenericArguments = genericArguments.ToArray();
+            OriginalGenericArguments = genericArguments.ToArray();
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace Namotion.Reflection
         /// <summary>
         /// Gets the nullability information of this type in the given context by unwrapping Nullable{T} into account.
         /// </summary>
-        public Nullability Nullability => IsNullableType ? Nullability.Null : OriginalNullability;
+        public Nullability Nullability => IsNullableType ? Nullability.Nullable : OriginalNullability;
 
         /// <summary>
         /// Gets the type's associated attributes of the given context.
@@ -77,9 +77,14 @@ namespace Namotion.Reflection
         public TypeWithContext Parent { get; }
 
         /// <summary>
-        /// Gets the generic type arguments of the type in the given context.
+        /// Gets the original generic type arguments of the type in the given context.
         /// </summary>
-        public TypeWithContext[] GenericArguments { get; }
+        public TypeWithContext[] OriginalGenericArguments { get; }
+
+        /// <summary>
+        /// Gets the generic type arguments of the type in the given context (empty when unwrapped from Nullable{T}).
+        /// </summary>
+        public TypeWithContext[] GenericArguments => IsNullableType ? new TypeWithContext[0] : OriginalGenericArguments;
 
         /// <summary>
         /// Gets the type context's parameter info.
@@ -95,5 +100,13 @@ namespace Namotion.Reflection
         /// Gets the type context's field info.
         /// </summary>
         public FieldInfo FieldInfo { get; internal set; }
+
+        public override string ToString()
+        {
+            var result = Type.Name + ": " + Nullability + "\n  " +
+                string.Join("\n", GenericArguments.Select(a => a.ToString())).Replace("\n", "\n  ");
+
+            return result.Trim();
+        }
     }
 }

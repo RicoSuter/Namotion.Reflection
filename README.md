@@ -22,7 +22,7 @@ public class TestClass
 Now, we can load the `TypeWithContext` instance for the first method parameter and display the nullability of the types:
 
 ```csharp
-var method = typeof(TestAction).GetMethod(nameof(TestAction.Process));
+var method = typeof(TestClass).GetMethod(nameof(TestClass.Process));
 var parameter = method.GetParameters().First();
 var parameterTypeWithContext = parameter.GetTypeWithContext();
 

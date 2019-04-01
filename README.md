@@ -2,6 +2,8 @@
 
 Library with advanced .NET reflection APIs.
 
+TODO: The idea is to move all reflection APIs from my other libraries (mainly NJsonSchema) into this general purpose library.
+
 ## TypeWithContext
 
 ### C# 8 nullability reflection

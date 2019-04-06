@@ -13,7 +13,7 @@ namespace Namotion.Reflection
         /// <returns>The type with context.</returns>
         public static TypeWithContext GetTypeWithContext(this ParameterInfo parameterInfo)
         {
-            var attributes = parameterInfo.GetCustomAttributes().OfType<Attribute>().ToArray();
+            var attributes = parameterInfo.GetCustomAttributes(true).OfType<Attribute>().ToArray();
             var type = TypeWithContext.ForType(parameterInfo.ParameterType, attributes);
             type.ParemterInfo = parameterInfo;
             return type;
@@ -26,7 +26,7 @@ namespace Namotion.Reflection
         /// <returns>The type with context.</returns>
         public static TypeWithContext GetTypeWithContext(this MemberInfo memberInfo)
         {
-            var attributes = memberInfo.GetCustomAttributes().OfType<Attribute>().ToArray();
+            var attributes = memberInfo.GetCustomAttributes(true).OfType<Attribute>().ToArray();
 
             if (memberInfo is PropertyInfo propertyInfo)
             {

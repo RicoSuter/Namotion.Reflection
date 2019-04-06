@@ -22,7 +22,11 @@ namespace Namotion.Reflection
             if (nullableFlags == null)
             {
                 var nullableAttribute = attributes.FirstOrDefault(a => a.GetType().FullName == "System.Runtime.CompilerServices.NullableAttribute");
+#if NET40
                 nullableFlags = (byte[])nullableAttribute?.GetType().GetField("NullableFlags")?.GetValue(nullableAttribute) ?? new byte[0];
+#else
+                nullableFlags = (byte[])nullableAttribute?.GetType().GetRuntimeField("NullableFlags")?.GetValue(nullableAttribute) ?? new byte[0];
+#endif
             }
 
             var nullableFlag = nullableFlags.Length > nullableFlagsIndex ? nullableFlags[nullableFlagsIndex] : -1;
@@ -34,7 +38,11 @@ namespace Namotion.Reflection
                 Nullability.Unknown;
 
             var genericArguments = new List<TypeWithContext>();
+#if NET40
+            foreach (var genericArgument in type.GetGenericArguments())
+#else
             foreach (var genericArgument in type.GenericTypeArguments)
+#endif
             {
                 genericArguments.Add(new TypeWithContext(genericArgument, attributes, this, nullableFlags, ref nullableFlagsIndex));
             }
@@ -49,7 +57,11 @@ namespace Namotion.Reflection
         /// <summary>
         /// Gets the actual unwrapped type (e.g. gets T of Nullable{T} types).
         /// </summary>
+#if NET40
+        internal Type Type => IsNullableType ? OriginalType.GetGenericArguments().First() : OriginalType;
+#else
         internal Type Type => IsNullableType ? OriginalType.GenericTypeArguments.First() : OriginalType;
+#endif
 
         /// <summary>
         /// Gets a value indicating whether this type is wrapped with Nullable{T}.

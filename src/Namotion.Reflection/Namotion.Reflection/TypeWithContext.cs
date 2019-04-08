@@ -7,13 +7,7 @@ namespace Namotion.Reflection
 {
     public class TypeWithContext
     {
-        public static TypeWithContext ForType(Type type, Attribute[] attributes)
-        {
-            var index = 0;
-            return new TypeWithContext(type, attributes, null, null, ref index);
-        }
-
-        private TypeWithContext(Type type, Attribute[] attributes, TypeWithContext parent, byte[] nullableFlags, ref int nullableFlagsIndex)
+        internal TypeWithContext(Type type, Attribute[] attributes, TypeWithContext parent, byte[] nullableFlags, ref int nullableFlagsIndex)
         {
             OriginalType = type;
             Attributes = attributes;
@@ -97,21 +91,6 @@ namespace Namotion.Reflection
         /// Gets the generic type arguments of the type in the given context (empty when unwrapped from Nullable{T}).
         /// </summary>
         public TypeWithContext[] GenericArguments => IsNullableType ? new TypeWithContext[0] : OriginalGenericArguments;
-
-        /// <summary>
-        /// Gets the type context's parameter info.
-        /// </summary>
-        public ParameterInfo ParemterInfo { get; internal set; }
-
-        /// <summary>
-        /// Gets the type context's property info.
-        /// </summary>
-        public PropertyInfo PropertyInfo { get; internal set; }
-
-        /// <summary>
-        /// Gets the type context's field info.
-        /// </summary>
-        public FieldInfo FieldInfo { get; internal set; }
 
         public override string ToString()
         {

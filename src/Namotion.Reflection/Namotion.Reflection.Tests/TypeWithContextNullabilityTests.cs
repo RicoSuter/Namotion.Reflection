@@ -23,7 +23,7 @@ namespace Namotion.Reflection.Tests
             var parameter = method.GetParameters().First();
 
             // Act
-            var typeWithContext = parameter.GetTypeWithContext();
+            var typeWithContext = parameter.GetParameterWithContext();
 
             // Assert
             Assert.Equal(Nullability.NotNullable, typeWithContext.Nullability);
@@ -54,7 +54,7 @@ namespace Namotion.Reflection.Tests
             var parameter = method.ReturnParameter;
 
             // Act
-            var typeWithContext = parameter.GetTypeWithContext();
+            var typeWithContext = parameter.GetParameterWithContext();
 
             // Assert
             Assert.Equal(Nullability.NotNullable, typeWithContext.Nullability);
@@ -74,7 +74,7 @@ namespace Namotion.Reflection.Tests
             var property = typeof(TestProperty).GetProperty(nameof(TestProperty.Property));
 
             // Act
-            var typeWithContext = property.GetTypeWithContext();
+            var typeWithContext = property.GetPropertyWithContext();
 
             // Assert
             Assert.Equal(Nullability.NotNullable, typeWithContext.Nullability);

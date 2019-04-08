@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using Namotion.Reflection.Infrastructure;
 using System;
 using System.Collections;
 using System.Collections.Generic;

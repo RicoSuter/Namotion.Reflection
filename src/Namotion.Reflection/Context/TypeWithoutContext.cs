@@ -39,6 +39,9 @@ namespace Namotion.Reflection
             OriginalGenericArguments = genericArguments.ToArray();
         }
 
+        /// <summary>
+        /// Updates the derived properties.
+        /// </summary>
         protected void UpdateDerivedProperties()
         {
             IsNullableType = OriginalType.Name == "Nullable`1";

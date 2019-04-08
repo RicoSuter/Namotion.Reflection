@@ -486,7 +486,7 @@ namespace Namotion.Reflection
                         return path;
                 }
 
-                if (ReflectionExtensions.HasProperty(assembly, "CodeBase"))
+                if (ObjectExtensions.HasProperty(assembly, "CodeBase"))
                 {
                     var codeBase = (string)assembly.CodeBase;
                     if (!string.IsNullOrEmpty(codeBase))

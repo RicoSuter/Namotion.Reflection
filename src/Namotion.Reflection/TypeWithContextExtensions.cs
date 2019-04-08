@@ -7,8 +7,8 @@ namespace Namotion.Reflection
 {
     public static class TypeWithContextExtensions
     {
-        private static object _lock = new object();
-        private static Dictionary<string, object> _cache = new Dictionary<string, object>();
+        private static object Lock = new object();
+        private static Dictionary<string, object> Cache = new Dictionary<string, object>();
 
         /// <summary>
         /// Gets an enumerable of <see cref="PropertyWithContext"/> and <see cref="FieldWithContext"/> for the given <see cref="Type"/> instance.
@@ -30,19 +30,19 @@ namespace Namotion.Reflection
         public static PropertyWithContext[] GetRuntimePropertiesWithContext(this Type type)
         {
             var key = "Properties:" + type.FullName;
-            lock (_lock)
+            lock (Lock)
             {
-                if (!_cache.ContainsKey(key))
+                if (!Cache.ContainsKey(key))
                 {
 #if NET40
-                    _cache[key] = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
+                    Cache[key] = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
 #else
-                    _cache[key] = type.GetRuntimeProperties()
+                    Cache[key] = type.GetRuntimeProperties()
 #endif
                         .Select(p => p.GetPropertyWithContext()).ToArray();
                 }
 
-                return (PropertyWithContext[])_cache[key];
+                return (PropertyWithContext[])Cache[key];
             }
         }
 
@@ -54,19 +54,19 @@ namespace Namotion.Reflection
         public static FieldWithContext[] GetRuntimeFieldsWithContext(this Type type)
         {
             var key = "Fields:" + type.FullName;
-            lock (_lock)
+            lock (Lock)
             {
-                if (!_cache.ContainsKey(key))
+                if (!Cache.ContainsKey(key))
                 {
 #if NET40
-                    _cache[key] = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
+                    Cache[key] = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
 #else
-                    _cache[key] = type.GetRuntimeFields()
+                    Cache[key] = type.GetRuntimeFields()
 #endif
                         .Select(p => p.GetFieldWithContext()).ToArray();
                 }
 
-                return (FieldWithContext[])_cache[key];
+                return (FieldWithContext[])Cache[key];
             }
         }
 
@@ -78,15 +78,15 @@ namespace Namotion.Reflection
         public static ParameterWithContext GetParameterWithContext(this ParameterInfo parameterInfo)
         {
             var key = "Parameter:" + parameterInfo.Name + ":" + parameterInfo.Member.DeclaringType.FullName;
-            lock (_lock)
+            lock (Lock)
             {
-                if (!_cache.ContainsKey(key))
+                if (!Cache.ContainsKey(key))
                 {
                     var index = 0;
-                    _cache[key] = new ParameterWithContext(parameterInfo, ref index);
+                    Cache[key] = new ParameterWithContext(parameterInfo, ref index);
                 }
 
-                return (ParameterWithContext)_cache[key];
+                return (ParameterWithContext)Cache[key];
             }
         }
 
@@ -98,15 +98,15 @@ namespace Namotion.Reflection
         public static PropertyWithContext GetPropertyWithContext(this PropertyInfo propertyInfo)
         {
             var key = "Property:" + propertyInfo.Name + ":" + propertyInfo.DeclaringType.FullName;
-            lock (_lock)
+            lock (Lock)
             {
-                if (!_cache.ContainsKey(key))
+                if (!Cache.ContainsKey(key))
                 {
                     var index = 0;
-                    _cache[key] = new PropertyWithContext(propertyInfo, ref index);
+                    Cache[key] = new PropertyWithContext(propertyInfo, ref index);
                 }
 
-                return (PropertyWithContext)_cache[key];
+                return (PropertyWithContext)Cache[key];
             }
         }
 
@@ -118,15 +118,15 @@ namespace Namotion.Reflection
         public static FieldWithContext GetFieldWithContext(this FieldInfo fieldInfo)
         {
             var key = "Field:" + fieldInfo.Name + ":" + fieldInfo.DeclaringType.FullName;
-            lock (_lock)
+            lock (Lock)
             {
-                if (!_cache.ContainsKey(key))
+                if (!Cache.ContainsKey(key))
                 {
                     var index = 0;
-                    _cache[key] = new FieldWithContext(fieldInfo, ref index);
+                    Cache[key] = new FieldWithContext(fieldInfo, ref index);
                 }
 
-                return (FieldWithContext)_cache[key];
+                return (FieldWithContext)Cache[key];
             }
         }
 
@@ -157,14 +157,14 @@ namespace Namotion.Reflection
         public static TypeWithoutContext GetTypeWithoutContext(this Type type)
         {
             var key = "Type:" + type.FullName;
-            lock (_lock)
+            lock (Lock)
             {
-                if (!_cache.ContainsKey(key))
+                if (!Cache.ContainsKey(key))
                 {
-                    _cache[key] = new TypeWithoutContext(type);
+                    Cache[key] = new TypeWithoutContext(type);
                 }
 
-                return (TypeWithoutContext)_cache[key];
+                return (TypeWithoutContext)Cache[key];
             }
         }
     }

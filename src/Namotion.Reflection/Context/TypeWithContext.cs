@@ -7,6 +7,12 @@ namespace Namotion.Reflection
 {
     public class TypeWithContext
     {
+        public static TypeWithContext ForType(Type type, Attribute[] contextAttributes)
+        {
+            var index = 0;
+            return new TypeWithContext(type, contextAttributes, null, null, ref index);
+        }
+
         internal TypeWithContext(Type type, Attribute[] contextAttributes, TypeWithContext parent, byte[] nullableFlags, ref int nullableFlagsIndex)
         {
             OriginalType = type;
@@ -15,7 +21,7 @@ namespace Namotion.Reflection
             Parent = parent;
 
             InitializeNullability(nullableFlags, ref nullableFlagsIndex);
-            InitializeGenericArguments(nullableFlags, ref nullableFlagsIndex);
+            InitializeGenericArguments(type, nullableFlags, ref nullableFlagsIndex);
             CalculateDerivedProperties();
         }
 
@@ -47,13 +53,13 @@ namespace Namotion.Reflection
                 Nullability.Unknown;
         }
 
-        private void InitializeGenericArguments(byte[] nullableFlags, ref int nullableFlagsIndex)
+        private void InitializeGenericArguments(Type type, byte[] nullableFlags, ref int nullableFlagsIndex)
         {
             var genericArguments = new List<TypeWithContext>();
 #if NET40
-            foreach (var genericArgument in Type.GetGenericArguments())
+            foreach (var genericArgument in type.GetGenericArguments())
 #else
-            foreach (var genericArgument in Type.GenericTypeArguments)
+            foreach (var genericArgument in type.GenericTypeArguments)
 #endif
             {
                 genericArguments.Add(new TypeWithContext(genericArgument, ContextAttributes, this, nullableFlags, ref nullableFlagsIndex));

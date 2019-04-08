@@ -20,11 +20,21 @@ namespace Namotion.Reflection
         /// </summary>
         public override MemberInfo MemberInfo => PropertyInfo;
 
+        /// <summary>
+        /// Returns the value of a field supported by a given object.
+        /// </summary>
+        /// <param name="obj">The object.</param>
+        /// <returns>The value.</returns>
         public override object GetValue(object obj)
         {
             return PropertyInfo.GetValue(obj);
         }
 
+        /// <summary>
+        /// Sets the value of the field supported by the given object.
+        /// </summary>
+        /// <param name="obj">The object.</param>
+        /// <param name="value">The value.</param>
         public override void SetValue(object obj, object value)
         {
             PropertyInfo.SetValue(obj, value);

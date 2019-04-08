@@ -4,7 +4,7 @@
         <name>Namotion.Reflection.Tests</name>
     </assembly>
     <members>
-        <member name="P:Namotion.Reflection.Tests.XmlDocTests.WithComplexXmlDoc.Foo">
+        <member name="P:Namotion.Reflection.Tests.XmlDocumentationTests.WithComplexXmlDoc.Foo">
              <summary>
              Query and manages users.
              
@@ -17,47 +17,47 @@
              You need one of the following role: Owner, Editor, use XYZ to manage permissions.
              </summary>
         </member>
-        <member name="P:Namotion.Reflection.Tests.XmlDocTests.WithTagsInXmlDoc.Foo">
+        <member name="P:Namotion.Reflection.Tests.XmlDocumentationTests.WithTagsInXmlDoc.Foo">
             <summary>Gets or sets the foo.</summary>
             <response code="201">Account created</response>
             <response code="400">Username already in use</response>
         </member>
-        <member name="P:Namotion.Reflection.Tests.XmlDocTests.WithSeeTagInXmlDoc.Foo">
+        <member name="P:Namotion.Reflection.Tests.XmlDocumentationTests.WithSeeTagInXmlDoc.Foo">
             <summary><see langword="null"/> for the default <see cref="T:Xunit.Record"/>. See <see cref="T:Xunit.Record">this</see> and <see href="https://github.com/rsuter/njsonschema">this</see> at <see href="https://github.com/rsuter/njsonschema"/>.</summary>
         </member>
-        <member name="P:Namotion.Reflection.Tests.XmlDocTests.WithGenericTagsInXmlDoc.Foo">
+        <member name="P:Namotion.Reflection.Tests.XmlDocumentationTests.WithGenericTagsInXmlDoc.Foo">
             <summary>This <c>are</c> <strong>some</strong> tags.</summary>
         </member>
-        <member name="P:Namotion.Reflection.Tests.XmlDocTests.BaseBaseClass.Foo">
+        <member name="P:Namotion.Reflection.Tests.XmlDocumentationTests.BaseBaseClass.Foo">
             <summary>Foo.</summary>
         </member>
-        <member name="M:Namotion.Reflection.Tests.XmlDocTests.BaseBaseClass.Bar(System.String)">
+        <member name="M:Namotion.Reflection.Tests.XmlDocumentationTests.BaseBaseClass.Bar(System.String)">
             <summary>Bar.</summary>
             <param name="baz">Baz.</param>
         </member>
-        <member name="P:Namotion.Reflection.Tests.XmlDocTests.BaseClass.Foo">
+        <member name="P:Namotion.Reflection.Tests.XmlDocumentationTests.BaseClass.Foo">
             <inheritdoc />
         </member>
-        <member name="M:Namotion.Reflection.Tests.XmlDocTests.BaseClass.Bar(System.String)">
+        <member name="M:Namotion.Reflection.Tests.XmlDocumentationTests.BaseClass.Bar(System.String)">
             <inheritdoc />
         </member>
-        <member name="P:Namotion.Reflection.Tests.XmlDocTests.ClassWithInheritdoc.Foo">
+        <member name="P:Namotion.Reflection.Tests.XmlDocumentationTests.ClassWithInheritdoc.Foo">
             <inheritdoc />
         </member>
-        <member name="M:Namotion.Reflection.Tests.XmlDocTests.ClassWithInheritdoc.Bar(System.String)">
+        <member name="M:Namotion.Reflection.Tests.XmlDocumentationTests.ClassWithInheritdoc.Bar(System.String)">
             <inheritdoc />
         </member>
-        <member name="P:Namotion.Reflection.Tests.XmlDocTests.IBaseBaseInterface.Foo">
+        <member name="P:Namotion.Reflection.Tests.XmlDocumentationTests.IBaseBaseInterface.Foo">
             <summary>Foo.</summary>
         </member>
-        <member name="M:Namotion.Reflection.Tests.XmlDocTests.IBaseBaseInterface.Bar(System.String)">
+        <member name="M:Namotion.Reflection.Tests.XmlDocumentationTests.IBaseBaseInterface.Bar(System.String)">
             <summary>Bar.</summary>
             <param name="baz">Baz.</param>
         </member>
-        <member name="P:Namotion.Reflection.Tests.XmlDocTests.ClassWithInheritdocOnInterface.Foo">
+        <member name="P:Namotion.Reflection.Tests.XmlDocumentationTests.ClassWithInheritdocOnInterface.Foo">
             <inheritdoc />
         </member>
-        <member name="M:Namotion.Reflection.Tests.XmlDocTests.ClassWithInheritdocOnInterface.Bar(System.String)">
+        <member name="M:Namotion.Reflection.Tests.XmlDocumentationTests.ClassWithInheritdocOnInterface.Bar(System.String)">
             <inheritdoc />
         </member>
     </members>

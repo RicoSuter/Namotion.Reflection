@@ -10,9 +10,16 @@ namespace Namotion.Reflection
         private static object _lock = new object();
         private static Dictionary<string, object> _cache = new Dictionary<string, object>();
 
+        /// <summary>
+        /// Gets an enumerable of <see cref="PropertyWithContext"/> and <see cref="FieldWithContext"/> for the given <see cref="Type"/> instance.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static IEnumerable<MemberWithContext> GetPropertiesAndFieldsWithContext(this Type type)
         {
-            return type.GetRuntimePropertiesWithContext().OfType<MemberWithContext>().Union(type.GetRuntimeFieldsWithContext());
+            return type.GetRuntimePropertiesWithContext()
+                .OfType<MemberWithContext>()
+                .Union(type.GetRuntimeFieldsWithContext());
         }
 
         /// <summary>
@@ -124,26 +131,6 @@ namespace Namotion.Reflection
         }
 
         /// <summary>
-        /// Gets a <see cref="FieldWithContext"/> for the given <see cref="FieldInfo"/> instance.
-        /// </summary>
-        /// <param name="memberInfo">The member info.</param>
-        /// <returns>The <see cref="FieldWithContext"/>.</returns>
-        public static TypeWithContext GetTypeWithContext(this Type type)
-        {
-            var key = "Type:" + type.FullName;
-            lock (_lock)
-            {
-                if (!_cache.ContainsKey(key))
-                {
-                    var index = 0;
-                    _cache[key] = new TypeWithContext(type, type.GetTypeInfo().GetCustomAttributes(true).OfType<Attribute>().ToArray(), null, null, ref index);
-                }
-
-                return (TypeWithContext)_cache[key];
-            }
-        }
-
-        /// <summary>
         /// Gets a <see cref="TypeWithContext"/> for the given <see cref="MemberInfo"/> instance.
         /// </summary>
         /// <param name="memberInfo">The member info.</param>
@@ -160,6 +147,25 @@ namespace Namotion.Reflection
             }
 
             throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Gets a <see cref="TypeWithoutContext"/> for the given <see cref="Type"/> instance.
+        /// </summary>
+        /// <param name="memberInfo">The type.</param>
+        /// <returns>The <see cref="TypeWithoutContext"/>.</returns>
+        public static TypeWithoutContext GetTypeWithoutContext(this Type type)
+        {
+            var key = "Type:" + type.FullName;
+            lock (_lock)
+            {
+                if (!_cache.ContainsKey(key))
+                {
+                    _cache[key] = new TypeWithoutContext(type);
+                }
+
+                return (TypeWithoutContext)_cache[key];
+            }
         }
     }
 }

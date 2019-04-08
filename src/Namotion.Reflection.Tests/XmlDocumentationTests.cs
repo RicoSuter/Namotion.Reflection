@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Namotion.Reflection.Tests
 {
-    public class XmlDocTests
+    public class XmlDocumentationTests
     {
         public class WithComplexXmlDoc
         {

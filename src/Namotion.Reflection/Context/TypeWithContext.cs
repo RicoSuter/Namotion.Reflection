@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace Namotion.Reflection
 {
-    public class TypeWithContext
+    public class TypeWithContext : TypeWithoutContext
     {
         public static TypeWithContext ForType(Type type, Attribute[] contextAttributes)
         {
@@ -14,15 +14,16 @@ namespace Namotion.Reflection
         }
 
         internal TypeWithContext(Type type, Attribute[] contextAttributes, TypeWithContext parent, byte[] nullableFlags, ref int nullableFlagsIndex)
+            : base(type, false)
         {
-            OriginalType = type;
-            ContextAttributes = contextAttributes;
-            TypeAttributes = type.GetTypeInfo().GetCustomAttributes(true).OfType<Attribute>().ToArray();
             Parent = parent;
+            ContextAttributes = contextAttributes;
 
             InitializeNullability(nullableFlags, ref nullableFlagsIndex);
             InitializeGenericArguments(type, nullableFlags, ref nullableFlagsIndex);
-            CalculateDerivedProperties();
+            UpdateDerivedProperties();
+
+            Nullability = IsNullableType ? Nullability.Nullable : OriginalNullability;
         }
 
         private void InitializeNullability(byte[] nullableFlags, ref int nullableFlagsIndex)
@@ -64,31 +65,27 @@ namespace Namotion.Reflection
             {
                 genericArguments.Add(new TypeWithContext(genericArgument, ContextAttributes, this, nullableFlags, ref nullableFlagsIndex));
             }
+
             OriginalGenericArguments = genericArguments.ToArray();
-        }
-
-        private void CalculateDerivedProperties()
-        {
-            IsNullableType = OriginalType.Name == "Nullable`1";
-            Nullability = IsNullableType ? Nullability.Nullable : OriginalNullability;
             GenericArguments = IsNullableType ? new TypeWithContext[0] : OriginalGenericArguments;
-            Type = IsNullableType ? OriginalGenericArguments.First().OriginalType : OriginalType;
+
+            base.OriginalGenericArguments = OriginalGenericArguments;
         }
 
         /// <summary>
-        /// Gets the original type (i.e. without unwrapping Nullable{T}).
+        /// Gets the parent type with context.
         /// </summary>
-        public Type OriginalType { get; }
+        public TypeWithContext Parent { get; }
 
         /// <summary>
-        /// Gets the actual unwrapped type (e.g. gets T of Nullable{T} types).
+        /// Gets the original generic type arguments of the type in the given context.
         /// </summary>
-        public Type Type { get; private set; }
+        public new TypeWithContext[] OriginalGenericArguments { get; private set; }
 
         /// <summary>
-        /// Gets a value indicating whether this type is wrapped with Nullable{T}.
+        /// Gets the generic type arguments of the type in the given context (empty when unwrapped from Nullable{T}).
         /// </summary>
-        public bool IsNullableType { get; private set; }
+        public new TypeWithContext[] GenericArguments { get; private set; }
 
         /// <summary>
         /// Gets the original nullability information of this type in the given context (i.e. without unwrapping Nullable{T}).
@@ -106,40 +103,20 @@ namespace Namotion.Reflection
         public Attribute[] ContextAttributes { get; }
 
         /// <summary>
-        /// Gets the type's associated attributes of the type.
+        /// Gets an attribute of the given type which is defined on the context (property, field, parameter or contextual generic argument type).
         /// </summary>
-        public Attribute[] TypeAttributes { get; }
-
-        /// <summary>
-        /// Gets the parent type with context.
-        /// </summary>
-        public TypeWithContext Parent { get; }
-
-        /// <summary>
-        /// Gets the original generic type arguments of the type in the given context.
-        /// </summary>
-        public TypeWithContext[] OriginalGenericArguments { get; private set; }
-
-        /// <summary>
-        /// Gets the generic type arguments of the type in the given context (empty when unwrapped from Nullable{T}).
-        /// </summary>
-        public TypeWithContext[] GenericArguments { get; private set; }
-
-        public T GetTypeAttribute<T>()
-        {
-            return TypeAttributes.OfType<T>().SingleOrDefault();
-        }
-
-        public IEnumerable<T> GetTypeAttributes<T>()
-        {
-            return TypeAttributes.OfType<T>();
-        }
-
+        /// <typeparam name="T">The attribute type.</typeparam>
+        /// <returns>The attribute or null.</returns>
         public T GetContextAttribute<T>()
         {
             return ContextAttributes.OfType<T>().SingleOrDefault();
         }
 
+        /// <summary>
+        /// Gets the attributes of the given type which are defined on the context (property, field, parameter or contextual generic argument type).
+        /// </summary>
+        /// <typeparam name="T">The attribute type.</typeparam>
+        /// <returns>The attributes.</returns>
         public IEnumerable<T> GetContextAttributes<T>()
         {
             return ContextAttributes.OfType<T>();
@@ -147,7 +124,7 @@ namespace Namotion.Reflection
 
         public override string ToString()
         {
-            var result = Type.Name + ": " + Nullability + "\n  " +
+            var result = Type.Name.Split('`').First() + ": " + Nullability + "\n  " +
                 string.Join("\n", GenericArguments.Select(a => a.ToString())).Replace("\n", "\n  ");
 
             return result.Trim();

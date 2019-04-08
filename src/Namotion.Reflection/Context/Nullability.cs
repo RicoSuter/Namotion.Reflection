@@ -3,8 +3,11 @@
     public enum Nullability
     {
         Unknown,
+
         NeverNull,
+
         NotNullable,
+
         Nullable
     }
 }

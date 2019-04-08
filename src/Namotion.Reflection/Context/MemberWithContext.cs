@@ -17,17 +17,17 @@ namespace Namotion.Reflection
         public abstract MemberInfo MemberInfo { get; }
 
         /// <summary>
-        /// 
+        /// Returns the value of a field supported by a given object.
         /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
+        /// <param name="obj">The object.</param>
+        /// <returns>The value.</returns>
         public abstract object GetValue(object obj);
 
         /// <summary>
-        /// 
+        /// Sets the value of the field supported by the given object.
         /// </summary>
-        /// <param name="obj"></param>
-        /// <param name="value"></param>
+        /// <param name="obj">The object.</param>
+        /// <param name="value">The value.</param>
         public abstract void SetValue(object obj, object value);
     }
 }

@@ -31,13 +31,6 @@ namespace Namotion.Reflection
         /// <param name="propertyName">Name of the property.</param>
         /// <param name="defaultValue">Default value if the property does not exist.</param>
         /// <returns><c>true</c> if the property exists; otherwise, <c>false</c>.</returns>
-
-/* Unmerged change from project 'Namotion.Reflection (net40)'
-Before:
-        public static T TryGetPropertyValue<T>(this object obj, string propertyName, T defaultValue = default(T))
-After:
-        public static T TryGetPropertyValue<T>(this object obj, string propertyName, T defaultValue = default)
-*/
         public static T TryGetPropertyValue<T>(this object obj, string propertyName, T defaultValue = default)
         {
             var property = obj?.GetType().GetRuntimeProperty(propertyName);
@@ -121,15 +114,12 @@ After:
         /// <summary>Gets the type of the array item.</summary>
         public static Type GetEnumerableItemType(this Type type)
         {
-            //var jsonSchemaAttribute = type.GetTypeInfo().GetCustomAttribute<JsonSchemaAttribute>();
-            //if (jsonSchemaAttribute?.ArrayItem != null)
-            //    return jsonSchemaAttribute.ArrayItem;
-
             var genericTypeArguments = type.GetGenericTypeArguments();
+
             var itemType = genericTypeArguments.Length == 0 ? type.GetElementType() : genericTypeArguments[0];
             if (itemType == null)
             {
-#if !LEGACY
+#if !NET40
                 foreach (var iface in type.GetTypeInfo().ImplementedInterfaces)
 #else
                 foreach (var iface in type.GetTypeInfo().GetInterfaces())
@@ -152,7 +142,7 @@ After:
         /// <returns>The type arguments.</returns>
         public static Type[] GetGenericTypeArguments(this Type type)
         {
-#if !LEGACY
+#if !NET40
 
             var genericTypeArguments = type.GenericTypeArguments;
             while (type != null && type != typeof(object) && genericTypeArguments.Length == 0)
@@ -177,9 +167,14 @@ After:
 #endif
         }
 
-        internal static string GetSafeTypeName(Type type)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static string GetSafeTypeName(this Type type)
         {
-#if !LEGACY
+#if !NET40
             if (type.IsConstructedGenericType)
                 return type.Name.Split('`').First() + "Of" + string.Join("And", type.GenericTypeArguments.Select(GetSafeTypeName));
 #else
@@ -190,9 +185,9 @@ After:
             return type.Name;
         }
 
-#if LEGACY
+#if NET40
 
-        internal static MethodInfo GetRuntimeMethod(this Type type, string name, Type[] types)
+        public static MethodInfo GetRuntimeMethod(this Type type, string name, Type[] types)
         {
             return type.GetMethod(name, types);
         }
@@ -202,37 +197,37 @@ After:
             return type.GetProperty(name);
         }
 
-        internal static FieldInfo GetDeclaredField(this Type type, string name)
+        public static FieldInfo GetDeclaredField(this Type type, string name)
         {
             return type.GetField(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
         }
 
-        internal static PropertyInfo[] GetRuntimeProperties(this Type type)
+        public static PropertyInfo[] GetRuntimeProperties(this Type type)
         {
             return type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
         }
 
-        internal static Type GetTypeInfo(this Type type)
+        public static Type GetTypeInfo(this Type type)
         {
             return type;
         }
 
-        internal static Attribute[] GetCustomAttributes(this FieldInfo fieldInfo, bool inherit = true)
+        public static Attribute[] GetCustomAttributes(this FieldInfo fieldInfo, bool inherit = true)
         {
             return fieldInfo.GetCustomAttributes(inherit).OfType<Attribute>().ToArray();
         }
 
-        internal static Attribute[] GetCustomAttributes(this Type type, bool inherit = true)
+        public static Attribute[] GetCustomAttributes(this Type type, bool inherit = true)
         {
             return type.GetCustomAttributes(inherit).OfType<Attribute>().ToArray();
         }
 
-        internal static Attribute[] GetCustomAttributes(this PropertyInfo propertyInfo, bool inherit = true)
+        public static Attribute[] GetCustomAttributes(this PropertyInfo propertyInfo, bool inherit = true)
         {
             return propertyInfo.GetCustomAttributes(inherit).OfType<Attribute>().ToArray();
         }
 
-        internal static T[] GetCustomAttributes<T>(this Type type, bool inherit = true)
+        public static T[] GetCustomAttributes<T>(this Type type, bool inherit = true)
             where T : Attribute
         {
             return type.GetCustomAttributes(inherit).OfType<T>().ToArray();
@@ -256,12 +251,12 @@ After:
             return propertyInfo.GetCustomAttributes().OfType<T>().FirstOrDefault();
         }
 
-        internal static object GetValue(this PropertyInfo propertyInfo, object obj)
+        public static object GetValue(this PropertyInfo propertyInfo, object obj)
         {
             return propertyInfo.GetValue(obj, null);
         }
 
-        internal static void SetValue(this PropertyInfo propertyInfo, object obj, object value)
+        public static void SetValue(this PropertyInfo propertyInfo, object obj, object value)
         {
             propertyInfo.SetValue(obj, value, null);
         }

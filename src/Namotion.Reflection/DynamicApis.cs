@@ -16,7 +16,7 @@ using System.Xml.Linq;
 namespace Namotion.Reflection
 {
     /// <summary>Provides dynamic access to framework APIs.</summary>
-    public static class DynamicApis
+    internal static class DynamicApis
     {
         private static readonly Type XPathExtensionsType;
         private static readonly Type FileType;

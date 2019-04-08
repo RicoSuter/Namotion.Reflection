@@ -6,7 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using Namotion.Reflection;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -27,14 +26,12 @@ namespace Namotion.Reflection
         private static readonly AsyncLock Lock = new AsyncLock();
         private static readonly Dictionary<string, XDocument> Cache = new Dictionary<string, XDocument>(StringComparer.OrdinalIgnoreCase);
 
-#if !LEGACY
-
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static Task<string> GetXmlSummaryAsync(this Type type)
         {
-            return type.GetTypeInfo().GetXmlDocumentationTagAsync("summary");
+            return GetXmlDocumentationTagAsync(type.GetTypeInfo(), "summary");
         }
 
         /// <summary>Returns the contents of the "remarks" XML documentation tag for the specified member.</summary>
@@ -42,7 +39,7 @@ namespace Namotion.Reflection
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static Task<string> GetXmlRemarksAsync(this Type type)
         {
-            return type.GetTypeInfo().GetXmlDocumentationTagAsync("remarks");
+            return GetXmlDocumentationTagAsync(type.GetTypeInfo(), "remarks");
         }
 
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
@@ -51,7 +48,7 @@ namespace Namotion.Reflection
         [Obsolete("Use GetXmlSummary instead.")]
         public static Task<string> GetXmlDocumentationAsync(this Type type)
         {
-            return type.GetXmlDocumentationTagAsync("summary");
+            return GetXmlDocumentationTagAsync(type, "summary");
         }
 
         /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
@@ -60,38 +57,15 @@ namespace Namotion.Reflection
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static Task<string> GetXmlDocumentationTagAsync(this Type type, string tagName)
         {
-
-/* Unmerged change from project 'Namotion.Reflection (netstandard2.0)'
-Before:
             return GetXmlDocumentationTagAsync((MemberInfo)type.GetTypeInfo(), tagName);
-After:
-            return ((MemberInfo)type.GetTypeInfo()).GetXmlDocumentationTagAsync(tagName);
-*/
-
-/* Unmerged change from project 'Namotion.Reflection (net40)'
-Before:
-            return GetXmlDocumentationTagAsync((MemberInfo)type.GetTypeInfo(), tagName);
-After:
-            return ((MemberInfo)type.GetTypeInfo()).GetXmlDocumentationTagAsync(tagName);
-*/
-
-/* Unmerged change from project 'Namotion.Reflection (net45)'
-Before:
-            return GetXmlDocumentationTagAsync((MemberInfo)type.GetTypeInfo(), tagName);
-After:
-            return ((MemberInfo)type.GetTypeInfo()).GetXmlDocumentationTagAsync(tagName);
-*/
-            return type.GetTypeInfo().GetXmlDocumentationTagAsync(tagName);
         }
-
-#endif
 
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static async Task<string> GetXmlSummaryAsync(this MemberInfo member)
         {
-            return await member.GetXmlDocumentationTagAsync("summary").ConfigureAwait(false);
+            return await GetXmlDocumentationTagAsync(member, "summary").ConfigureAwait(false);
         }
 
         /// <summary>Returns the contents of the "remarks" XML documentation tag for the specified member.</summary>
@@ -99,59 +73,7 @@ After:
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static async Task<string> GetXmlRemarksAsync(this MemberInfo member)
         {
-            return await member.GetXmlDocumentationTagAsync("remarks").ConfigureAwait(false);
-        }
-
-        /// <summary>Gets the description of the given member (based on the DescriptionAttribute, DisplayAttribute or XML Documentation).</summary>
-        /// <param name="memberInfo">The member info</param>
-        /// <param name="attributes">The attributes.</param>
-        /// <returns>The description or null if no description is available.</returns>
-        public static async Task<string> GetDescriptionAsync(this MemberInfo memberInfo, IEnumerable<Attribute> attributes)
-        {
-            dynamic descriptionAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.DescriptionAttribute");
-            if (descriptionAttribute != null && !string.IsNullOrEmpty(descriptionAttribute.Description))
-                return descriptionAttribute.Description;
-            else
-            {
-                dynamic displayAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.DataAnnotations.DisplayAttribute");
-                if (displayAttribute != null && !string.IsNullOrEmpty(displayAttribute.Description))
-                    return displayAttribute.Description;
-
-                if (memberInfo != null)
-                {
-                    var summary = await memberInfo.GetXmlSummaryAsync().ConfigureAwait(false);
-                    if (summary != string.Empty)
-                        return summary;
-                }
-            }
-
-            return null;
-        }
-
-        /// <summary>Gets the description of the given member (based on the DescriptionAttribute, DisplayAttribute or XML Documentation).</summary>
-        /// <param name="parameter">The parameter.</param>
-        /// <param name="attributes">The attributes.</param>
-        /// <returns>The description or null if no description is available.</returns>
-        public static async Task<string> GetDescriptionAsync(this ParameterInfo parameter, IEnumerable<Attribute> attributes)
-        {
-            dynamic descriptionAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.DescriptionAttribute");
-            if (descriptionAttribute != null && !string.IsNullOrEmpty(descriptionAttribute.Description))
-                return descriptionAttribute.Description;
-            else
-            {
-                dynamic displayAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.DataAnnotations.DisplayAttribute");
-                if (displayAttribute != null && !string.IsNullOrEmpty(displayAttribute.Description))
-                    return displayAttribute.Description;
-
-                if (parameter != null)
-                {
-                    var summary = await parameter.GetXmlDocumentationAsync().ConfigureAwait(false);
-                    if (summary != string.Empty)
-                        return summary;
-                }
-            }
-
-            return null;
+            return await GetXmlDocumentationTagAsync(member, "remarks").ConfigureAwait(false);
         }
 
         /// <summary>Converts the given XML documentation <see cref="XElement"/> to text.</summary>
@@ -196,10 +118,10 @@ After:
                         value.Append(node);
                 }
 
-                return value.ToString();
+                return RemoveLineBreakWhiteSpaces(value.ToString());
             }
 
-            return null;
+            return string.Empty;
         }
 
         /// <summary>Clears the cache.</summary>
@@ -229,8 +151,8 @@ After:
                     return string.Empty;
 
                 var documentationPath = await GetXmlDocumentationPathAsync(member.Module.Assembly).ConfigureAwait(false);
-                var element = await member.GetXmlDocumentationWithoutLockAsync(documentationPath).ConfigureAwait(false);
-                return RemoveLineBreakWhiteSpaces((element?.Element(tagName)).GetXmlDocumentationText().GetXmlDocumentationText());
+                var element = await GetXmlDocumentationWithoutLockAsync(member, documentationPath).ConfigureAwait(false);
+                return GetXmlDocumentationText(element?.Element(tagName));
             }
         }
 
@@ -249,8 +171,8 @@ After:
                     return string.Empty;
 
                 var documentationPath = await GetXmlDocumentationPathAsync(parameter.Member.Module.Assembly).ConfigureAwait(false);
-                var element = await parameter.GetXmlDocumentationWithoutLockAsync(documentationPath).ConfigureAwait(false);
-                return RemoveLineBreakWhiteSpaces(element.GetXmlDocumentationText());
+                var element = await GetXmlDocumentationWithoutLockAsync(parameter, documentationPath).ConfigureAwait(false);
+                return GetXmlDocumentationText(element);
             }
         }
 
@@ -280,7 +202,7 @@ After:
                 var assemblyName = parameter.Member.Module.Assembly.GetName();
                 using (Lock.Lock())
                 {
-                    return await parameter.GetXmlDocumentationWithoutLockAsync(pathToXmlFile).ConfigureAwait(false);
+                    return await GetXmlDocumentationWithoutLockAsync(parameter, pathToXmlFile).ConfigureAwait(false);
                 }
             }
             catch
@@ -296,7 +218,7 @@ After:
         {
             using (Lock.Lock())
             {
-                return await member.GetXmlDocumentationWithoutLockAsync().ConfigureAwait(false);
+                return await GetXmlDocumentationWithoutLockAsync(member).ConfigureAwait(false);
             }
         }
 
@@ -308,7 +230,7 @@ After:
         {
             using (Lock.Lock())
             {
-                return await member.GetXmlDocumentationWithoutLockAsync(pathToXmlFile).ConfigureAwait(false);
+                return await GetXmlDocumentationWithoutLockAsync(member, pathToXmlFile).ConfigureAwait(false);
             }
         }
 
@@ -324,7 +246,7 @@ After:
                 if (document == null)
                     return null;
 
-                return await parameter.GetXmlDocumentationAsync(document).ConfigureAwait(false);
+                return await GetXmlDocumentationAsync(parameter, document).ConfigureAwait(false);
             }
             catch
             {
@@ -342,7 +264,7 @@ After:
                 return null;
 
             var documentationPath = await GetXmlDocumentationPathAsync(member.Module.Assembly).ConfigureAwait(false);
-            return await member.GetXmlDocumentationWithoutLockAsync(documentationPath).ConfigureAwait(false);
+            return await GetXmlDocumentationWithoutLockAsync(member, documentationPath).ConfigureAwait(false);
         }
 
         private static async Task<XElement> GetXmlDocumentationWithoutLockAsync(this MemberInfo member, string pathToXmlFile)
@@ -357,8 +279,8 @@ After:
                 if (document == null)
                     return null;
 
-                var element = member.GetXmlDocumentation(document);
-                await member.ReplaceInheritdocElementsAsync(element).ConfigureAwait(false);
+                var element = GetXmlDocumentation(member, document);
+                await ReplaceInheritdocElementsAsync(member, element).ConfigureAwait(false);
                 return element;
             }
             catch
@@ -406,7 +328,7 @@ After:
             var element = result.OfType<XElement>().FirstOrDefault();
             if (element != null)
             {
-                await parameter.Member.ReplaceInheritdocElementsAsync(element).ConfigureAwait(false);
+                await ReplaceInheritdocElementsAsync(parameter.Member, element).ConfigureAwait(false);
 
                 if (parameter.IsRetval || string.IsNullOrEmpty(parameter.Name))
                     result = (IEnumerable)DynamicApis.XPathEvaluate(xml, $"/doc/members/member[@name='{name}']/returns");
@@ -421,7 +343,7 @@ After:
 
         private static async Task ReplaceInheritdocElementsAsync(this MemberInfo member, XElement element)
         {
-#if !LEGACY
+#if !NET40
             if (element == null)
                 return;
 
@@ -442,19 +364,17 @@ After:
                         }
                         else
                         {
-                            await member.ProcessInheritdocInterfaceElementsAsync(child).ConfigureAwait(false);
+                            await ProcessInheritdocInterfaceElementsAsync(member, child).ConfigureAwait(false);
                         }
                     }
                     else
                     {
-                        await member.ProcessInheritdocInterfaceElementsAsync(child).ConfigureAwait(false);
+                        await ProcessInheritdocInterfaceElementsAsync(member, child).ConfigureAwait(false);
                     }
                 }
             }
-#endif
         }
 
-#if !LEGACY
         private static async Task ProcessInheritdocInterfaceElementsAsync(this MemberInfo member, XElement child)
         {
             foreach (var baseInterface in member.DeclaringType.GetTypeInfo().ImplementedInterfaces)
@@ -470,8 +390,8 @@ After:
                     }
                 }
             }
-        }
 #endif
+        }
 
         private static string RemoveLineBreakWhiteSpaces(string documentation)
         {
@@ -538,6 +458,7 @@ After:
                 default:
                     throw new ArgumentException("Unknown member type.", "member");
             }
+
             return string.Format("{0}:{1}", prefixCode, memberName.Replace("+", "."));
         }
 

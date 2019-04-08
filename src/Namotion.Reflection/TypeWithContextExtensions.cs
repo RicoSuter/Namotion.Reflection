@@ -10,6 +10,11 @@ namespace Namotion.Reflection
         private static object _lock = new object();
         private static Dictionary<string, object> _cache = new Dictionary<string, object>();
 
+        public static IEnumerable<MemberWithContext> GetPropertiesAndFieldsWithContext(this Type type)
+        {
+            return type.GetRuntimePropertiesWithContext().OfType<MemberWithContext>().Union(type.GetRuntimeFieldsWithContext());
+        }
+
         /// <summary>
         /// Gets an array of <see cref="PropertyWithContext"/> for the given <see cref="Type"/> instance.
         /// </summary>
@@ -115,6 +120,26 @@ namespace Namotion.Reflection
                 }
 
                 return (FieldWithContext)_cache[key];
+            }
+        }
+
+        /// <summary>
+        /// Gets a <see cref="FieldWithContext"/> for the given <see cref="FieldInfo"/> instance.
+        /// </summary>
+        /// <param name="memberInfo">The member info.</param>
+        /// <returns>The <see cref="FieldWithContext"/>.</returns>
+        public static TypeWithContext GetTypeWithContext(this Type type)
+        {
+            var key = "Type:" + type.FullName;
+            lock (_lock)
+            {
+                if (!_cache.ContainsKey(key))
+                {
+                    var index = 0;
+                    _cache[key] = new TypeWithContext(type, type.GetTypeInfo().GetCustomAttributes(true).OfType<Attribute>().ToArray(), null, null, ref index);
+                }
+
+                return (TypeWithContext)_cache[key];
             }
         }
 

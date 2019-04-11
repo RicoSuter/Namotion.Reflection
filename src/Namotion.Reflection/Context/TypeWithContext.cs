@@ -7,6 +7,22 @@ namespace Namotion.Reflection
 {
     public class TypeWithContext : TypeWithoutContext
     {
+        /// <summary>
+        /// Creates a <see cref="TypeWithContext"/> with an empty context for the given type.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns>The <see cref="TypeWithContext"/>.</returns>
+        public static TypeWithContext ForType(Type type)
+        {
+            return ForType(type, new Attribute[0]);
+        }
+
+        /// <summary>
+        /// Creates a <see cref="TypeWithContext"/> the given type.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <param name="contextAttributes">The contextual attributes.</param>
+        /// <returns>The <see cref="TypeWithContext"/>.</returns>
         public static TypeWithContext ForType(Type type, Attribute[] contextAttributes)
         {
             var index = 0;

@@ -150,6 +150,37 @@ namespace Namotion.Reflection
         }
 
         /// <summary>
+        /// Gets a <see cref="TypeWithoutContext"/> for the given <see cref="Type"/> instance and attributes (uncached).
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <param name="attributes">The attributes.</param>
+        /// <returns>The <see cref="TypeWithoutContext"/>.</returns>
+        public static TypeWithContext GetTypeWithContext(this Type type, Attribute[] attributes)
+        {
+            // TODO: Cache this?
+            return TypeWithContext.ForType(type, attributes);
+        }
+
+        /// <summary>
+        /// Gets a <see cref="TypeWithoutContext"/> for the given <see cref="Type"/> instance.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns>The <see cref="TypeWithoutContext"/>.</returns>
+        public static TypeWithContext GetTypeWithContext(this Type type)
+        {
+            var key = "Type:Context:" + type.FullName;
+            lock (Lock)
+            {
+                if (!Cache.ContainsKey(key))
+                {
+                    Cache[key] = TypeWithContext.ForType(type, new Attribute[0]);
+                }
+
+                return (TypeWithContext)Cache[key];
+            }
+        }
+
+        /// <summary>
         /// Gets a <see cref="TypeWithoutContext"/> for the given <see cref="Type"/> instance.
         /// </summary>
         /// <param name="memberInfo">The type.</param>

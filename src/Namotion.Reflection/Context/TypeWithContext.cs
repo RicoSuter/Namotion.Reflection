@@ -138,6 +138,26 @@ namespace Namotion.Reflection
             return ContextAttributes.OfType<T>();
         }
 
+        /// <summary>
+        /// Gets an attribute of the given type which is defined on the context or on the type.
+        /// </summary>
+        /// <typeparam name="T">The attribute type.</typeparam>
+        /// <returns>The attribute or null.</returns>
+        public T GetAttribute<T>()
+        {
+            return ContextAttributes.OfType<T>().Concat(TypeAttributes.OfType<T>()).FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Gets the attributes of the given type which are defined on the context or on the type.
+        /// </summary>
+        /// <typeparam name="T">The attribute type.</typeparam>
+        /// <returns>The attributes.</returns>
+        public IEnumerable<T> GetAttributes<T>()
+        {
+            return ContextAttributes.OfType<T>().Concat(TypeAttributes.OfType<T>());
+        }
+
         public override string ToString()
         {
             var result = Type.Name.Split('`').First() + ": " + Nullability + "\n  " +

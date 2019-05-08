@@ -1,52 +1,25 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace Namotion.Reflection
 {
     public class TypeWithoutContext
     {
-        internal TypeWithoutContext(Type type)
-            : this(type, true)
-        {
-        }
+        private bool isNullableType;
+        private Type type;
 
-        protected TypeWithoutContext(Type type, bool loadGenericArguments)
+        protected object genericArguments;
+        protected object originalGenericArguments;
+
+        private Attribute[] typeAttributes;
+
+        internal TypeWithoutContext(Type type)
         {
             OriginalType = type;
-            TypeAttributes = type.GetTypeInfo().GetCustomAttributes(true).OfType<Attribute>().ToArray();
-
-            if (loadGenericArguments)
-            {
-                InitializeGenericArguments(type);
-                UpdateDerivedProperties();
-            }
-        }
-
-        private void InitializeGenericArguments(Type type)
-        {
-            var genericArguments = new List<TypeWithoutContext>();
-#if NET40
-            foreach (var genericArgument in type.GetGenericArguments())
-#else
-            foreach (var genericArgument in type.GenericTypeArguments)
-#endif
-            {
-                genericArguments.Add(genericArgument.GetTypeWithoutContext());
-            }
-
-            OriginalGenericArguments = genericArguments.ToArray();
-        }
-
-        /// <summary>
-        /// Updates the derived properties.
-        /// </summary>
-        protected void UpdateDerivedProperties()
-        {
-            IsNullableType = OriginalType.Name == "Nullable`1";
-            GenericArguments = IsNullableType ? new TypeWithoutContext[0] : OriginalGenericArguments;
-            Type = IsNullableType ? OriginalGenericArguments.First().OriginalType : OriginalType;
         }
 
         /// <summary>
@@ -55,29 +28,78 @@ namespace Namotion.Reflection
         public Type OriginalType { get; }
 
         /// <summary>
+        /// Gets the type's associated attributes of the type.
+        /// </summary>
+        public Attribute[] TypeAttributes
+        {
+            get
+            {
+                if (typeAttributes != null)
+                {
+                    return typeAttributes;
+                }
+
+                UpdateOriginalGenericArguments();
+                lock (this)
+                {
+                    if (typeAttributes == null)
+                    {
+                        // TODO: rename to inherited type attributes and add type attributes property
+                        typeAttributes = type.GetTypeInfo().GetCustomAttributes(true).OfType<Attribute>().ToArray();
+                    }
+
+                    return typeAttributes;
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets the actual unwrapped type (e.g. gets T of a Nullable{T} type).
         /// </summary>
-        public Type Type { get; private set; }
+        public Type Type
+        {
+            get
+            {
+                UpdateOriginalGenericArguments();
+                return type;
+            }
+        }
 
         /// <summary>
         /// Gets a value indicating whether this type is wrapped with Nullable{T}.
         /// </summary>
-        public bool IsNullableType { get; private set; }
-
-        /// <summary>
-        /// Gets the type's associated attributes of the type.
-        /// </summary>
-        public Attribute[] TypeAttributes { get; }
+        public bool IsNullableType
+        {
+            get
+            {
+                UpdateOriginalGenericArguments();
+                return isNullableType;
+            }
+        }
 
         /// <summary>
         /// Gets the type's generic arguments (Nullable{T} is unwrapped).
         /// </summary>
-        public TypeWithoutContext[] GenericArguments { get; protected set; }
+        public TypeWithoutContext[] GenericArguments
+        {
+            get
+            {
+                UpdateOriginalGenericArguments();
+                return (TypeWithoutContext[])genericArguments;
+            }
+        }
 
         /// <summary>
         /// Gets the type's original generic arguments (Nullable{T} is not unwrapped).
         /// </summary>
-        public TypeWithoutContext[] OriginalGenericArguments { get; protected set; }
+        public TypeWithoutContext[] OriginalGenericArguments
+        {
+            get
+            {
+                UpdateOriginalGenericArguments();
+                return (TypeWithoutContext[])originalGenericArguments;
+            }
+        }
 
         /// <summary>
         /// Gets an attribute of the given type which is defined on the type.
@@ -105,6 +127,50 @@ namespace Namotion.Reflection
                 string.Join("\n", GenericArguments.Select(a => a.ToString())).Replace("\n", "\n  ");
 
             return result.Trim();
+        }
+
+        protected virtual TypeWithoutContext GetTypeInformation(Type type, ref int nullableFlagsIndex)
+        {
+            return type.GetTypeWithoutContext();
+        }
+
+#if !NET40
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        protected void UpdateOriginalGenericArguments()
+        {
+            var nullableFlagsIndex = 0;
+            UpdateOriginalGenericArguments(ref nullableFlagsIndex);
+        }
+
+#if !NET40
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        protected void UpdateOriginalGenericArguments(ref int nullableFlagsIndex)
+        {
+            if (originalGenericArguments == null)
+            {
+                lock (this)
+                {
+                    if (originalGenericArguments == null)
+                    {
+                        var arguments = new List<TypeWithoutContext>();
+#if NET40
+                        foreach (var type in OriginalType.GetGenericArguments())
+#else
+                        foreach (var type in OriginalType.GenericTypeArguments)
+#endif
+                        {
+                            arguments.Add(GetTypeInformation(type, ref nullableFlagsIndex));
+                        }
+
+                        originalGenericArguments = arguments.ToArray();
+                        isNullableType = OriginalType.Name == "Nullable`1";
+                        genericArguments = isNullableType ? new TypeWithoutContext[0] : originalGenericArguments;
+                        type = isNullableType ? ((IEnumerable)originalGenericArguments).Cast<TypeWithoutContext>().First().OriginalType : OriginalType;
+                    }
+                }
+            }
         }
     }
 }

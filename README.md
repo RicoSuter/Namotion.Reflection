@@ -15,9 +15,9 @@ Given the following test class with some C# 8 nullability annotations (?):
 ```csharp
 #nullable enable
 
-public class TestClass
+public class MyClass
 {
-    public void Process(Dictionary<string, string?> dictionary)
+    public void MyMethod(Dictionary<string, string?> dictionary)
     {
     }
 }
@@ -26,7 +26,7 @@ public class TestClass
 To reflect on the first parameter's nullability, we can load a `TypeWithContext` instance and display the nullability of the parameter's types:
 
 ```csharp
-var method = typeof(TestClass).GetMethod(nameof(TestClass.Process));
+var method = typeof(MyClass).GetMethod(nameof(MyClass.MyMethod));
 var parameter = method.GetParameters().First();
 var parameterTypeWithContext = parameter.GetTypeWithContext();
 

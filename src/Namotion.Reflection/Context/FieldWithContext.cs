@@ -4,6 +4,8 @@ namespace Namotion.Reflection
 {
     public class FieldWithContext : MemberWithContext
     {
+        private string _name;
+
         internal FieldWithContext(FieldInfo fieldInfo, ref int nullableFlagsIndex)
             : base(fieldInfo, fieldInfo.FieldType, ref nullableFlagsIndex)
         {
@@ -19,6 +21,11 @@ namespace Namotion.Reflection
         /// Gets the type context's member info.
         /// </summary>
         public override MemberInfo MemberInfo => FieldInfo;
+
+        /// <summary>
+        /// Gets the cached field name.
+        /// </summary>
+        public override string Name => _name ?? (_name = FieldInfo.Name);
 
         /// <summary>
         /// Returns the value of a field supported by a given object.

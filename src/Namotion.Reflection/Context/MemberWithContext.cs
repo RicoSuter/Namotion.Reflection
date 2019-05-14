@@ -17,6 +17,11 @@ namespace Namotion.Reflection
         public abstract MemberInfo MemberInfo { get; }
 
         /// <summary>
+        /// Gets the name of the cached member name (property or parameter name).
+        /// </summary>
+        public abstract string Name { get; }
+
+        /// <summary>
         /// Returns the value of a field supported by a given object.
         /// </summary>
         /// <param name="obj">The object.</param>

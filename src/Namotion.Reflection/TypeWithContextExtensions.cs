@@ -30,20 +30,24 @@ namespace Namotion.Reflection
         public static PropertyWithContext[] GetRuntimePropertiesWithContext(this Type type)
         {
             var key = "Properties:" + type.FullName;
-            lock (Lock)
-            {
-                if (!Cache.ContainsKey(key))
-                {
-#if NET40
-                    Cache[key] = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
-#else
-                    Cache[key] = type.GetRuntimeProperties()
-#endif
-                        .Select(p => p.GetPropertyWithContext()).ToArray();
-                }
 
-                return (PropertyWithContext[])Cache[key];
+            if (!Cache.ContainsKey(key))
+            {
+                lock (Lock)
+                {
+                    if (!Cache.ContainsKey(key))
+                    {
+#if NET40
+                        Cache[key] = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
+#else
+                        Cache[key] = type.GetRuntimeProperties()
+#endif
+                            .Select(p => p.GetPropertyWithContext()).ToArray();
+                    }
+                }
             }
+
+            return (PropertyWithContext[])Cache[key];
         }
 
         /// <summary>
@@ -54,20 +58,23 @@ namespace Namotion.Reflection
         public static FieldWithContext[] GetRuntimeFieldsWithContext(this Type type)
         {
             var key = "Fields:" + type.FullName;
-            lock (Lock)
+            if (!Cache.ContainsKey(key))
             {
-                if (!Cache.ContainsKey(key))
+                lock (Lock)
                 {
+                    if (!Cache.ContainsKey(key))
+                    {
 #if NET40
-                    Cache[key] = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
+                        Cache[key] = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
 #else
-                    Cache[key] = type.GetRuntimeFields()
+                        Cache[key] = type.GetRuntimeFields()
 #endif
-                        .Select(p => p.GetFieldWithContext()).ToArray();
+                            .Select(p => p.GetFieldWithContext()).ToArray();
+                    }
                 }
-
-                return (FieldWithContext[])Cache[key];
             }
+
+            return (FieldWithContext[])Cache[key];
         }
 
         /// <summary>
@@ -78,36 +85,45 @@ namespace Namotion.Reflection
         public static ParameterWithContext GetParameterWithContext(this ParameterInfo parameterInfo)
         {
             var key = "Parameter:" + parameterInfo.Name + ":" + parameterInfo.Member.DeclaringType.FullName;
-            lock (Lock)
+            if (!Cache.ContainsKey(key))
             {
-                if (!Cache.ContainsKey(key))
+                lock (Lock)
                 {
-                    var index = 0;
-                    Cache[key] = new ParameterWithContext(parameterInfo, ref index);
-                }
+                    if (!Cache.ContainsKey(key))
+                    {
+                        var index = 0;
+                        Cache[key] = new ParameterWithContext(parameterInfo, ref index);
+                    }
 
-                return (ParameterWithContext)Cache[key];
+                }
             }
+
+            return (ParameterWithContext)Cache[key];
         }
 
         /// <summary>
         /// Gets a <see cref="PropertyWithContext"/> for the given <see cref="PropertyInfo"/> instance.
         /// </summary>
-        /// <param name="memberInfo">The member info.</param>
+        /// <param name="propertyInfo">The property info.</param>
         /// <returns>The <see cref="PropertyWithContext"/>.</returns>
         public static PropertyWithContext GetPropertyWithContext(this PropertyInfo propertyInfo)
         {
             var key = "Property:" + propertyInfo.Name + ":" + propertyInfo.DeclaringType.FullName;
-            lock (Lock)
+            if (!Cache.ContainsKey(key))
             {
-                if (!Cache.ContainsKey(key))
+                lock (Lock)
                 {
-                    var index = 0;
-                    Cache[key] = new PropertyWithContext(propertyInfo, ref index);
-                }
+                    if (!Cache.ContainsKey(key))
+                    {
+                        var index = 0;
+                        Cache[key] = new PropertyWithContext(propertyInfo, ref index);
+                    }
 
-                return (PropertyWithContext)Cache[key];
+                    return (PropertyWithContext)Cache[key];
+                }
             }
+
+            return (PropertyWithContext)Cache[key];
         }
 
         /// <summary>
@@ -118,16 +134,19 @@ namespace Namotion.Reflection
         public static FieldWithContext GetFieldWithContext(this FieldInfo fieldInfo)
         {
             var key = "Field:" + fieldInfo.Name + ":" + fieldInfo.DeclaringType.FullName;
-            lock (Lock)
+            if (!Cache.ContainsKey(key))
             {
-                if (!Cache.ContainsKey(key))
+                lock (Lock)
                 {
-                    var index = 0;
-                    Cache[key] = new FieldWithContext(fieldInfo, ref index);
+                    if (!Cache.ContainsKey(key))
+                    {
+                        var index = 0;
+                        Cache[key] = new FieldWithContext(fieldInfo, ref index);
+                    }
                 }
-
-                return (FieldWithContext)Cache[key];
             }
+
+            return (FieldWithContext)Cache[key];
         }
 
         /// <summary>
@@ -183,20 +202,23 @@ namespace Namotion.Reflection
         /// <summary>
         /// Gets a <see cref="TypeWithoutContext"/> for the given <see cref="Type"/> instance.
         /// </summary>
-        /// <param name="memberInfo">The type.</param>
+        /// <param name="type">The type.</param>
         /// <returns>The <see cref="TypeWithoutContext"/>.</returns>
         public static TypeWithoutContext GetTypeWithoutContext(this Type type)
         {
             var key = "Type:" + type.FullName;
-            lock (Lock)
+            if (!Cache.ContainsKey(key))
             {
-                if (!Cache.ContainsKey(key))
+                lock (Lock)
                 {
-                    Cache[key] = new TypeWithoutContext(type);
+                    if (!Cache.ContainsKey(key))
+                    {
+                        Cache[key] = new TypeWithoutContext(type);
+                    }
                 }
-
-                return (TypeWithoutContext)Cache[key];
             }
+
+            return (TypeWithoutContext)Cache[key];
         }
     }
 }

@@ -4,6 +4,8 @@ namespace Namotion.Reflection
 {
     public class PropertyWithContext : MemberWithContext
     {
+        private string _name;
+
         internal PropertyWithContext(PropertyInfo propertyInfo, ref int nullableFlagsIndex)
             : base(propertyInfo, propertyInfo.PropertyType, ref nullableFlagsIndex)
         {
@@ -14,6 +16,11 @@ namespace Namotion.Reflection
         /// Gets the type context's property info.
         /// </summary>
         public PropertyInfo PropertyInfo { get; }
+
+        /// <summary>
+        /// Gets the cached field name.
+        /// </summary>
+        public override string Name => _name ?? (_name = PropertyInfo.Name);
 
         /// <summary>
         /// Gets the type context's member info.

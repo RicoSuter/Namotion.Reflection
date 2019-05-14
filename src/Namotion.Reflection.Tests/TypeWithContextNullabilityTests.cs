@@ -1,3 +1,4 @@
+using Namotion.Reflection.Tests.FullAssembly;
 using System;
 using System.Linq;
 using Xunit;
@@ -36,6 +37,20 @@ namespace Namotion.Reflection.Tests
 
             Assert.Equal(Nullability.NotNullable, typeWithContext.GenericArguments[3].Nullability);
             Assert.Equal(Nullability.Nullable, typeWithContext.GenericArguments[4].Nullability);
+        }
+
+        [Fact]
+        public void WhenMethodParametersNullabilityIsReflectedOnAssemblyWithProjectNRT_ThenItWorks()
+        {
+            // Arrange
+            var method = typeof(FullAssemblyTestAction).GetMethod(nameof(FullAssemblyTestAction.Action));
+            var parameter = method.GetParameters().First();
+
+            // Act
+            var typeWithContext = parameter.GetParameterWithContext();
+
+            // Assert
+            Assert.Equal(Nullability.NotNullable, typeWithContext.Nullability);
         }
 
         class TestFunction

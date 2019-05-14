@@ -25,7 +25,10 @@ namespace Namotion.Reflection
             _nullableFlags = nullableFlags;
 
             InitializeNullableFlagsAndOriginalNullability(ref nullableFlagsIndex);
-            UpdateOriginalGenericArguments(ref nullableFlagsIndex);
+            if (_nullableFlags != null)
+            {
+                UpdateOriginalGenericArguments(ref nullableFlagsIndex);
+            }
         }
 
         /// <summary>

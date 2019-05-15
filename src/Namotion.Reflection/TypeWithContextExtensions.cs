@@ -80,7 +80,7 @@ namespace Namotion.Reflection
         /// <summary>
         /// Gets a <see cref="ParameterWithContext"/> for the given <see cref="ParameterInfo"/> instance.
         /// </summary>
-        /// <param name="memberInfo">The member info.</param>
+        /// <param name="parameterInfo">The parameter info.</param>
         /// <returns>The <see cref="ParameterWithContext"/>.</returns>
         public static ParameterWithContext GetParameterWithContext(this ParameterInfo parameterInfo)
         {
@@ -129,7 +129,7 @@ namespace Namotion.Reflection
         /// <summary>
         /// Gets a <see cref="FieldWithContext"/> for the given <see cref="FieldInfo"/> instance.
         /// </summary>
-        /// <param name="memberInfo">The member info.</param>
+        /// <param name="fieldInfo">The field info.</param>
         /// <returns>The <see cref="FieldWithContext"/>.</returns>
         public static FieldWithContext GetFieldWithContext(this FieldInfo fieldInfo)
         {

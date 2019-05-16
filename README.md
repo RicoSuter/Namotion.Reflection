@@ -28,11 +28,11 @@ To reflect on the first parameter's nullability, we can load a `ContextualType` 
 ```csharp
 var method = typeof(MyClass).GetMethod(nameof(MyClass.MyMethod));
 var parameter = method.GetParameters().First();
-var parameterTypeWithContext = parameter.ToContextualParameter();
+var contextualParameter = parameter.ToContextualParameter();
 
-Console.WriteLine("Dictionary: " + parameterTypeWithContext.Nullability);
-Console.WriteLine("Key: " + parameterTypeWithContext.GenericArguments[0].Nullability);
-Console.WriteLine("Value: " + parameterTypeWithContext.GenericArguments[1].Nullability);
+Console.WriteLine("Dictionary: " + contextualParameter.Nullability);
+Console.WriteLine("Key: " + contextualParameter.GenericArguments[0].Nullability);
+Console.WriteLine("Value: " + contextualParameter.GenericArguments[1].Nullability);
 ```
 
 The output is: 

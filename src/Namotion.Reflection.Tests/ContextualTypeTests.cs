@@ -7,7 +7,7 @@ using Xunit;
 
 namespace Namotion.Reflection.Tests
 {
-    public class TypeWithContextNullabilityTests
+    public class ContextualTypeTests
     {
         class TestAction
         {
@@ -24,7 +24,7 @@ namespace Namotion.Reflection.Tests
             var parameter = method.GetParameters().First();
 
             // Act
-            var typeWithContext = parameter.GetParameterWithContext();
+            var typeWithContext = parameter.ToContextualParameter();
 
             // Assert
             Assert.Equal(Nullability.NotNullable, typeWithContext.Nullability);
@@ -47,7 +47,7 @@ namespace Namotion.Reflection.Tests
             var parameter = method.GetParameters().First();
 
             // Act
-            var typeWithContext = parameter.GetParameterWithContext();
+            var typeWithContext = parameter.ToContextualParameter();
 
             // Assert
             Assert.Equal(Nullability.NotNullable, typeWithContext.Nullability);
@@ -69,7 +69,7 @@ namespace Namotion.Reflection.Tests
             var parameter = method.ReturnParameter;
 
             // Act
-            var typeWithContext = parameter.GetParameterWithContext();
+            var typeWithContext = parameter.ToContextualParameter();
 
             // Assert
             Assert.Equal(Nullability.NotNullable, typeWithContext.Nullability);
@@ -89,7 +89,7 @@ namespace Namotion.Reflection.Tests
             var property = typeof(TestProperty).GetProperty(nameof(TestProperty.Property));
 
             // Act
-            var typeWithContext = property.GetPropertyWithContext();
+            var typeWithContext = property.ToContextualProperty();
 
             // Assert
             Assert.Equal(Nullability.NotNullable, typeWithContext.Nullability);

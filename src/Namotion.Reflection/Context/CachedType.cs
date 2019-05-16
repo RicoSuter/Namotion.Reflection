@@ -147,7 +147,7 @@ namespace Namotion.Reflection
         /// <returns>The cached type.</returns>
         protected virtual CachedType GetCachedType(Type type, ref int nullableFlagsIndex)
         {
-            return type.GetCachedType();
+            return type.ToCachedType();
         }
 
         /// <summary>

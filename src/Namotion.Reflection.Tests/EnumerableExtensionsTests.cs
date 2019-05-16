@@ -30,7 +30,7 @@ namespace Namotion.Reflection.Tests
         public void When_two_classes_inherit_common_base_class_then_it_is_the_common_base_type()
         {
             //// Act
-            var commonBaseType = new[] { typeof(Dog), typeof(Horse) }.FindCommonBaseType();
+            var commonBaseType = new[] { typeof(Dog), typeof(Horse) }.GetCommonBaseType();
 
             //// Assert
             Assert.Equal(typeof(Animal), commonBaseType);
@@ -40,7 +40,7 @@ namespace Namotion.Reflection.Tests
         public void When_one_class_is_base_class_then_it_is_the_common_base_class()
         {
             //// Act
-            var commonBaseType = new[] { typeof(Animal), typeof(Horse) }.FindCommonBaseType();
+            var commonBaseType = new[] { typeof(Animal), typeof(Horse) }.GetCommonBaseType();
 
             //// Assert
             Assert.Equal(typeof(Animal), commonBaseType);
@@ -50,7 +50,7 @@ namespace Namotion.Reflection.Tests
         public void When_no_common_base_class_exists_then_object_is_common_base_class()
         {
             //// Act
-            var commonBaseType = new[] { typeof(Animal), typeof(Horse), typeof(EnumerableExtensionsTests) }.FindCommonBaseType();
+            var commonBaseType = new[] { typeof(Animal), typeof(Horse), typeof(EnumerableExtensionsTests) }.GetCommonBaseType();
 
             //// Assert
             Assert.Equal(typeof(object), commonBaseType);

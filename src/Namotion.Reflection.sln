@@ -7,7 +7,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Namotion.Reflection", "Namo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Namotion.Reflection.Tests", "Namotion.Reflection.Tests\Namotion.Reflection.Tests.csproj", "{AFC02943-A167-4DFD-A747-93658C80296B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Namotion.Reflection.Tests.FullAssembly", "Namotion.Reflection.Tests.FullAssembly\Namotion.Reflection.Tests.FullAssembly.csproj", "{7D57D49F-608A-4FE8-B13D-4F78322D4F42}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Namotion.Reflection.Tests.FullAssembly", "Namotion.Reflection.Tests.FullAssembly\Namotion.Reflection.Tests.FullAssembly.csproj", "{7D57D49F-608A-4FE8-B13D-4F78322D4F42}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F50FE573-405B-46A4-B8BE-3224547FF5AF}"
+	ProjectSection(SolutionItems) = preProject
+		..\README.md = ..\README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

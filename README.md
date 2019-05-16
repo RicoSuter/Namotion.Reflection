@@ -8,7 +8,7 @@ TODO: The idea is to move all reflection APIs from my other libraries (mainly NJ
 
 ### C# 8 nullability reflection
 
-With the `TypeWithContext` class you can reflect on the nullability of properties, fields, method parameters and return types which will be available when compiling with the C# 8 compiler with the Nullable Reference Types feature enabled. 
+With the `ContextualType` class you can reflect on the nullability of properties, fields, method parameters and return types which will be available when compiling with the C# 8 compiler with the Nullable Reference Types feature enabled. 
 
 Given the following test class with some C# 8 nullability annotations (?):
 
@@ -23,12 +23,12 @@ public class MyClass
 }
 ```
 
-To reflect on the first parameter's nullability, we can load a `TypeWithContext` instance and display the nullability of the parameter's types:
+To reflect on the first parameter's nullability, we can load a `ContextualType` instance and display the nullability of the parameter's types:
 
 ```csharp
 var method = typeof(MyClass).GetMethod(nameof(MyClass.MyMethod));
 var parameter = method.GetParameters().First();
-var parameterTypeWithContext = parameter.GetTypeWithContext();
+var parameterTypeWithContext = parameter.ToContextualParameter();
 
 Console.WriteLine("Dictionary: " + parameterTypeWithContext.Nullability);
 Console.WriteLine("Key: " + parameterTypeWithContext.GenericArguments[0].Nullability);

@@ -13,8 +13,23 @@ using System.Reflection;
 
 namespace Namotion.Reflection
 {
-    public static class EnumerableTypeExtensions
+    /// <summary>
+    /// IEnumerable extensions.
+    /// </summary>
+    public static class EnumerableExtensions
     {
+        /// <summary>Tries to get the first object which is assignable to the given type name.</summary>
+        /// <param name="objects">The objects.</param>
+        /// <param name="typeName">Type of the attribute.</param>
+        /// <param name="typeNameStyle">The type name style.</param>
+        /// <returns>May return null (not found).</returns>
+        public static T FirstAssignableToTypeNameOrDefault<T>(this IEnumerable<T> objects, string typeName, TypeNameStyle typeNameStyle = TypeNameStyle.FullName)
+        {
+            return objects != null ?
+                objects.FirstOrDefault(a => a.GetType().IsAssignableToTypeName(typeName, typeNameStyle)) :
+                default;
+        }
+
         /// <summary>Finds the first common base of the given types.</summary>
         /// <param name="types">The types.</param>
         /// <returns>The common base type.</returns>

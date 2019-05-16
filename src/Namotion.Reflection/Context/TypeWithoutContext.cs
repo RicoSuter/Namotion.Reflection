@@ -107,6 +107,7 @@ namespace Namotion.Reflection
         /// <typeparam name="T">The attribute type.</typeparam>
         /// <returns>The attribute or null.</returns>
         public T GetTypeAttribute<T>()
+            where T : Attribute
         {
             return TypeAttributes.OfType<T>().SingleOrDefault();
         }

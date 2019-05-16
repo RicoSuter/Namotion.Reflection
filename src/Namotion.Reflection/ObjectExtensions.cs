@@ -10,6 +10,9 @@ using System.Reflection;
 
 namespace Namotion.Reflection
 {
+    /// <summary>
+    /// Object extensions.
+    /// </summary>
     public static class ObjectExtensions
     {
         /// <summary>Determines whether the specified property name exists.</summary>
@@ -24,7 +27,7 @@ namespace Namotion.Reflection
         /// <summary>Determines whether the specified property name exists.</summary>
         /// <param name="obj">The object.</param>
         /// <param name="propertyName">Name of the property.</param>
-        /// <param name="defaultValue">Default value if the property does not exist.</param>
+        /// <param name="defaultValue">The default value if the property does not exist.</param>
         /// <returns><c>true</c> if the property exists; otherwise, <c>false</c>.</returns>
         public static T TryGetPropertyValue<T>(this object obj, string propertyName, T defaultValue = default)
         {

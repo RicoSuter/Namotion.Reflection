@@ -17,9 +17,23 @@ namespace Namotion.Reflection
         /// <returns></returns>
         public static IEnumerable<MemberWithContext> GetPropertiesAndFieldsWithContext(this Type type)
         {
-            return type.GetRuntimePropertiesWithContext()
-                .OfType<MemberWithContext>()
-                .Union(type.GetRuntimeFieldsWithContext());
+            var key = "PropertiesAndFields:" + type.FullName;
+
+            if (!Cache.ContainsKey(key))
+            {
+                lock (Lock)
+                {
+                    if (!Cache.ContainsKey(key))
+                    {
+                        Cache[key] = type.GetRuntimePropertiesWithContext()
+                            .OfType<MemberWithContext>()
+                            .Union(type.GetRuntimeFieldsWithContext())
+                            .ToArray();
+                    }
+                }
+            }
+
+            return (IEnumerable<MemberWithContext>)Cache[key];
         }
 
         /// <summary>

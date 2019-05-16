@@ -21,15 +21,26 @@ namespace Namotion.Reflection
         /// <param name="typeName">Name of the type.</param>
         /// <param name="typeNameStyle">The type name style.</param>
         /// <returns></returns>
-        public static bool IsAssignableTo(this Type type, string typeName, TypeNameStyle typeNameStyle)
+        public static bool IsAssignableToTypeName(this Type type, string typeName, TypeNameStyle typeNameStyle)
         {
             if (typeNameStyle == TypeNameStyle.Name && type.Name == typeName)
+            {
                 return true;
+            }
 
             if (typeNameStyle == TypeNameStyle.FullName && type.FullName == typeName)
+            {
                 return true;
+            }
 
-            return type.InheritsFrom(typeName, typeNameStyle);
+            return type.InheritsFromTypeName(typeName, typeNameStyle) ||
+#if NETSTANDARD1_0
+                (typeNameStyle == TypeNameStyle.Name && type.GetTypeInfo().ImplementedInterfaces.Any(i => i.Name == typeName)) ||
+                (typeNameStyle == TypeNameStyle.FullName && type.GetTypeInfo().ImplementedInterfaces.Any(i => i.FullName == typeName));
+#else
+                (typeNameStyle == TypeNameStyle.Name && type.GetInterfaces().Any(i => i.Name == typeName)) ||
+                (typeNameStyle == TypeNameStyle.FullName && type.GetInterfaces().Any(i => i.FullName == typeName));
+#endif
         }
 
         /// <summary>Checks whether the given type inherits from the given type name.</summary>
@@ -37,7 +48,7 @@ namespace Namotion.Reflection
         /// <param name="typeName">Name of the type.</param>
         /// <param name="typeNameStyle">The type name style.</param>
         /// <returns>true if the type inherits from typeName.</returns>
-        public static bool InheritsFrom(this Type type, string typeName, TypeNameStyle typeNameStyle)
+        public static bool InheritsFromTypeName(this Type type, string typeName, TypeNameStyle typeNameStyle)
         {
             var baseType = type.GetTypeInfo().BaseType;
             while (baseType != null)
@@ -55,7 +66,7 @@ namespace Namotion.Reflection
         /// <summary>Gets the type of the array item.</summary>
         public static Type GetEnumerableItemType(this Type type)
         {
-            var genericTypeArguments = type.GetGenericTypeArguments();
+            var genericTypeArguments = type.GetGenericTypeArgumentsOfTypeOrBaseTypes();
 
             var itemType = genericTypeArguments.Length == 0 ? type.GetElementType() : genericTypeArguments[0];
             if (itemType == null)
@@ -75,16 +86,15 @@ namespace Namotion.Reflection
                     }
                 }
             }
+
             return itemType;
         }
 
-        /// <summary>Gets the generic type arguments of a type.</summary>
+        /// <summary>Gets the generic type arguments of a type or its base type.</summary>
         /// <param name="type">The type.</param>
         /// <returns>The type arguments.</returns>
-        public static Type[] GetGenericTypeArguments(this Type type)
+        private static Type[] GetGenericTypeArgumentsOfTypeOrBaseTypes(this Type type)
         {
-            // TODO: Rename method
-
 #if !NET40
 
             var genericTypeArguments = type.GenericTypeArguments;
@@ -92,7 +102,9 @@ namespace Namotion.Reflection
             {
                 type = type.GetTypeInfo().BaseType;
                 if (type != null)
+                {
                     genericTypeArguments = type.GenericTypeArguments;
+                }
             }
 
             return genericTypeArguments;
@@ -104,7 +116,9 @@ namespace Namotion.Reflection
             {
                 type = type.GetTypeInfo().BaseType;
                 if (type != null)
+                {
                     genericTypeArguments = type.GetGenericArguments();
+                }
             }
 
             return genericTypeArguments;
@@ -115,14 +129,18 @@ namespace Namotion.Reflection
         /// <summary>Gets a human readable type name (e.g. DictionaryOfStringAndObject).</summary>
         /// <param name="type">The type.</param>
         /// <returns>The type name.</returns>
-        public static string GetSafeTypeName(this Type type)
+        public static string GetDisplayName(this Type type)
         {
 #if !NET40
             if (type.IsConstructedGenericType)
-                return type.Name.Split('`').First() + "Of" + string.Join("And", type.GenericTypeArguments.Select(GetSafeTypeName));
+            {
+                return type.Name.Split('`').First() + "Of" + string.Join("And", type.GenericTypeArguments.Select(GetDisplayName));
+            }
 #else
             if (type.IsGenericType)
-                return type.Name.Split('`').First() + "Of" + string.Join("And", type.GetGenericArguments().Select(GetSafeTypeName));
+            {
+                return type.Name.Split('`').First() + "Of" + string.Join("And", type.GetGenericArguments().Select(GetDisplayName));
+            }
 #endif
 
             return type.Name;

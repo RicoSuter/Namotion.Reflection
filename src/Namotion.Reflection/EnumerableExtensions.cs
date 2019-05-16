@@ -33,13 +33,15 @@ namespace Namotion.Reflection
         /// <summary>Finds the first common base of the given types.</summary>
         /// <param name="types">The types.</param>
         /// <returns>The common base type.</returns>
-        public static Type FindCommonBaseType(this IEnumerable<Type> types)
+        public static Type GetCommonBaseType(this IEnumerable<Type> types)
         {
             var baseType = types.First();
             while (baseType != typeof(object) && baseType != null)
             {
                 if (types.All(t => baseType.GetTypeInfo().IsAssignableFrom(t.GetTypeInfo())))
+                {
                     return baseType;
+                }
 
                 baseType = baseType.GetTypeInfo().BaseType;
             }

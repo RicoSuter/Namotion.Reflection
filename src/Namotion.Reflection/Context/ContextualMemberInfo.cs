@@ -4,9 +4,12 @@ using System.Reflection;
 
 namespace Namotion.Reflection
 {
-    public abstract class MemberWithContext : TypeWithContext
+    /// <summary>
+    /// A member info with contextual information.
+    /// </summary>
+    public abstract class ContextualMemberInfo : ContextualType
     {
-        internal MemberWithContext(MemberInfo memberInfo, Type memberType, ref int nullableFlagsIndex) 
+        internal ContextualMemberInfo(MemberInfo memberInfo, Type memberType, ref int nullableFlagsIndex) 
             : base(memberType, memberInfo.GetCustomAttributes(true).OfType<Attribute>().ToArray(), null, null, ref nullableFlagsIndex)
         {
         }

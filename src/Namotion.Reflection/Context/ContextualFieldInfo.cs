@@ -2,11 +2,14 @@
 
 namespace Namotion.Reflection
 {
-    public class FieldWithContext : MemberWithContext
+    /// <summary>
+    /// A field info with contextual information.
+    /// </summary>
+    public class ContextualFieldInfo : ContextualMemberInfo
     {
         private string _name;
 
-        internal FieldWithContext(FieldInfo fieldInfo, ref int nullableFlagsIndex)
+        internal ContextualFieldInfo(FieldInfo fieldInfo, ref int nullableFlagsIndex)
             : base(fieldInfo, fieldInfo.FieldType, ref nullableFlagsIndex)
         {
             FieldInfo = fieldInfo;

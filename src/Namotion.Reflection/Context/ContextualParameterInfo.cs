@@ -4,11 +4,14 @@ using System.Reflection;
 
 namespace Namotion.Reflection
 {
-    public class ParameterWithContext : TypeWithContext
+    /// <summary>
+    /// A parameter info with contextual information.
+    /// </summary>
+    public class ContextualParameterInfo : ContextualType
     {
         private string _name;
 
-        internal ParameterWithContext(ParameterInfo parameterInfo, ref int nullableFlagsIndex)
+        internal ContextualParameterInfo(ParameterInfo parameterInfo, ref int nullableFlagsIndex)
             : base(parameterInfo.ParameterType, parameterInfo.GetCustomAttributes(true).OfType<Attribute>().ToArray(), null, null, ref nullableFlagsIndex)
         {
             ParameterInfo = parameterInfo;

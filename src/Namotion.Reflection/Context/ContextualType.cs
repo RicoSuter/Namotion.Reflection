@@ -6,18 +6,21 @@ using System.Reflection;
 
 namespace Namotion.Reflection
 {
-    public class TypeWithContext : TypeWithoutContext
+    /// <summary>
+    /// A cached type with context information (e.g. parameter, field, property with nullability).
+    /// </summary>
+    public class ContextualType : CachedType
     {
         private byte[] _nullableFlags;
         private Nullability? nullability;
 
-        internal static TypeWithContext ForType(Type type, Attribute[] contextAttributes)
+        internal static ContextualType ForType(Type type, Attribute[] contextAttributes)
         {
             var index = 0;
-            return new TypeWithContext(type, contextAttributes, null, null, ref index);
+            return new ContextualType(type, contextAttributes, null, null, ref index);
         }
 
-        internal TypeWithContext(Type type, Attribute[] contextAttributes, TypeWithContext parent, byte[] nullableFlags, ref int nullableFlagsIndex)
+        internal ContextualType(Type type, Attribute[] contextAttributes, ContextualType parent, byte[] nullableFlags, ref int nullableFlagsIndex)
             : base(type)
         {
             Parent = parent;
@@ -34,7 +37,7 @@ namespace Namotion.Reflection
         /// <summary>
         /// Gets the parent type with context.
         /// </summary>
-        public TypeWithContext Parent { get; }
+        public ContextualType Parent { get; }
 
         /// <summary>
         /// Gets the type's associated attributes of the given context.
@@ -49,41 +52,41 @@ namespace Namotion.Reflection
         /// <summary>
         /// Gets the generic type arguments of the type in the given context (empty when unwrapped from Nullable{T}).
         /// </summary>
-        public new TypeWithContext[] GenericArguments
+        public new ContextualType[] GenericArguments
         {
             get
             {
                 UpdateOriginalGenericArguments();
 
-                if (genericArguments is TypeWithContext[])
+                if (genericArguments is ContextualType[])
                 {
-                    return (TypeWithContext[])genericArguments;
+                    return (ContextualType[])genericArguments;
                 }
                 else
                 {
-                    genericArguments = ((IEnumerable)genericArguments).Cast<TypeWithContext>().ToArray();
-                    return (TypeWithContext[])genericArguments;
+                    genericArguments = ((IEnumerable)genericArguments).Cast<ContextualType>().ToArray();
+                    return (ContextualType[])genericArguments;
                 }
             }
         }
 
         /// <summary>
         /// Gets the original generic type arguments of the type in the given context.
-        /// </summary
-        public new TypeWithContext[] OriginalGenericArguments
+        /// </summary>
+        public new ContextualType[] OriginalGenericArguments
         {
             get
             {
                 UpdateOriginalGenericArguments();
 
-                if (originalGenericArguments is TypeWithContext[])
+                if (originalGenericArguments is ContextualType[])
                 {
-                    return (TypeWithContext[])originalGenericArguments;
+                    return (ContextualType[])originalGenericArguments;
                 }
                 else
                 {
-                    originalGenericArguments = ((IEnumerable)originalGenericArguments).Cast<TypeWithContext>().ToArray();
-                    return (TypeWithContext[])originalGenericArguments;
+                    originalGenericArguments = ((IEnumerable)originalGenericArguments).Cast<ContextualType>().ToArray();
+                    return (ContextualType[])originalGenericArguments;
                 }
             }
         }
@@ -153,6 +156,7 @@ namespace Namotion.Reflection
             return ContextAttributes.OfType<T>().Concat(TypeAttributes.OfType<T>());
         }
 
+        /// <inheritdocs />
         public override string ToString()
         {
             var result = Type.Name.Split('`').First() + ": " + Nullability + "\n  " +
@@ -161,9 +165,13 @@ namespace Namotion.Reflection
             return result.Trim();
         }
 
-        protected override TypeWithoutContext GetTypeInformation(Type type, ref int nullableFlagsIndex)
+        /// <summary>Gets the cached type for the given type and nullable flags index.</summary>
+        /// <param name="type">The type.</param>
+        /// <param name="nullableFlagsIndex">The flags.</param>
+        /// <returns>The cached type.</returns>
+        protected override CachedType GetCachedType(Type type, ref int nullableFlagsIndex)
         {
-            return new TypeWithContext(type, ContextAttributes, this, _nullableFlags, ref nullableFlagsIndex);
+            return new ContextualType(type, ContextAttributes, this, _nullableFlags, ref nullableFlagsIndex);
         }
 
         private void InitializeNullableFlagsAndOriginalNullability(ref int nullableFlagsIndex)

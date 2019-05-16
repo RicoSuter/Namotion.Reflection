@@ -2,11 +2,14 @@
 
 namespace Namotion.Reflection
 {
-    public class PropertyWithContext : MemberWithContext
+    /// <summary>
+    /// A property info with contextual information.
+    /// </summary>
+    public class ContextualPropertyInfo : ContextualMemberInfo
     {
         private string _name;
 
-        internal PropertyWithContext(PropertyInfo propertyInfo, ref int nullableFlagsIndex)
+        internal ContextualPropertyInfo(PropertyInfo propertyInfo, ref int nullableFlagsIndex)
             : base(propertyInfo, propertyInfo.PropertyType, ref nullableFlagsIndex)
         {
             PropertyInfo = propertyInfo;

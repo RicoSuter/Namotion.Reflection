@@ -5,17 +5,20 @@ using System.Reflection;
 
 namespace Namotion.Reflection
 {
-    public static class TypeWithContextExtensions
+    /// <summary>
+    /// Type and member extension methods to extract contextual or cached types.
+    /// </summary>
+    public static class ContextualTypeExtensions
     {
-        private static object Lock = new object();
-        private static Dictionary<string, object> Cache = new Dictionary<string, object>();
+        private static readonly object Lock = new object();
+        private static readonly Dictionary<string, object> Cache = new Dictionary<string, object>();
 
         /// <summary>
-        /// Gets an enumerable of <see cref="PropertyWithContext"/> and <see cref="FieldWithContext"/> for the given <see cref="Type"/> instance.
+        /// Gets an enumerable of <see cref="ContextualPropertyInfo"/> and <see cref="ContextualFieldInfo"/> for the given <see cref="Type"/> instance.
         /// </summary>
-        /// <param name="type"></param>
+        /// <param name="type">The type.</param>
         /// <returns></returns>
-        public static IEnumerable<MemberWithContext> GetPropertiesAndFieldsWithContext(this Type type)
+        public static IEnumerable<ContextualMemberInfo> GetContextualPropertiesAndFields(this Type type)
         {
             var key = "PropertiesAndFields:" + type.FullName;
 
@@ -25,23 +28,23 @@ namespace Namotion.Reflection
                 {
                     if (!Cache.ContainsKey(key))
                     {
-                        Cache[key] = type.GetRuntimePropertiesWithContext()
-                            .OfType<MemberWithContext>()
-                            .Union(type.GetRuntimeFieldsWithContext())
+                        Cache[key] = type.GetContextualRuntimeProperties()
+                            .OfType<ContextualMemberInfo>()
+                            .Union(type.GetContextualRuntimeFields())
                             .ToArray();
                     }
                 }
             }
 
-            return (IEnumerable<MemberWithContext>)Cache[key];
+            return (IEnumerable<ContextualMemberInfo>)Cache[key];
         }
 
         /// <summary>
-        /// Gets an array of <see cref="PropertyWithContext"/> for the given <see cref="Type"/> instance.
+        /// Gets an array of <see cref="ContextualPropertyInfo"/> for the given <see cref="Type"/> instance.
         /// </summary>
         /// <param name="type">The type.</param>
         /// <returns>The runtime properties.</returns>
-        public static PropertyWithContext[] GetRuntimePropertiesWithContext(this Type type)
+        public static ContextualPropertyInfo[] GetContextualRuntimeProperties(this Type type)
         {
             var key = "Properties:" + type.FullName;
 
@@ -56,20 +59,20 @@ namespace Namotion.Reflection
 #else
                         Cache[key] = type.GetRuntimeProperties()
 #endif
-                            .Select(p => p.GetPropertyWithContext()).ToArray();
+                            .Select(p => p.GetContextualProperty()).ToArray();
                     }
                 }
             }
 
-            return (PropertyWithContext[])Cache[key];
+            return (ContextualPropertyInfo[])Cache[key];
         }
 
         /// <summary>
-        /// Gets an array of <see cref="FieldWithContext"/> for the given <see cref="Type"/> instance.
+        /// Gets an array of <see cref="ContextualFieldInfo"/> for the given <see cref="Type"/> instance.
         /// </summary>
         /// <param name="type">The type.</param>
         /// <returns>The runtime fields.</returns>
-        public static FieldWithContext[] GetRuntimeFieldsWithContext(this Type type)
+        public static ContextualFieldInfo[] GetContextualRuntimeFields(this Type type)
         {
             var key = "Fields:" + type.FullName;
             if (!Cache.ContainsKey(key))
@@ -83,20 +86,20 @@ namespace Namotion.Reflection
 #else
                         Cache[key] = type.GetRuntimeFields()
 #endif
-                            .Select(p => p.GetFieldWithContext()).ToArray();
+                            .Select(p => p.GetContextualField()).ToArray();
                     }
                 }
             }
 
-            return (FieldWithContext[])Cache[key];
+            return (ContextualFieldInfo[])Cache[key];
         }
 
         /// <summary>
-        /// Gets a <see cref="ParameterWithContext"/> for the given <see cref="ParameterInfo"/> instance.
+        /// Gets a <see cref="ContextualParameterInfo"/> for the given <see cref="ParameterInfo"/> instance.
         /// </summary>
         /// <param name="parameterInfo">The parameter info.</param>
-        /// <returns>The <see cref="ParameterWithContext"/>.</returns>
-        public static ParameterWithContext GetParameterWithContext(this ParameterInfo parameterInfo)
+        /// <returns>The <see cref="ContextualParameterInfo"/>.</returns>
+        public static ContextualParameterInfo GetContextualParameter(this ParameterInfo parameterInfo)
         {
             var key = "Parameter:" + parameterInfo.Name + ":" + parameterInfo.Member.DeclaringType.FullName;
             if (!Cache.ContainsKey(key))
@@ -106,21 +109,21 @@ namespace Namotion.Reflection
                     if (!Cache.ContainsKey(key))
                     {
                         var index = 0;
-                        Cache[key] = new ParameterWithContext(parameterInfo, ref index);
+                        Cache[key] = new ContextualParameterInfo(parameterInfo, ref index);
                     }
 
                 }
             }
 
-            return (ParameterWithContext)Cache[key];
+            return (ContextualParameterInfo)Cache[key];
         }
 
         /// <summary>
-        /// Gets a <see cref="PropertyWithContext"/> for the given <see cref="PropertyInfo"/> instance.
+        /// Gets a <see cref="ContextualPropertyInfo"/> for the given <see cref="PropertyInfo"/> instance.
         /// </summary>
         /// <param name="propertyInfo">The property info.</param>
-        /// <returns>The <see cref="PropertyWithContext"/>.</returns>
-        public static PropertyWithContext GetPropertyWithContext(this PropertyInfo propertyInfo)
+        /// <returns>The <see cref="ContextualPropertyInfo"/>.</returns>
+        public static ContextualPropertyInfo GetContextualProperty(this PropertyInfo propertyInfo)
         {
             var key = "Property:" + propertyInfo.Name + ":" + propertyInfo.DeclaringType.FullName;
             if (!Cache.ContainsKey(key))
@@ -130,22 +133,22 @@ namespace Namotion.Reflection
                     if (!Cache.ContainsKey(key))
                     {
                         var index = 0;
-                        Cache[key] = new PropertyWithContext(propertyInfo, ref index);
+                        Cache[key] = new ContextualPropertyInfo(propertyInfo, ref index);
                     }
 
-                    return (PropertyWithContext)Cache[key];
+                    return (ContextualPropertyInfo)Cache[key];
                 }
             }
 
-            return (PropertyWithContext)Cache[key];
+            return (ContextualPropertyInfo)Cache[key];
         }
 
         /// <summary>
-        /// Gets a <see cref="FieldWithContext"/> for the given <see cref="FieldInfo"/> instance.
+        /// Gets a <see cref="ContextualFieldInfo"/> for the given <see cref="FieldInfo"/> instance.
         /// </summary>
         /// <param name="fieldInfo">The field info.</param>
-        /// <returns>The <see cref="FieldWithContext"/>.</returns>
-        public static FieldWithContext GetFieldWithContext(this FieldInfo fieldInfo)
+        /// <returns>The <see cref="ContextualFieldInfo"/>.</returns>
+        public static ContextualFieldInfo GetContextualField(this FieldInfo fieldInfo)
         {
             var key = "Field:" + fieldInfo.Name + ":" + fieldInfo.DeclaringType.FullName;
             if (!Cache.ContainsKey(key))
@@ -155,70 +158,70 @@ namespace Namotion.Reflection
                     if (!Cache.ContainsKey(key))
                     {
                         var index = 0;
-                        Cache[key] = new FieldWithContext(fieldInfo, ref index);
+                        Cache[key] = new ContextualFieldInfo(fieldInfo, ref index);
                     }
                 }
             }
 
-            return (FieldWithContext)Cache[key];
+            return (ContextualFieldInfo)Cache[key];
         }
 
         /// <summary>
-        /// Gets a <see cref="TypeWithContext"/> for the given <see cref="MemberInfo"/> instance.
+        /// Gets a <see cref="ContextualMemberInfo"/> for the given <see cref="MemberInfo"/> instance.
         /// </summary>
         /// <param name="memberInfo">The member info.</param>
-        /// <returns>The <see cref="TypeWithContext"/>.</returns>
-        public static TypeWithContext GetMemberWithContext(this MemberInfo memberInfo)
+        /// <returns>The <see cref="ContextualMemberInfo"/>.</returns>
+        public static ContextualMemberInfo GetContextualMember(this MemberInfo memberInfo)
         {
             if (memberInfo is PropertyInfo propertyInfo)
             {
-                return propertyInfo.GetPropertyWithContext();
+                return propertyInfo.GetContextualProperty();
             }
             else if (memberInfo is FieldInfo fieldInfo)
             {
-                return fieldInfo.GetFieldWithContext();
+                return fieldInfo.GetContextualField();
             }
 
             throw new NotSupportedException();
         }
 
         /// <summary>
-        /// Gets a <see cref="TypeWithoutContext"/> for the given <see cref="Type"/> instance and attributes (uncached).
+        /// Gets an uncached <see cref="ContextualType"/> for the given <see cref="Type"/> instance and attributes.
         /// </summary>
         /// <param name="type">The type.</param>
         /// <param name="attributes">The attributes.</param>
-        /// <returns>The <see cref="TypeWithoutContext"/>.</returns>
-        public static TypeWithContext GetTypeWithContext(this Type type, Attribute[] attributes)
+        /// <returns>The <see cref="CachedType"/>.</returns>
+        public static ContextualType GetContextualType(this Type type, Attribute[] attributes)
         {
-            // TODO: Cache this?
-            return TypeWithContext.ForType(type, attributes);
+            // TODO: Should we cache this somehow?
+            return ContextualType.ForType(type, attributes);
         }
 
         /// <summary>
-        /// Gets a <see cref="TypeWithoutContext"/> for the given <see cref="Type"/> instance.
+        /// Gets a <see cref="CachedType"/> for the given <see cref="Type"/> instance.
         /// </summary>
         /// <param name="type">The type.</param>
-        /// <returns>The <see cref="TypeWithoutContext"/>.</returns>
-        public static TypeWithContext GetTypeWithContext(this Type type)
+        /// <returns>The <see cref="CachedType"/>.</returns>
+        public static ContextualType GetContextualType(this Type type)
         {
             var key = "Type:Context:" + type.FullName;
             lock (Lock)
             {
                 if (!Cache.ContainsKey(key))
                 {
-                    Cache[key] = TypeWithContext.ForType(type, new Attribute[0]);
+                    Cache[key] = ContextualType.ForType(type, new Attribute[0]);
                 }
 
-                return (TypeWithContext)Cache[key];
+                return (ContextualType)Cache[key];
             }
         }
 
         /// <summary>
-        /// Gets a <see cref="TypeWithoutContext"/> for the given <see cref="Type"/> instance.
+        /// Gets a <see cref="CachedType"/> for the given <see cref="Type"/> instance.
         /// </summary>
         /// <param name="type">The type.</param>
-        /// <returns>The <see cref="TypeWithoutContext"/>.</returns>
-        public static TypeWithoutContext GetTypeWithoutContext(this Type type)
+        /// <returns>The <see cref="CachedType"/>.</returns>
+        public static CachedType GetCachedType(this Type type)
         {
             var key = "Type:" + type.FullName;
             if (!Cache.ContainsKey(key))
@@ -227,12 +230,12 @@ namespace Namotion.Reflection
                 {
                     if (!Cache.ContainsKey(key))
                     {
-                        Cache[key] = new TypeWithoutContext(type);
+                        Cache[key] = new CachedType(type);
                     }
                 }
             }
 
-            return (TypeWithoutContext)Cache[key];
+            return (CachedType)Cache[key];
         }
     }
 }

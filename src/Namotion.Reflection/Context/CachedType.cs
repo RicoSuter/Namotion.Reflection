@@ -7,17 +7,27 @@ using System.Runtime.CompilerServices;
 
 namespace Namotion.Reflection
 {
-    public class TypeWithoutContext
+    /// <summary>
+    /// A cached type object without context.
+    /// </summary>
+    public class CachedType
     {
         private bool isNullableType;
         private Type type;
 
+        /// <summary>
+        /// Internal generic arguments.
+        /// </summary>
         protected object genericArguments;
+
+        /// <summary>
+        /// Internal original generic arguments.
+        /// </summary>
         protected object originalGenericArguments;
 
         private Attribute[] typeAttributes;
 
-        internal TypeWithoutContext(Type type)
+        internal CachedType(Type type)
         {
             OriginalType = type;
         }
@@ -80,24 +90,24 @@ namespace Namotion.Reflection
         /// <summary>
         /// Gets the type's generic arguments (Nullable{T} is unwrapped).
         /// </summary>
-        public TypeWithoutContext[] GenericArguments
+        public CachedType[] GenericArguments
         {
             get
             {
                 UpdateOriginalGenericArguments();
-                return (TypeWithoutContext[])genericArguments;
+                return (CachedType[])genericArguments;
             }
         }
 
         /// <summary>
         /// Gets the type's original generic arguments (Nullable{T} is not unwrapped).
         /// </summary>
-        public TypeWithoutContext[] OriginalGenericArguments
+        public CachedType[] OriginalGenericArguments
         {
             get
             {
                 UpdateOriginalGenericArguments();
-                return (TypeWithoutContext[])originalGenericArguments;
+                return (CachedType[])originalGenericArguments;
             }
         }
 
@@ -122,6 +132,7 @@ namespace Namotion.Reflection
             return TypeAttributes.OfType<T>();
         }
 
+        /// <inheritdocs />
         public override string ToString()
         {
             var result = Type.Name.Split('`').First() + "\n  " +
@@ -130,11 +141,18 @@ namespace Namotion.Reflection
             return result.Trim();
         }
 
-        protected virtual TypeWithoutContext GetTypeInformation(Type type, ref int nullableFlagsIndex)
+        /// <summary>Gets the cached type for the given type and nullable flags index.</summary>
+        /// <param name="type">The type.</param>
+        /// <param name="nullableFlagsIndex">The flags.</param>
+        /// <returns>The cached type.</returns>
+        protected virtual CachedType GetCachedType(Type type, ref int nullableFlagsIndex)
         {
-            return type.GetTypeWithoutContext();
+            return type.GetCachedType();
         }
 
+        /// <summary>
+        /// Updates the original generic arguments.
+        /// </summary>
 #if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
@@ -144,6 +162,9 @@ namespace Namotion.Reflection
             UpdateOriginalGenericArguments(ref nullableFlagsIndex);
         }
 
+        /// <summary>
+        /// Updates the original generic arguments.
+        /// </summary>
 #if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
@@ -155,20 +176,20 @@ namespace Namotion.Reflection
                 {
                     if (originalGenericArguments == null)
                     {
-                        var arguments = new List<TypeWithoutContext>();
+                        var arguments = new List<CachedType>();
 #if NET40
                         foreach (var type in OriginalType.GetGenericArguments())
 #else
                         foreach (var type in OriginalType.GenericTypeArguments)
 #endif
                         {
-                            arguments.Add(GetTypeInformation(type, ref nullableFlagsIndex));
+                            arguments.Add(GetCachedType(type, ref nullableFlagsIndex));
                         }
 
                         originalGenericArguments = arguments.ToArray();
                         isNullableType = OriginalType.Name == "Nullable`1";
-                        genericArguments = isNullableType ? new TypeWithoutContext[0] : originalGenericArguments;
-                        type = isNullableType ? ((IEnumerable)originalGenericArguments).Cast<TypeWithoutContext>().First().OriginalType : OriginalType;
+                        genericArguments = isNullableType ? new CachedType[0] : originalGenericArguments;
+                        type = isNullableType ? ((IEnumerable)originalGenericArguments).Cast<CachedType>().First().OriginalType : OriginalType;
                     }
                 }
             }

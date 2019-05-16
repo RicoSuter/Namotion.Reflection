@@ -2,11 +2,7 @@
 
 Library with advanced .NET reflection APIs.
 
-TODO: The idea is to move all reflection APIs from my other libraries (mainly NJsonSchema) into this general purpose library.
-
-## TypeWithContext
-
-### C# 8 nullability reflection
+## C# 8 nullability reflection
 
 With the `ContextualType` class you can reflect on the nullability of properties, fields, method parameters and return types which will be available when compiling with the C# 8 compiler with the Nullable Reference Types feature enabled. 
 
@@ -45,15 +41,27 @@ Value: Nullable
 
 For more details, see https://blog.rsuter.com/the-output-of-nullable-reference-types-and-how-to-reflect-it/
 
-## XML Docs
+## Read XML Documentation
 
-TODO: Move into this repo
+- GetXmlSummaryAsync
+- GetXmlRemarksAsync
+- GetXmlDocumentationAsync: Gets the XElement of the given type
 
-https://github.com/RicoSuter/NJsonSchema/blob/master/src/NJsonSchema/Infrastructure/XmlDocumentationExtensions.cs
+## Extension methods
 
-## Other APIs
+**IEnumerable extensions**
 
-TODO: Move into this repo
+- FirstAssignableToTypeNameOrDefault
+- GetCommonBaseType
 
-https://github.com/RicoSuter/NJsonSchema/blob/master/src/NJsonSchema/Infrastructure/ReflectionExtensions.cs
-https://github.com/RicoSuter/NJsonSchema/blob/master/src/NJsonSchema/Infrastructure/ReflectionCache.cs
+**Object extensions**
+
+- HasProperty
+- TryGetPropertyValue
+
+**Type extensions**
+
+- IsAssignableToTypeName
+- InheritsFromTypeName
+- GetEnumerableItemType
+- GetDisplayName

@@ -28,7 +28,7 @@ namespace Namotion.Reflection
         /// <param name="obj">The object.</param>
         /// <param name="propertyName">Name of the property.</param>
         /// <param name="defaultValue">The default value if the property does not exist.</param>
-        /// <returns><c>true</c> if the property exists; otherwise, <c>false</c>.</returns>
+        /// <returns>The property or the default value.</returns>
         public static T TryGetPropertyValue<T>(this object obj, string propertyName, T defaultValue = default)
         {
             var property = obj?.GetType().GetRuntimeProperty(propertyName);

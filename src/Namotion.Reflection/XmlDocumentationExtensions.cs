@@ -43,15 +43,6 @@ namespace Namotion.Reflection
             return GetXmlDocumentationTagAsync(type.GetTypeInfo(), "remarks");
         }
 
-        /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
-        /// <param name="type">The type.</param>
-        /// <returns>The contents of the "summary" tag for the member.</returns>
-        [Obsolete("Use GetXmlSummary instead.")]
-        public static Task<string> GetXmlDocumentationAsync(this Type type)
-        {
-            return GetXmlDocumentationTagAsync(type, "summary");
-        }
-
         /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
         /// <param name="tagName">Name of the tag.</param>

@@ -31,15 +31,6 @@ namespace Namotion.Reflection
         /// Unwraps the OriginalType as <see cref="Type"/> from the context type.
         /// </summary>
         /// <param name="type">The contextual type</param>
-        public static implicit operator CachedType(Type type)
-        {
-            return type.ToCachedType();
-        }
-
-        /// <summary>
-        /// Unwraps the OriginalType as <see cref="Type"/> from the context type.
-        /// </summary>
-        /// <param name="type">The contextual type</param>
         public static implicit operator Type(CachedType type)
         {
             return type.OriginalType;

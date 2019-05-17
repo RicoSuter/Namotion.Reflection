@@ -4,7 +4,7 @@ trigger:
     - '*'
 
 pool:
-  vmImage: 'windows-2019'
+  vmImage: 'vs2019-win2019'
 
 variables:
   solution: 'src/Namotion.Reflection.sln'

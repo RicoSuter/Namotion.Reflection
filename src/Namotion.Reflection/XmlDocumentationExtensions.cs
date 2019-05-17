@@ -27,6 +27,17 @@ namespace Namotion.Reflection
         private static readonly AsyncLock Lock = new AsyncLock();
         private static readonly Dictionary<string, XDocument> Cache = new Dictionary<string, XDocument>(StringComparer.OrdinalIgnoreCase);
 
+        /// <summary>
+        /// Clears the cache.
+        /// </summary>
+        public static void ClearCache()
+        {
+            using (Lock.Lock())
+            {
+                Cache.Clear();
+            }
+        }
+
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
@@ -114,17 +125,6 @@ namespace Namotion.Reflection
             }
 
             return string.Empty;
-        }
-
-        /// <summary>Clears the cache.</summary>
-        /// <returns>The task.</returns>
-        public static Task ClearCacheAsync()
-        {
-            using (Lock.Lock())
-            {
-                Cache.Clear();
-                return DynamicApis.FromResult<object>(null);
-            }
         }
 
         /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>

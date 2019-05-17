@@ -14,6 +14,17 @@ namespace Namotion.Reflection
         private static readonly Dictionary<string, object> Cache = new Dictionary<string, object>();
 
         /// <summary>
+        /// Clears the cache.
+        /// </summary>
+        public static void ClearCache()
+        {
+            lock (Lock)
+            {
+                Cache.Clear();
+            }
+        }
+
+        /// <summary>
         /// Gets an enumerable of <see cref="ContextualPropertyInfo"/> and <see cref="ContextualFieldInfo"/> for the given <see cref="Type"/> instance.
         /// </summary>
         /// <param name="type">The type.</param>

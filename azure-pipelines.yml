@@ -21,6 +21,7 @@ steps:
   inputs:
     command: 'restore'
     projects: '$(solution)'
+    nugetConfigPath: 'src/nuget.config'
     feedsToUse: 'select'
     versioningScheme: 'off'
 - task: DotNetCoreCLI@2

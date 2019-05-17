@@ -17,15 +17,6 @@ steps:
     packageType: 'sdk'
     version: '2.2.203'
 - task: DotNetCoreCLI@2
-  displayName: 'Restore NuGet packages'
-  inputs:
-    command: 'restore'
-    projects: '$(solution)'
-    feedsToUse: 'select'
-    vstsFeed: 'https://dotnet.myget.org/F/roslyn/api/v3/index.json'
-    verbosityRestore: 'Normal'
-    versioningScheme: 'off'
-- task: DotNetCoreCLI@2
   displayName: 'Build solution'
   inputs:
     command: 'build'

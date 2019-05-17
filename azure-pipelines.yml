@@ -11,11 +11,18 @@ variables:
   configuration: release
 
 steps:
-- task: UseDotNet@2
-  displayName: 'Install .NET Core SDK'
+# - task: UseDotNet@2
+#   displayName: 'Install .NET Core SDK'
+#   inputs:
+#     packageType: 'sdk'
+#     version: '2.2.203'
+- task: NuGetCommand@2
   inputs:
-    packageType: 'sdk'
-    version: '2.2.203'
+    command: 'restore'
+    restoreSolution: '$(solution)'
+    feedsToUse: 'config'
+    nugetConfigPath: 'src/nuget.config'
+    versioningScheme: 'off'
 - task: DotNetCoreCLI@2
   displayName: 'Build solution'
   inputs:

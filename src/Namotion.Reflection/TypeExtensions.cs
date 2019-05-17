@@ -21,6 +21,16 @@ namespace Namotion.Reflection
         /// <param name="typeName">Name of the type.</param>
         /// <param name="typeNameStyle">The type name style.</param>
         /// <returns></returns>
+        public static bool IsAssignableToTypeName(this CachedType type, string typeName, TypeNameStyle typeNameStyle)
+        {
+            return type.OriginalType.IsAssignableToTypeName(typeName, typeNameStyle);
+        }
+
+        /// <summary>Checks whether the given type is assignable to the given type name.</summary>
+        /// <param name="type">The type.</param>
+        /// <param name="typeName">Name of the type.</param>
+        /// <param name="typeNameStyle">The type name style.</param>
+        /// <returns></returns>
         public static bool IsAssignableToTypeName(this Type type, string typeName, TypeNameStyle typeNameStyle)
         {
             if (typeNameStyle == TypeNameStyle.Name && type.Name == typeName)

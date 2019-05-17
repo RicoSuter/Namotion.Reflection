@@ -14,17 +14,17 @@ namespace Namotion.Reflection
         private byte[] _nullableFlags;
         private Nullability? nullability;
 
-        internal static ContextualType ForType(Type type, Attribute[] contextAttributes)
+        internal static ContextualType ForType(Type type, IEnumerable<Attribute> contextAttributes)
         {
             var index = 0;
             return new ContextualType(type, contextAttributes, null, null, ref index);
         }
 
-        internal ContextualType(Type type, Attribute[] contextAttributes, ContextualType parent, byte[] nullableFlags, ref int nullableFlagsIndex)
+        internal ContextualType(Type type, IEnumerable<Attribute> contextAttributes, ContextualType parent, byte[] nullableFlags, ref int nullableFlagsIndex)
             : base(type)
         {
             Parent = parent;
-            ContextAttributes = contextAttributes;
+            ContextAttributes = contextAttributes is Attribute[] ? (Attribute[])contextAttributes : contextAttributes.ToArray();
             _nullableFlags = nullableFlags;
 
             InitializeNullableFlagsAndOriginalNullability(ref nullableFlagsIndex);
@@ -48,6 +48,11 @@ namespace Namotion.Reflection
         /// Gets the original nullability information of this type in the given context (i.e. without unwrapping Nullable{T}).
         /// </summary>
         public Nullability OriginalNullability { get; private set; }
+
+        /// <summary>
+        /// Gets all contextual and type attributes (in this order).
+        /// </summary>
+        public override IEnumerable<Attribute> Attributes => ContextAttributes.Concat(base.Attributes);
 
         /// <summary>
         /// Gets the generic type arguments of the type in the given context (empty when unwrapped from Nullable{T}).

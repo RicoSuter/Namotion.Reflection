@@ -9,7 +9,7 @@ namespace Namotion.Reflection
     /// </summary>
     public abstract class ContextualMemberInfo : ContextualType
     {
-        internal ContextualMemberInfo(MemberInfo memberInfo, Type memberType, ref int nullableFlagsIndex) 
+        internal ContextualMemberInfo(MemberInfo memberInfo, Type memberType, ref int nullableFlagsIndex)
             : base(memberType, memberInfo.GetCustomAttributes(true).OfType<Attribute>().ToArray(), null, null, ref nullableFlagsIndex)
         {
         }
@@ -37,5 +37,11 @@ namespace Namotion.Reflection
         /// <param name="obj">The object.</param>
         /// <param name="value">The value.</param>
         public abstract void SetValue(object obj, object value);
+
+        /// <inheritdocs />
+        public override string ToString()
+        {
+            return Name + " (" + GetType().Name.Replace("Contextual", "").Replace("Info", "") + ") - " + base.ToString();
+        }
     }
 }

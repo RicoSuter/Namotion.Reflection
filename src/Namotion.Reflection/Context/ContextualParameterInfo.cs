@@ -26,5 +26,11 @@ namespace Namotion.Reflection
         /// Gets the cached parameter name.
         /// </summary>
         public string Name => _name ?? (_name = ParameterInfo.Name);
+
+        /// <inheritdocs />
+        public override string ToString()
+        {
+            return Name + " (Parameter) - " + base.ToString();
+        }
     }
 }

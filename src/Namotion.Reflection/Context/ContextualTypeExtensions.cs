@@ -191,7 +191,7 @@ namespace Namotion.Reflection
         /// <param name="type">The type.</param>
         /// <param name="attributes">The attributes.</param>
         /// <returns>The <see cref="CachedType"/>.</returns>
-        public static ContextualType ToContextualType(this Type type, Attribute[] attributes)
+        public static ContextualType ToContextualType(this Type type, IEnumerable<Attribute> attributes)
         {
             // TODO: Should we cache this somehow?
             return ContextualType.ForType(type, attributes);

@@ -27,6 +27,24 @@ namespace Namotion.Reflection
 
         private Attribute[] typeAttributes;
 
+        /// <summary>
+        /// Unwraps the OriginalType as <see cref="Type"/> from the context type.
+        /// </summary>
+        /// <param name="type">The contextual type</param>
+        public static implicit operator CachedType(Type type)
+        {
+            return type.ToCachedType();
+        }
+
+        /// <summary>
+        /// Unwraps the OriginalType as <see cref="Type"/> from the context type.
+        /// </summary>
+        /// <param name="type">The contextual type</param>
+        public static implicit operator Type(CachedType type)
+        {
+            return type.OriginalType;
+        }
+
         internal CachedType(Type type)
         {
             OriginalType = type;
@@ -37,6 +55,24 @@ namespace Namotion.Reflection
         /// </summary>
         public Type OriginalType { get; }
 
+        /// <summary>
+        /// Gets all type attributes.
+        /// </summary>
+        public virtual IEnumerable<Attribute> Attributes => TypeAttributes;
+
+        /// <summary>
+        /// Gets the type name.
+        /// </summary>
+        public string TypeName => Type.Name;
+
+        /// <summary>
+        /// Gest the original's type info.
+        /// </summary>
+#if !NET40
+        public TypeInfo TypeInfo => OriginalType.GetTypeInfo();
+#else
+        public Type TypeInfo => OriginalType;
+#endif
         /// <summary>
         /// Gets the type's associated attributes of the type.
         /// </summary>

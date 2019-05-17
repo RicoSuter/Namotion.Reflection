@@ -51,7 +51,7 @@ For more details, see https://blog.rsuter.com/the-output-of-nullable-reference-t
 
 **IEnumerable extensions**
 
-- FirstAssignableToTypeNameOrDefault
+- TryGetAssignableToTypeName
 - GetCommonBaseType
 
 **Object extensions**

@@ -12,6 +12,7 @@ variables:
 
 steps:
 - task: DotNetCoreCLI@2
+  displayName: 'Build solution'
   inputs:
     command: 'build'
     projects: '$(solution)'
@@ -19,6 +20,7 @@ steps:
     feedsToUse: 'select'
     versioningScheme: 'off'
 - task: DotNetCoreCLI@2
+  displayName: 'Run tests'
   inputs:
     command: 'test'
     projects: '$(solution)'

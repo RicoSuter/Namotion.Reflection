@@ -20,6 +20,7 @@ steps:
   displayName: 'Restore NuGet packages'
   inputs:
     command: 'restore'
+    projects: '$(solution)'
     feedsToUse: 'select'
     vstsFeed: 'https://dotnet.myget.org/F/roslyn/api/v3/index.json'
     verbosityRestore: 'Normal'
@@ -40,3 +41,9 @@ steps:
     arguments: '--configuration $(configuration)'
     feedsToUse: 'select'
     versioningScheme: 'off'
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish artifacts'
+  inputs:
+    PathtoPublish: '**/*.nupkg'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'

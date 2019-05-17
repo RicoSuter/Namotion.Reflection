@@ -4,11 +4,11 @@ trigger:
     - '*'
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'windows-2019'
 
 variables:
-  configuration: release
   solution: 'src/Namotion.Reflection.sln'
+  configuration: release
 
 steps:
 - task: DotNetCoreCLI@2

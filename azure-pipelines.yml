@@ -20,9 +20,9 @@ steps:
   displayName: 'Restore NuGet packages'
   inputs:
     command: 'restore'
-    projects: '$(solution)'
-    nugetConfigPath: 'src/nuget.config'
     feedsToUse: 'select'
+    vstsFeed: 'https://dotnet.myget.org/F/roslyn/api/v3/index.json'
+    verbosityRestore: 'Normal'
     versioningScheme: 'off'
 - task: DotNetCoreCLI@2
   displayName: 'Build solution'

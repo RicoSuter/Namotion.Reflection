@@ -1,14 +1,27 @@
 trigger:
-- master
+  branches:
+    include:
+    - '*'
 
 pool:
   vmImage: 'ubuntu-latest'
+
+variables:
+  configuration: release
+  solution: 'src/Namotion.Reflection.sln'
 
 steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
-    projects: 'src/Namotion.Reflection.sln'
-    arguments: '--configuration Release'
+    projects: '$(solution)'
+    arguments: '--configuration $(configuration)'
+    feedsToUse: 'select'
+    versioningScheme: 'off'
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'test'
+    projects: '$(solution)'
+    arguments: '--configuration $(configuration)'
     feedsToUse: 'select'
     versioningScheme: 'off'

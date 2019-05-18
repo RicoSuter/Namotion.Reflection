@@ -11,19 +11,6 @@ variables:
   configuration: release
 
 steps:
-# - task: UseDotNet@2
-#   displayName: 'Install .NET Core SDK'
-#   inputs:
-#     packageType: 'sdk'
-#     version: '2.2.203'
-- task: DotNetCoreCLI@2
-  displayName: 'Build solution'
-  inputs:
-    command: 'build'
-    projects: '$(solution)'
-    arguments: '--configuration $(configuration)'
-    feedsToUse: 'select'
-    versioningScheme: 'off'
 - task: DotNetCoreCLI@2
   displayName: 'Run tests'
   inputs:
@@ -32,9 +19,16 @@ steps:
     arguments: '--configuration $(configuration)'
     feedsToUse: 'select'
     versioningScheme: 'off'
+- task: DotNetCoreCLI@2
+  displayName: 'Pack packages'
+  inputs:
+    command: 'pack'
+    feedsToUse: 'select'
+    packagesToPack: '$(solution)'
+    versioningScheme: 'off'
 - task: PublishBuildArtifacts@1
   displayName: 'Publish artifacts'
   inputs:
-    PathtoPublish: '**/*.nupkg'
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'drop'
     publishLocation: 'Container'

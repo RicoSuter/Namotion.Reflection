@@ -11,6 +11,15 @@ variables:
   configuration: release
 
 steps:
+- task: CmdLine@2
+  displayName: 'Install DNT'
+  inputs:
+    script: 'npm i -g dotnettools'
+- task: CmdLine@2
+  displayName: 'Patch project versions'
+  inputs:
+    script: 'dnt bump-versions patch $(Build.BuildNumber)'
+
 - task: DotNetCoreCLI@2
   displayName: 'Build solution'
   inputs:
@@ -28,7 +37,7 @@ steps:
     feedsToUse: 'select'
     versioningScheme: 'off'
 - task: DotNetCoreCLI@2
-  displayName: 'Pack packages'
+  displayName: 'Create packages'
   inputs:
     command: 'pack'
     feedsToUse: 'select'
@@ -43,7 +52,7 @@ steps:
     publishLocation: 'Container'
 
 - task: DotNetCoreCLI@2
-  displayName: 'Publish packages to CI feed'
+  displayName: 'Push packages to CI feed'
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   inputs:
     command: 'push'

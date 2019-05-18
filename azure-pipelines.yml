@@ -11,6 +11,7 @@ variables:
   configuration: release
 
 steps:
+# Install required SDKs and tools
 - task: UseDotNet@2
   displayName: 'Install .NET Core SDK'
   inputs:
@@ -20,6 +21,8 @@ steps:
   displayName: 'Install DNT'
   inputs:
     script: 'npm i -g dotnettools'
+
+# Patch project versions
 - task: CmdLine@2
   displayName: 'Update project version revision'
   condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/release'))
@@ -31,6 +34,7 @@ steps:
   inputs:
     script: 'dnt bump-versions preview "build.$(Build.BuildNumber)"'
 
+# Build, test and pack
 - task: DotNetCoreCLI@2
   displayName: 'Build solution'
   inputs:
@@ -62,6 +66,7 @@ steps:
     ArtifactName: 'drop'
     publishLocation: 'Container'
 
+# Push packages
 - task: DotNetCoreCLI@2
   displayName: 'Push packages to CI feed'
   condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/release')))
@@ -72,7 +77,6 @@ steps:
     nuGetFeedType: 'internal'
     publishVstsFeed: 'Namotion.Reflection-CI'
     versioningScheme: 'off'
-
 - task: DotNetCoreCLI@2
   displayName: 'Push packages to NuGet.org'
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'))

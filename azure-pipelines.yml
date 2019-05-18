@@ -7,7 +7,7 @@ pool:
   vmImage: 'windows-2019'
 
 variables:
-  solution: '**/*.csproj'
+  projects: '**/*.csproj'
   configuration: release
 
 steps:
@@ -15,7 +15,7 @@ steps:
   displayName: 'Build solution'
   inputs:
     command: 'build'
-    projects: '$(solution)'
+    projects: '$(projects)'
     arguments: '--configuration $(configuration)'
     feedsToUse: 'select'
     versioningScheme: 'off'
@@ -23,7 +23,7 @@ steps:
   displayName: 'Run tests'
   inputs:
     command: 'test'
-    projects: '$(solution)'
+    projects: '$(projects)'
     arguments: '--configuration $(configuration)'
     feedsToUse: 'select'
     versioningScheme: 'off'
@@ -32,7 +32,8 @@ steps:
   inputs:
     command: 'pack'
     feedsToUse: 'select'
-    packagesToPack: '$(solution)'
+    packagesToPack: '$(projects)'
+    arguments: '--configuration $(configuration)'
     versioningScheme: 'off'
 - task: PublishBuildArtifacts@1
   displayName: 'Publish artifacts'

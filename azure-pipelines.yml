@@ -11,10 +11,16 @@ variables:
   configuration: release
 
 steps:
+- task: UseDotNet@2
+  displayName: 'Install .NET Core SDK'
+  inputs:
+    packageType: 'sdk'
+    version: '2.2.203'
 - task: CmdLine@2
   displayName: 'Install DNT'
   inputs:
     script: 'npm i -g dotnettools'
+
 - task: CmdLine@2
   displayName: 'Patch project versions'
   inputs:

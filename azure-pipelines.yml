@@ -18,7 +18,7 @@ steps:
 - task: CmdLine@2
   displayName: 'Patch project versions'
   inputs:
-    script: 'dnt bump-versions patch $(Build.BuildNumber)'
+    script: 'dnt bump-versions patch $(Rev:.r)'
 
 - task: DotNetCoreCLI@2
   displayName: 'Build solution'

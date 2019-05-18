@@ -10,34 +10,56 @@ variables:
   projects: '**/*.csproj'
   configuration: release
 
-steps:
-- task: DotNetCoreCLI@2
-  displayName: 'Build solution'
-  inputs:
-    command: 'build'
-    projects: '$(projects)'
-    arguments: '--configuration $(configuration)'
-    feedsToUse: 'select'
-    versioningScheme: 'off'
-- task: DotNetCoreCLI@2
-  displayName: 'Run tests'
-  inputs:
-    command: 'test'
-    projects: '$(projects)'
-    arguments: '--configuration $(configuration)'
-    feedsToUse: 'select'
-    versioningScheme: 'off'
-- task: DotNetCoreCLI@2
-  displayName: 'Pack packages'
-  inputs:
-    command: 'pack'
-    feedsToUse: 'select'
-    packagesToPack: '$(projects)'
-    arguments: '--configuration $(configuration)'
-    versioningScheme: 'off'
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish artifacts'
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'drop'
-    publishLocation: 'Container'
+jobs:
+  - job: build_and_test
+    displayName: 'Build and test'
+    steps:
+    - task: DotNetCoreCLI@2
+      displayName: 'Build solution'
+      inputs:
+        command: 'build'
+        projects: '$(projects)'
+        arguments: '--configuration $(configuration)'
+        feedsToUse: 'select'
+        versioningScheme: 'off'
+    - task: DotNetCoreCLI@2
+      displayName: 'Run tests'
+      inputs:
+        command: 'test'
+        projects: '$(projects)'
+        arguments: '--configuration $(configuration)'
+        feedsToUse: 'select'
+        versioningScheme: 'off'
+    - task: DotNetCoreCLI@2
+      displayName: 'Pack packages'
+      inputs:
+        command: 'pack'
+        feedsToUse: 'select'
+        packagesToPack: '$(projects)'
+        arguments: '--configuration $(configuration)'
+        versioningScheme: 'off'
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish artifacts'
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
+    - script: echo Hello!
+
+  - job: publish_to_ci_feed
+    displayName: 'Publish to CI feed'
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    steps:
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'push'
+          feedsToUse: 'select'
+          packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
+          nuGetFeedType: 'internal'
+          publishVstsFeed: 'Namotion.Reflection-CI'
+          versioningScheme: 'off'
+
+  # - job: publish_to_public_feed
+  #   displayName: 'Publish to public feed'
+  #   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'))
+      

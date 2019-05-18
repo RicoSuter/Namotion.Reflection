@@ -4,18 +4,18 @@ trigger:
     - '*'
 
 pool:
-  vmImage: 'vs2017-win2016'
+  vmImage: 'windows-2019'
 
 variables:
-  solution: 'src/Namotion.Reflection.sln'
+  solution: '**/*.csproj'
   configuration: release
 
 steps:
-- task: UseDotNet@2
-  displayName: 'Install .NET Core SDK'
-  inputs:
-    packageType: 'sdk'
-    version: '2.2.203'
+# - task: UseDotNet@2
+#   displayName: 'Install .NET Core SDK'
+#   inputs:
+#     packageType: 'sdk'
+#     version: '2.2.203'
 - task: DotNetCoreCLI@2
   displayName: 'Build solution'
   inputs:

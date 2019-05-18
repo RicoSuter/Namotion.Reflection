@@ -29,7 +29,7 @@ steps:
   displayName: 'Patch project version preview'
   condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/release'))
   inputs:
-    script: 'dnt bump-versions preview "preview-$(Build.BuildNumber)"'
+    script: 'dnt bump-versions preview "build.$(Build.BuildNumber)"'
 
 - task: DotNetCoreCLI@2
   displayName: 'Build solution'

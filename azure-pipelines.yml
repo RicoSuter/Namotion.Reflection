@@ -50,14 +50,14 @@ jobs:
   displayName: 'Publish to CI feed'
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   steps:
-    - task: DotNetCoreCLI@2
-      inputs:
-        command: 'push'
-        feedsToUse: 'select'
-        packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
-        nuGetFeedType: 'internal'
-        publishVstsFeed: 'Namotion.Reflection-CI'
-        versioningScheme: 'off'
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: 'push'
+      feedsToUse: 'select'
+      packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
+      nuGetFeedType: 'internal'
+      publishVstsFeed: 'Namotion.Reflection-CI'
+      versioningScheme: 'off'
 
   # - job: publish_to_public_feed
   #   displayName: 'Publish to public feed'

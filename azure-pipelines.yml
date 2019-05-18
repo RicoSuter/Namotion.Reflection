@@ -25,6 +25,11 @@ steps:
   displayName: 'Patch project versions'
   inputs:
     script: 'dnt bump-versions patch "$(Build.BuildNumber)"'
+- task: CmdLine@2
+  displayName: 'Patch project versions with preview'
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  inputs:
+    script: 'dnt bump-versions patch "$(Build.BuildNumber)"'
 
 - task: DotNetCoreCLI@2
   displayName: 'Build solution'

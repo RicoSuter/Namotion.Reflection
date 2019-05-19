@@ -67,23 +67,23 @@ steps:
     publishLocation: 'Container'
 
 # Push packages
-- task: DotNetCoreCLI@2
-  displayName: 'Push packages to CI feed'
-  condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/release')))
-  inputs:
-    command: 'push'
-    feedsToUse: 'select'
-    packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
-    nuGetFeedType: 'internal'
-    publishVstsFeed: 'Namotion.Reflection-CI'
-    versioningScheme: 'off'
-- task: DotNetCoreCLI@2
-  displayName: 'Push packages to NuGet.org'
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'))
-  inputs:
-    command: 'push'
-    feedsToUse: 'select'
-    packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
-    nuGetFeedType: 'external'
-    publishFeedCredentials: 'NuGet.org'
-    versioningScheme: 'off'
+# - task: DotNetCoreCLI@2
+#   displayName: 'Push packages to CI feed'
+#   condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/release')))
+#   inputs:
+#     command: 'push'
+#     feedsToUse: 'select'
+#     packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
+#     nuGetFeedType: 'internal'
+#     publishVstsFeed: 'Namotion.Reflection-CI'
+#     versioningScheme: 'off'
+# - task: DotNetCoreCLI@2
+#   displayName: 'Push packages to NuGet.org'
+#   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'))
+#   inputs:
+#     command: 'push'
+#     feedsToUse: 'select'
+#     packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
+#     nuGetFeedType: 'external'
+#     publishFeedCredentials: 'NuGet.org'
+#     versioningScheme: 'off'

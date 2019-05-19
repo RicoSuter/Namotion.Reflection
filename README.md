@@ -1,3 +1,5 @@
+[![Build Status](https://rsuter.visualstudio.com/Namotion.Reflection/_apis/build/status/Namotion.Reflection%20-%20CI?branchName=master)](https://rsuter.visualstudio.com/Namotion.Reflection/_build/latest?definitionId=16&branchName=master)
+
 # Namotion.Reflection
 
 Library with advanced .NET reflection APIs.

@@ -7,27 +7,39 @@ pool:
   vmImage: 'windows-2019'
 
 variables:
-  solution: 'src/Namotion.Reflection.sln'
+  projects: '**/*.csproj'
   configuration: release
 
 steps:
-# - task: UseDotNet@2
-#   displayName: 'Install .NET Core SDK'
-#   inputs:
-#     packageType: 'sdk'
-#     version: '2.2.203'
-- task: NuGetCommand@2
+# Install required SDKs and tools
+- task: UseDotNet@2
+  displayName: 'Install .NET Core SDK'
   inputs:
-    command: 'restore'
-    restoreSolution: '$(solution)'
-    feedsToUse: 'config'
-    nugetConfigPath: 'src/nuget.config'
-    versioningScheme: 'off'
+    packageType: 'sdk'
+    version: '2.2.203'
+- task: CmdLine@2
+  displayName: 'Install DNT'
+  inputs:
+    script: 'npm i -g dotnettools'
+
+# Patch project versions
+- task: CmdLine@2
+  displayName: 'Update project version revision'
+  condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/release'))
+  inputs:
+    script: 'dnt bump-versions revision "$(Build.BuildNumber)"'
+- task: CmdLine@2
+  displayName: 'Patch project version preview'
+  condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/release'))
+  inputs:
+    script: 'dnt bump-versions preview "build.$(Build.BuildNumber)"'
+
+# Build, test and pack
 - task: DotNetCoreCLI@2
   displayName: 'Build solution'
   inputs:
     command: 'build'
-    projects: '$(solution)'
+    projects: '$(projects)'
     arguments: '--configuration $(configuration)'
     feedsToUse: 'select'
     versioningScheme: 'off'
@@ -35,13 +47,43 @@ steps:
   displayName: 'Run tests'
   inputs:
     command: 'test'
-    projects: '$(solution)'
+    projects: '$(projects)'
     arguments: '--configuration $(configuration)'
     feedsToUse: 'select'
+    versioningScheme: 'off'
+- task: DotNetCoreCLI@2
+  displayName: 'Create packages'
+  inputs:
+    command: 'pack'
+    feedsToUse: 'select'
+    packagesToPack: '$(projects)'
+    arguments: '--configuration $(configuration)'
     versioningScheme: 'off'
 - task: PublishBuildArtifacts@1
   displayName: 'Publish artifacts'
   inputs:
-    PathtoPublish: '**/*.nupkg'
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'drop'
     publishLocation: 'Container'
+
+# Push packages
+- task: DotNetCoreCLI@2
+  displayName: 'Push packages to CI feed'
+  condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/release')))
+  inputs:
+    command: 'push'
+    feedsToUse: 'select'
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
+    nuGetFeedType: 'internal'
+    publishVstsFeed: 'Namotion.Reflection-CI'
+    versioningScheme: 'off'
+- task: DotNetCoreCLI@2
+  displayName: 'Push packages to NuGet.org'
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'))
+  inputs:
+    command: 'push'
+    feedsToUse: 'select'
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
+    nuGetFeedType: 'external'
+    publishFeedCredentials: 'NuGet.org'
+    versioningScheme: 'off'

@@ -2,7 +2,7 @@ trigger:
   branches:
       include:
       - master
-      - refs/tags/*
+      - release
 pr:
 - master
 
@@ -10,8 +10,8 @@ pool:
   vmImage: 'windows-2019'
 
 variables:
-  projects: '**/*.csproj'
   BuildConfiguration: Release
+  Projects: '**/*.csproj'
 
 steps:
 # Install required SDKs and tools
@@ -43,7 +43,7 @@ steps:
   displayName: 'Build solution'
   inputs:
     command: 'build'
-    projects: '$(projects)'
+    projects: '$(Projects)'
     arguments: '--configuration $(BuildConfiguration)'
     feedsToUse: 'select'
     versioningScheme: 'off'
@@ -51,12 +51,12 @@ steps:
   displayName: 'Run tests'
   inputs:
     command: 'test'
-    projects: '$(projects)'
+    projects: '$(Projects)'
     arguments: '--configuration $(BuildConfiguration)'
     feedsToUse: 'select'
     versioningScheme: 'off'
 
-# Pack and publish packages
+# Pack and publish artifacts
 - task: DotNetCoreCLI@2
   displayName: 'Create packages'
   condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))

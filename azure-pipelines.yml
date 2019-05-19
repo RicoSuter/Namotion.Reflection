@@ -22,18 +22,19 @@ steps:
     version: '2.2.203'
 - task: CmdLine@2
   displayName: 'Install DNT'
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   inputs:
     script: 'npm i -g dotnettools'
 
 # Patch project versions
 - task: CmdLine@2
   displayName: 'Update project version revision'
-  condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/release'))
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   inputs:
     script: 'dnt bump-versions revision "$(Build.BuildNumber)"'
 - task: CmdLine@2
   displayName: 'Patch project version preview'
-  condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/release'))
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   inputs:
     script: 'dnt bump-versions preview "build.$(Build.BuildNumber)"'
 

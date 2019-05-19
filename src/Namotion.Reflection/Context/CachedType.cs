@@ -14,6 +14,7 @@ namespace Namotion.Reflection
     {
         private Type _type;
         private bool _isNullableType;
+        private string _typeName;
 
         private Attribute[] typeAttributes;
 
@@ -54,16 +55,16 @@ namespace Namotion.Reflection
         /// <summary>
         /// Gets the type name.
         /// </summary>
-        public string TypeName => Type.Name;
+        public string TypeName => _typeName ?? (_typeName = Type.Name);
 
         /// <summary>
         /// Gest the original's type info.
         /// </summary>
 #if !NET40
-        public TypeInfo TypeInfo => _typeInfo ?? (_typeInfo = OriginalType.GetTypeInfo());
+        public TypeInfo TypeInfo => _typeInfo ?? (_typeInfo = Type.GetTypeInfo());
         private TypeInfo _typeInfo;
 #else
-        public Type TypeInfo => OriginalType;
+        public Type TypeInfo => Type;
 #endif
         /// <summary>
         /// Gets the type's associated attributes of the type.

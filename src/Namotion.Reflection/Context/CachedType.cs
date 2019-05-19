@@ -12,8 +12,10 @@ namespace Namotion.Reflection
     /// </summary>
     public class CachedType
     {
-        private bool isNullableType;
-        private Type type;
+        private Type _type;
+        private bool _isNullableType;
+
+        private Attribute[] typeAttributes;
 
         /// <summary>
         /// Internal generic arguments.
@@ -24,8 +26,6 @@ namespace Namotion.Reflection
         /// Internal original generic arguments.
         /// </summary>
         protected object originalGenericArguments;
-
-        private Attribute[] typeAttributes;
 
         /// <summary>
         /// Unwraps the OriginalType as <see cref="Type"/> from the context type.
@@ -60,7 +60,8 @@ namespace Namotion.Reflection
         /// Gest the original's type info.
         /// </summary>
 #if !NET40
-        public TypeInfo TypeInfo => OriginalType.GetTypeInfo();
+        public TypeInfo TypeInfo => _typeInfo ?? (_typeInfo = OriginalType.GetTypeInfo());
+        private TypeInfo _typeInfo;
 #else
         public Type TypeInfo => OriginalType;
 #endif
@@ -82,7 +83,7 @@ namespace Namotion.Reflection
                     if (typeAttributes == null)
                     {
                         // TODO: rename to inherited type attributes and add type attributes property
-                        typeAttributes = type.GetTypeInfo().GetCustomAttributes(true).OfType<Attribute>().ToArray();
+                        typeAttributes = _type.GetTypeInfo().GetCustomAttributes(true).OfType<Attribute>().ToArray();
                     }
 
                     return typeAttributes;
@@ -98,7 +99,7 @@ namespace Namotion.Reflection
             get
             {
                 UpdateOriginalGenericArguments();
-                return type;
+                return _type;
             }
         }
 
@@ -110,7 +111,7 @@ namespace Namotion.Reflection
             get
             {
                 UpdateOriginalGenericArguments();
-                return isNullableType;
+                return _isNullableType;
             }
         }
 
@@ -214,9 +215,9 @@ namespace Namotion.Reflection
                         }
 
                         originalGenericArguments = arguments.ToArray();
-                        isNullableType = OriginalType.Name == "Nullable`1";
-                        genericArguments = isNullableType ? new CachedType[0] : originalGenericArguments;
-                        type = isNullableType ? ((IEnumerable)originalGenericArguments).Cast<CachedType>().First().OriginalType : OriginalType;
+                        _isNullableType = OriginalType.Name == "Nullable`1";
+                        genericArguments = _isNullableType ? new CachedType[0] : originalGenericArguments;
+                        _type = _isNullableType ? ((IEnumerable)originalGenericArguments).Cast<CachedType>().First().OriginalType : OriginalType;
                     }
                 }
             }

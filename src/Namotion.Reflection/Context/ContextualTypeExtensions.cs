@@ -112,7 +112,7 @@ namespace Namotion.Reflection
         /// <returns>The <see cref="ContextualParameterInfo"/>.</returns>
         public static ContextualParameterInfo ToContextualParameter(this ParameterInfo parameterInfo)
         {
-            var key = "Parameter:" + parameterInfo.Name + ":" + parameterInfo.Member.DeclaringType.FullName;
+            var key = "Parameter:" + parameterInfo.Name + ":" + parameterInfo.Member.Name + ":" + parameterInfo.Member.DeclaringType.FullName;
             if (!Cache.ContainsKey(key))
             {
                 lock (Lock)

@@ -12,7 +12,7 @@ namespace Namotion.Reflection
         private string _name;
 
         internal ContextualParameterInfo(ParameterInfo parameterInfo, ref int nullableFlagsIndex)
-            : base(parameterInfo.ParameterType, parameterInfo.GetCustomAttributes(true).OfType<Attribute>().ToArray(), null, null, ref nullableFlagsIndex)
+            : base(parameterInfo.ParameterType, parameterInfo.GetCustomAttributes(false).OfType<Attribute>().ToArray(), null, null, ref nullableFlagsIndex)
         {
             ParameterInfo = parameterInfo;
         }

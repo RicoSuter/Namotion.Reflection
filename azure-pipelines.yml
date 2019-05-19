@@ -1,14 +1,17 @@
 trigger:
   branches:
-    include:
-    - '*'
+      include:
+      - master
+      - refs/tags/*
+pr:
+- master
 
 pool:
   vmImage: 'windows-2019'
 
 variables:
   projects: '**/*.csproj'
-  configuration: release
+  BuildConfiguration: Release
 
 steps:
 # Install required SDKs and tools
@@ -34,13 +37,13 @@ steps:
   inputs:
     script: 'dnt bump-versions preview "build.$(Build.BuildNumber)"'
 
-# Build, test and pack
+# Build and test
 - task: DotNetCoreCLI@2
   displayName: 'Build solution'
   inputs:
     command: 'build'
     projects: '$(projects)'
-    arguments: '--configuration $(configuration)'
+    arguments: '--configuration $(BuildConfiguration)'
     feedsToUse: 'select'
     versioningScheme: 'off'
 - task: DotNetCoreCLI@2
@@ -48,19 +51,23 @@ steps:
   inputs:
     command: 'test'
     projects: '$(projects)'
-    arguments: '--configuration $(configuration)'
+    arguments: '--configuration $(BuildConfiguration)'
     feedsToUse: 'select'
     versioningScheme: 'off'
+
+# Pack and publish packages
 - task: DotNetCoreCLI@2
   displayName: 'Create packages'
+  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
   inputs:
     command: 'pack'
     feedsToUse: 'select'
     packagesToPack: '$(projects)'
-    arguments: '--configuration $(configuration)'
+    arguments: '--configuration $(BuildConfiguration)'
     versioningScheme: 'off'
 - task: PublishBuildArtifacts@1
   displayName: 'Publish artifacts'
+  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'drop'

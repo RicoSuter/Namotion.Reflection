@@ -1,4 +1,4 @@
-[![Build Status](https://rsuter.visualstudio.com/Namotion.Reflection/_apis/build/status/Namotion.Reflection%20-%20CI?branchName=master)](https://rsuter.visualstudio.com/Namotion.Reflection/_build/latest?definitionId=16&branchName=master)
+![Azure DevOps builds (branch)](https://img.shields.io/azure-devops/build/rsuter/Namotion.Reflection/16/master.svg)
 
 # Namotion.Reflection
 

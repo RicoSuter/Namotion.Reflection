@@ -12,6 +12,14 @@ namespace Namotion.Reflection
     /// </summary>
     public class CachedType
     {
+        /// <summary>
+        /// Clears the cache.
+        /// </summary>
+        public static void ClearCache()
+        {
+            ContextualTypeExtensions.ClearCache();
+        }
+
         private Type _type;
         private bool _isNullableType;
         private string _typeName;

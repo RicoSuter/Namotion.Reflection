@@ -21,16 +21,24 @@ using System.Xml.Linq;
 namespace Namotion.Reflection
 {
     /// <summary>Provides extension methods for reading XML comments from reflected members.</summary>
-    /// <remarks>This class currently works only on the desktop .NET framework.</remarks>
+    public static class XmlDocumentation
+    {
+        /// <summary>
+        /// Clears the cache.
+        /// </summary>
+        public static void ClearCache()
+        {
+            XmlDocumentationExtensions.ClearCache();
+        }
+    }
+
+    /// <summary>Provides extension methods for reading XML comments from reflected members.</summary>
     public static class XmlDocumentationExtensions
     {
         private static readonly AsyncLock Lock = new AsyncLock();
         private static readonly Dictionary<string, XDocument> Cache = new Dictionary<string, XDocument>(StringComparer.OrdinalIgnoreCase);
 
-        /// <summary>
-        /// Clears the cache.
-        /// </summary>
-        public static void ClearCache()
+        internal static void ClearCache()
         {
             using (Lock.Lock())
             {

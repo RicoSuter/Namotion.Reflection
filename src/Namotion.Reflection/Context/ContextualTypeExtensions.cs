@@ -13,10 +13,7 @@ namespace Namotion.Reflection
         private static readonly object Lock = new object();
         private static readonly Dictionary<string, object> Cache = new Dictionary<string, object>();
 
-        /// <summary>
-        /// Clears the cache.
-        /// </summary>
-        public static void ClearCache()
+        internal static void ClearCache()
         {
             lock (Lock)
             {

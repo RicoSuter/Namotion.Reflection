@@ -27,7 +27,7 @@ namespace Namotion.Reflection.Tests
         public async Task When_xml_doc_with_multiple_breaks_is_read_then_they_are_not_stripped_away()
         {
             //// Arrange
-            XmlDocumentationExtensions.ClearCache();
+            XmlDocumentation.ClearCache();
 
             //// Act
             var summary = await typeof(WithComplexXmlDoc).GetProperty("Foo").GetXmlSummaryAsync();
@@ -50,7 +50,7 @@ namespace Namotion.Reflection.Tests
         public async Task When_xml_doc_contains_xml_then_it_is_fully_read()
         {
             //// Arrange
-            XmlDocumentationExtensions.ClearCache();
+            XmlDocumentation.ClearCache();
 
             //// Act
             var element = await typeof(WithTagsInXmlDoc).GetProperty("Foo").GetXmlDocumentationAsync();
@@ -76,7 +76,7 @@ namespace Namotion.Reflection.Tests
         public async Task When_summary_has_see_tag_then_it_is_converted()
         {
             //// Arrange
-            XmlDocumentationExtensions.ClearCache();
+            XmlDocumentation.ClearCache();
 
             //// Act
             var summary = await typeof(WithSeeTagInXmlDoc).GetProperty("Foo").GetXmlSummaryAsync();
@@ -95,7 +95,7 @@ namespace Namotion.Reflection.Tests
         public async Task When_summary_has_generic_tags_then_it_is_converted()
         {
             //// Arrange
-            XmlDocumentationExtensions.ClearCache();
+            XmlDocumentation.ClearCache();
 
             //// Act
             var summary = await typeof(WithGenericTagsInXmlDoc).GetProperty("Foo").GetXmlSummaryAsync();
@@ -108,7 +108,7 @@ namespace Namotion.Reflection.Tests
         public async Task When_xml_doc_is_missing_then_summary_is_missing()
         {
             //// Arrange
-            XmlDocumentationExtensions.ClearCache();
+            XmlDocumentation.ClearCache();
 
             //// Act
             var summary = await typeof(Point).GetXmlSummaryAsync();
@@ -150,7 +150,7 @@ namespace Namotion.Reflection.Tests
         public async Task When_parameter_has_inheritdoc_then_it_is_resolved()
         {
             //// Arrange
-            XmlDocumentationExtensions.ClearCache();
+            XmlDocumentation.ClearCache();
 
             //// Act
             var parameterXml = await typeof(ClassWithInheritdoc).GetMethod("Bar").GetParameters()
@@ -164,7 +164,7 @@ namespace Namotion.Reflection.Tests
         public async Task When_property_has_inheritdoc_then_it_is_resolved()
         {
             //// Arrange
-            XmlDocumentationExtensions.ClearCache();
+            XmlDocumentation.ClearCache();
 
             //// Act
             var propertySummary = await typeof(ClassWithInheritdoc).GetProperty("Foo").GetXmlSummaryAsync();
@@ -177,7 +177,7 @@ namespace Namotion.Reflection.Tests
         public async Task When_method_has_inheritdoc_then_it_is_resolved()
         {
             //// Arrange
-            XmlDocumentationExtensions.ClearCache();
+            XmlDocumentation.ClearCache();
 
             //// Act
             var methodSummary = await typeof(ClassWithInheritdoc).GetMethod("Bar").GetXmlSummaryAsync();
@@ -213,7 +213,7 @@ namespace Namotion.Reflection.Tests
         public async Task When_parameter_has_inheritdoc_on_interface_then_it_is_resolved()
         {
             //// Arrange
-            XmlDocumentationExtensions.ClearCache();
+            XmlDocumentation.ClearCache();
 
             //// Act
             var parameterXml = await typeof(ClassWithInheritdocOnInterface).GetMethod("Bar").GetParameters()
@@ -227,7 +227,7 @@ namespace Namotion.Reflection.Tests
         public async Task When_property_has_inheritdoc_on_interface_then_it_is_resolved()
         {
             //// Arrange
-            XmlDocumentationExtensions.ClearCache();
+            XmlDocumentation.ClearCache();
 
             //// Act
             var propertySummary = await typeof(ClassWithInheritdocOnInterface).GetProperty("Foo").GetXmlSummaryAsync();
@@ -240,7 +240,7 @@ namespace Namotion.Reflection.Tests
         public async Task When_method_has_inheritdoc_then_on_interface_it_is_resolved()
         {
             //// Arrange
-            XmlDocumentationExtensions.ClearCache();
+            XmlDocumentation.ClearCache();
 
             //// Act
             var methodSummary = await typeof(ClassWithInheritdocOnInterface).GetMethod("Bar").GetXmlSummaryAsync();

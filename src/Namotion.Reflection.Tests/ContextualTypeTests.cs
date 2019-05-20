@@ -3,12 +3,16 @@ using System;
 using System.Linq;
 using Xunit;
 
+#if !NET45
 #nullable enable
+#endif
 
 namespace Namotion.Reflection.Tests
 {
     public class ContextualTypeTests
     {
+#if !NET45
+
         class TestAction
         {
             public void Action(Tuple<string, int, int?, TestAction, TestAction?> parameter)
@@ -52,6 +56,8 @@ namespace Namotion.Reflection.Tests
             // Assert
             Assert.Equal(Nullability.NotNullable, typeWithContext.Nullability);
         }
+
+#endif
 
         class TestFunction
         {

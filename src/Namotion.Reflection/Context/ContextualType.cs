@@ -40,7 +40,7 @@ namespace Namotion.Reflection
         public ContextualType Parent { get; }
 
         /// <summary>
-        /// Gets the type's associated attributes of the given context.
+        /// Gets the type's associated attributes of the given context (not inherited).
         /// </summary>
         public Attribute[] ContextAttributes { get; private set; }
 

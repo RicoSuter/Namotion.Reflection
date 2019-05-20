@@ -4,7 +4,9 @@
 
 Library with advanced .NET reflection APIs.
 
-## C# 8 nullability reflection
+## Contextual and cached types
+
+### C# 8 nullability reflection
 
 With the `ContextualType` class you can reflect on the nullability of properties, fields, method parameters and return types which will be available when compiling with the C# 8 compiler with the Nullable Reference Types feature enabled. 
 

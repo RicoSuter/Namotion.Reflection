@@ -2,7 +2,7 @@
 
 # Namotion.Reflection
 
-Library with advanced .NET reflection APIs.
+.NET library with advanced reflection APIs like XML documentation reading, Null Reference Types (C# 8) reflection and string based type checks.
 
 ## Contextual and cached types
 

@@ -12,7 +12,7 @@ namespace Namotion.Reflection
         private string _name;
 
         internal ContextualParameterInfo(ParameterInfo parameterInfo, ref int nullableFlagsIndex)
-            : base(parameterInfo.ParameterType, parameterInfo.GetCustomAttributes(false).OfType<Attribute>().ToArray(), null, null, ref nullableFlagsIndex)
+            : base(parameterInfo.ParameterType, GetContextualAttributes(parameterInfo), null, null, ref nullableFlagsIndex)
         {
             ParameterInfo = parameterInfo;
         }
@@ -31,6 +31,19 @@ namespace Namotion.Reflection
         public override string ToString()
         {
             return Name + " (Parameter) - " + base.ToString();
+        }
+
+        private static Attribute[] GetContextualAttributes(ParameterInfo parameterInfo)
+        {
+            try
+            {
+                return parameterInfo.GetCustomAttributes(true).OfType<Attribute>().ToArray();
+            }
+            catch
+            {
+                // Needed for legacy runtimes
+                return parameterInfo.GetCustomAttributes(false).OfType<Attribute>().ToArray();
+            }
         }
     }
 }

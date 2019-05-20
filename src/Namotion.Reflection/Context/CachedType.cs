@@ -67,7 +67,7 @@ namespace Namotion.Reflection
         public Type TypeInfo => Type;
 #endif
         /// <summary>
-        /// Gets the type's associated attributes of the type (direct and inherited).
+        /// Gets the type's associated attributes of the type (inherited).
         /// </summary>
         public Attribute[] TypeAttributes
         {

@@ -7,9 +7,7 @@
 
 .NET library with advanced reflection APIs like XML documentation reading, Null Reference Types (C# 8) reflection and string based type checks.
 
-.
-
-.
+This library is mainly used in [NJsonSchema](https://github.com/RicoSuter/NJsonSchema).
 
 ## Contextual and cached types
 

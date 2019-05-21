@@ -5,7 +5,7 @@
 
 <img align="left" src="https://raw.githubusercontent.com/RicoSuter/Namotion.Reflection/master/assets/GitHubIcon.png">
 
-Library with advanced .NET reflection APIs.
+.NET library with advanced reflection APIs like XML documentation reading, Null Reference Types (C# 8) reflection and string based type checks.
 
 .
 

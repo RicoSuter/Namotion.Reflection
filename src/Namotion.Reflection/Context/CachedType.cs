@@ -24,7 +24,7 @@ namespace Namotion.Reflection
         private bool _isNullableType;
         private string _typeName;
 
-        private Attribute[] typeAttributes;
+        private Attribute[] _typeAttributes;
 
         /// <summary>
         /// Internal generic arguments.
@@ -81,21 +81,21 @@ namespace Namotion.Reflection
         {
             get
             {
-                if (typeAttributes != null)
+                if (_typeAttributes != null)
                 {
-                    return typeAttributes;
+                    return _typeAttributes;
                 }
 
                 UpdateOriginalGenericArguments();
                 lock (this)
                 {
-                    if (typeAttributes == null)
+                    if (_typeAttributes == null)
                     {
                         // TODO: rename to inherited type attributes and add type attributes property
-                        typeAttributes = _type.GetTypeInfo().GetCustomAttributes(true).OfType<Attribute>().ToArray();
+                        _typeAttributes = _type.GetTypeInfo().GetCustomAttributes(true).OfType<Attribute>().ToArray();
                     }
 
-                    return typeAttributes;
+                    return _typeAttributes;
                 }
             }
         }

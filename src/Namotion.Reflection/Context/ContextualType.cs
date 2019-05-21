@@ -24,7 +24,11 @@ namespace Namotion.Reflection
             : base(type)
         {
             Parent = parent;
-            ContextAttributes = contextAttributes is Attribute[] ? (Attribute[])contextAttributes : contextAttributes.ToArray();
+            ContextAttributes = contextAttributes is Attribute[]?
+                (Attribute[])contextAttributes :
+                contextAttributes?.ToArray() ??
+                new Attribute[0];
+
             _nullableFlags = nullableFlags;
 
             InitializeNullableFlagsAndOriginalNullability(ref nullableFlagsIndex);

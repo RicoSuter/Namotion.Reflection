@@ -56,9 +56,15 @@ steps:
     versioningScheme: 'off'
 
 # Publish artifacts
+- task: CopyFiles@2
+  displayName: 'Copy packages'
+#  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+  inputs:
+    Contents: '**/*.nupkg'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
 - task: PublishBuildArtifacts@1
   displayName: 'Publish artifacts'
-  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+#  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'drop'

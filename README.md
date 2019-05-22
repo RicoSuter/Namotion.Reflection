@@ -70,14 +70,14 @@ Methods:
 
 **IEnumerable extensions**
 
-- GetAssignableToTypeName
-- FirstAssignableToTypeName
-- GetCommonBaseType
+- GetAssignableToTypeName: Tries to get the first object which is assignable to the given type nameHasProperty
+- FirstAssignableToTypeNameOrDefault: Tries to get the first object which is assignable to the given type name.
+- GetCommonBaseType: Finds the first common base type of the given types.
 
 **Object extensions**
 
-- HasProperty
-- TryGetPropertyValue
+- HasProperty: Determines whether the specified property name exists.
+- TryGetPropertyValue: Determines whether the specified property name exists.
 
 **Type extensions**
 

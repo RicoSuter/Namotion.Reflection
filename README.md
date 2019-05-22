@@ -2,6 +2,7 @@
 
 [![Azure DevOps](https://img.shields.io/azure-devops/build/rsuter/Namotion.Reflection/16/master.svg)](https://rsuter.visualstudio.com/Namotion.Reflection/_build?definitionId=16)
 [![Nuget](https://img.shields.io/nuget/v/Namotion.Reflection.svg)](https://www.nuget.org/packages/Namotion.Reflection/)
+[![](![MyGet](https://img.shields.io/myget/namotion-reflection/v/Namotion.Reflection.svg?label=Preview%20NuGet))](https://www.myget.org/feed/Details/namotion-reflection)
 
 <img align="left" src="https://raw.githubusercontent.com/RicoSuter/Namotion.Reflection/master/assets/NuGetIcon.png">
 

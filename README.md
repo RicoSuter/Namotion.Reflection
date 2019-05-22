@@ -3,13 +3,11 @@
 [![Azure DevOps](https://img.shields.io/azure-devops/build/rsuter/Namotion.Reflection/16/master.svg)](https://rsuter.visualstudio.com/Namotion.Reflection/_build?definitionId=16)
 [![Nuget](https://img.shields.io/nuget/v/Namotion.Reflection.svg)](https://www.nuget.org/packages/Namotion.Reflection/)
 
-<img align="left" src="https://raw.githubusercontent.com/RicoSuter/Namotion.Reflection/master/assets/GitHubIcon.png">
+<img align="left" src="https://raw.githubusercontent.com/RicoSuter/Namotion.Reflection/master/assets/NuGetIcon.png">
 
 .NET library with advanced reflection APIs like XML documentation reading, Null Reference Types (C# 8) reflection and string based type checks.
 
-.
-
-.
+This library is mainly used in [NJsonSchema](https://github.com/RicoSuter/NJsonSchema).
 
 ## Contextual and cached types
 
@@ -52,17 +50,28 @@ Value: Nullable
 
 For more details, see https://blog.rsuter.com/the-output-of-nullable-reference-types-and-how-to-reflect-it/
 
+Methods: 
+
+- CachedType.ClearCache()
+
 ## Read XML Documentation
 
-- GetXmlSummaryAsync
-- GetXmlRemarksAsync
-- GetXmlDocumentationAsync: Gets the XElement of the given type
+Methods: 
+
+- **Type|MemberInfo.GetXmlDocsSummaryAsync():**
+- **Type|MemberInfo.GetXmlDocsRemarksAsync():**
+- **ParameterInfo.GetXmlDocsAsync():** Gets the XElement of the given type
+
+- **XmlDocs.ClearCache()**
 
 ## Extension methods
 
+Methods: 
+
 **IEnumerable extensions**
 
-- TryGetAssignableToTypeName
+- GetAssignableToTypeName
+- FirstAssignableToTypeName
 - GetCommonBaseType
 
 **Object extensions**

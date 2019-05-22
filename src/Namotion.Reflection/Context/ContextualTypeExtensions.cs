@@ -36,9 +36,9 @@ namespace Namotion.Reflection
                 {
                     if (!Cache.ContainsKey(key))
                     {
-                        Cache[key] = type.GetContextualRuntimeProperties()
+                        Cache[key] = type.GetContextualProperties()
                             .OfType<ContextualMemberInfo>()
-                            .Union(type.GetContextualRuntimeFields())
+                            .Union(type.GetContextualFields())
                             .ToArray();
                     }
                 }
@@ -48,11 +48,36 @@ namespace Namotion.Reflection
         }
 
         /// <summary>
+        /// Gets an array of <see cref="ContextualParameterInfo"/> for the given <see cref="MethodInfo"/> instance.
+        /// </summary>
+        /// <param name="method">The method.</param>
+        /// <returns>The runtime properties.</returns>
+        public static ContextualParameterInfo[] GetContextualParameters(this MethodInfo method)
+        {
+            var key = "Parameters:" + method.Name + ":" + method.DeclaringType.FullName;
+
+            if (!Cache.ContainsKey(key))
+            {
+                lock (Lock)
+                {
+                    if (!Cache.ContainsKey(key))
+                    {
+                        Cache[key] = method.GetParameters()
+                            .Select(p => p.ToContextualParameter())
+                            .ToArray();
+                    }
+                }
+            }
+
+            return (ContextualParameterInfo[])Cache[key];
+        }
+
+        /// <summary>
         /// Gets an array of <see cref="ContextualPropertyInfo"/> for the given <see cref="Type"/> instance.
         /// </summary>
         /// <param name="type">The type.</param>
         /// <returns>The runtime properties.</returns>
-        public static ContextualPropertyInfo[] GetContextualRuntimeProperties(this Type type)
+        public static ContextualPropertyInfo[] GetContextualProperties(this Type type)
         {
             var key = "Properties:" + type.FullName;
 
@@ -80,7 +105,7 @@ namespace Namotion.Reflection
         /// </summary>
         /// <param name="type">The type.</param>
         /// <returns>The runtime fields.</returns>
-        public static ContextualFieldInfo[] GetContextualRuntimeFields(this Type type)
+        public static ContextualFieldInfo[] GetContextualFields(this Type type)
         {
             var key = "Fields:" + type.FullName;
             if (!Cache.ContainsKey(key))
@@ -201,7 +226,7 @@ namespace Namotion.Reflection
         /// <returns>The <see cref="CachedType"/>.</returns>
         public static ContextualType ToContextualType(this Type type, IEnumerable<Attribute> attributes)
         {
-            // TODO: Should we cache this somehow?
+            // TODO: Is there a way to cache these contextual types?
             return ContextualType.ForType(type, attributes);
         }
 

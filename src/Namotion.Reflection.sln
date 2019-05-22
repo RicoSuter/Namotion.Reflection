@@ -14,6 +14,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Namotion.Reflection.Demo", "Namotion.Reflection.Demo\Namotion.Reflection.Demo.csproj", "{A6268E5A-0AA1-452D-BCAC-BCF0C38B6DFC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +34,10 @@ Global
 		{7D57D49F-608A-4FE8-B13D-4F78322D4F42}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D57D49F-608A-4FE8-B13D-4F78322D4F42}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7D57D49F-608A-4FE8-B13D-4F78322D4F42}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A6268E5A-0AA1-452D-BCAC-BCF0C38B6DFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6268E5A-0AA1-452D-BCAC-BCF0C38B6DFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A6268E5A-0AA1-452D-BCAC-BCF0C38B6DFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6268E5A-0AA1-452D-BCAC-BCF0C38B6DFC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

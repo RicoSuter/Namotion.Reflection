@@ -22,11 +22,10 @@ steps:
     version: '2.2.203'
 - task: CmdLine@2
   displayName: 'Install DNT'
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   inputs:
     script: 'npm i -g dotnettools'
 
-# Patch project versions
+# Patch project versions (on master only)
 - task: CmdLine@2
   displayName: 'Update project version revision'
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
@@ -39,6 +38,7 @@ steps:
     script: 'dnt bump-versions preview "$(Build.BuildNumber)"'
 
 # Build and test
+
 - task: DotNetCoreCLI@2
   displayName: 'Build solution'
   inputs:

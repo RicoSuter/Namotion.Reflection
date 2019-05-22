@@ -56,16 +56,7 @@ steps:
     feedsToUse: 'select'
     versioningScheme: 'off'
 
-# Pack and publish artifacts
-- task: DotNetCoreCLI@2
-  displayName: 'Create packages'
-  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
-  inputs:
-    command: 'pack'
-    feedsToUse: 'select'
-    packagesToPack: '$(projects)'
-    arguments: '--configuration $(BuildConfiguration)'
-    versioningScheme: 'off'
+# Publish artifacts
 - task: PublishBuildArtifacts@1
   displayName: 'Publish artifacts'
   condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))

@@ -22,11 +22,21 @@ namespace Namotion.Reflection
         /// <param name="objects">The objects.</param>
         /// <param name="typeName">Type of the attribute.</param>
         /// <param name="typeNameStyle">The type name style.</param>
+        /// <returns>The objects which are assignable.</returns>
+        public static IEnumerable<T> GetAssignableToTypeName<T>(this IEnumerable<T> objects, string typeName, TypeNameStyle typeNameStyle = TypeNameStyle.FullName)
+        {
+            return objects.Where(o => o.GetType().IsAssignableToTypeName(typeName, typeNameStyle));
+        }
+
+        /// <summary>Tries to get the first object which is assignable to the given type name.</summary>
+        /// <param name="objects">The objects.</param>
+        /// <param name="typeName">Type of the attribute.</param>
+        /// <param name="typeNameStyle">The type name style.</param>
         /// <returns>May return null (not found).</returns>
-        public static T TryGetAssignableToTypeName<T>(this IEnumerable<T> objects, string typeName, TypeNameStyle typeNameStyle = TypeNameStyle.FullName)
+        public static T FirstAssignableToTypeNameOrDefault<T>(this IEnumerable<T> objects, string typeName, TypeNameStyle typeNameStyle = TypeNameStyle.FullName)
         {
             return objects != null ?
-                objects.FirstOrDefault(a => a.GetType().IsAssignableToTypeName(typeName, typeNameStyle)) :
+                objects.GetAssignableToTypeName(typeName, typeNameStyle).FirstOrDefault() :
                 default;
         }
 

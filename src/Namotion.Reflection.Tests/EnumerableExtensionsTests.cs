@@ -8,7 +8,7 @@ namespace Namotion.Reflection.Tests
         public void When_retrieving_first_assignable_object_then_it_is_correct()
         {
             //// Act
-            var obj = new object[] { 3, "abc" }.TryGetAssignableToTypeName("String", TypeNameStyle.Name);
+            var obj = new object[] { 3, "abc" }.FirstAssignableToTypeNameOrDefault("String", TypeNameStyle.Name);
 
             //// Assert
             Assert.Equal("abc", obj);

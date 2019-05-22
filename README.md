@@ -52,17 +52,28 @@ Value: Nullable
 
 For more details, see https://blog.rsuter.com/the-output-of-nullable-reference-types-and-how-to-reflect-it/
 
+Methods: 
+
+- CachedType.ClearCache()
+
 ## Read XML Documentation
 
-- GetXmlSummaryAsync
-- GetXmlRemarksAsync
-- GetXmlDocumentationAsync: Gets the XElement of the given type
+Methods: 
+
+- **Type|MemberInfo.GetXmlDocsSummaryAsync():**
+- **Type|MemberInfo.GetXmlDocsRemarksAsync():**
+- **ParameterInfo.GetXmlDocsAsync():** Gets the XElement of the given type
+
+- **XmlDocs.ClearCache()**
 
 ## Extension methods
 
+Methods: 
+
 **IEnumerable extensions**
 
-- TryGetAssignableToTypeName
+- GetAssignableToTypeName
+- FirstAssignableToTypeName
 - GetCommonBaseType
 
 **Object extensions**

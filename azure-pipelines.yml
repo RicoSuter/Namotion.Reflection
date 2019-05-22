@@ -38,7 +38,6 @@ steps:
     script: 'dnt bump-versions preview "$(Build.BuildNumber)"'
 
 # Build and test
-
 - task: DotNetCoreCLI@2
   displayName: 'Build solution'
   inputs:

@@ -62,6 +62,7 @@ steps:
   inputs:
     Contents: '**/*.nupkg'
     TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    flattenFolders: true
 - task: PublishBuildArtifacts@1
   displayName: 'Publish artifacts'
 #  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))

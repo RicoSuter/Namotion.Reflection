@@ -3,6 +3,7 @@ trigger:
       include:
       - master
       - release
+      - refs/tags/*
 pr:
 - master
 
@@ -22,21 +23,20 @@ steps:
     version: '2.2.203'
 - task: CmdLine@2
   displayName: 'Install DNT'
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   inputs:
     script: 'npm i -g dotnettools'
 
-# Patch project versions
+# Patch project versions (on master only)
 - task: CmdLine@2
   displayName: 'Update project version revision'
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   inputs:
-    script: 'dnt bump-versions revision "$(Build.BuildNumber)"'
+    script: 'dnt bump-versions revision "$(Build.BuildId)"'
 - task: CmdLine@2
   displayName: 'Patch project version preview'
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   inputs:
-    script: 'dnt bump-versions preview "build.$(Build.BuildNumber)"'
+    script: 'dnt bump-versions preview "$(Build.BuildNumber)"'
 
 # Build and test
 - task: DotNetCoreCLI@2
@@ -56,19 +56,17 @@ steps:
     feedsToUse: 'select'
     versioningScheme: 'off'
 
-# Pack and publish artifacts
-- task: DotNetCoreCLI@2
-  displayName: 'Create packages'
-  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+# Publish artifacts
+- task: CopyFiles@2
+  displayName: 'Copy packages'
+#  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
   inputs:
-    command: 'pack'
-    feedsToUse: 'select'
-    packagesToPack: '$(projects)'
-    arguments: '--configuration $(BuildConfiguration)'
-    versioningScheme: 'off'
+    Contents: '**/*.nupkg'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    flattenFolders: true
 - task: PublishBuildArtifacts@1
   displayName: 'Publish artifacts'
-  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+#  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'drop'

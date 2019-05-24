@@ -40,7 +40,7 @@ namespace Namotion.Reflection
                 default;
         }
 
-        /// <summary>Finds the first common base of the given types.</summary>
+        /// <summary>Finds the first common base type of the given types.</summary>
         /// <param name="types">The types.</param>
         /// <returns>The common base type.</returns>
         public static Type GetCommonBaseType(this IEnumerable<Type> types)

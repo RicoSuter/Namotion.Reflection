@@ -17,6 +17,9 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("Namotion.Reflection.Cecil, PublicKey=0024000004800000940000000602000000240000525341310004000001000100337d8a0b73ac39048dc55d8e48dd86dcebd0af16aa514c73fbf5f283a8e94d7075b4152e5621e18d234bf7a5aafcb6683091f79d87b80c3be3e806f688e6f940adf92b28cedf1f8f69aa443699c235fa049204b56b83d94f599dd9800171f28e45ab74351acab17d889cd65961354d2f6405bddb9e896956e69e60033c2574f1")]
 
 namespace Namotion.Reflection
 {
@@ -423,6 +426,11 @@ namespace Namotion.Reflection
         private static XElement GetXmlDocsElement(this MemberInfo member, XDocument xml)
         {
             var name = GetMemberElementName(member);
+            return GetXmlDocsElement(xml, name);
+        }
+
+        internal static XElement GetXmlDocsElement(this XDocument xml, string name)
+        {
             var result = (IEnumerable)DynamicApis.XPathEvaluate(xml, $"/doc/members/member[@name='{name}']");
             return result.OfType<XElement>().FirstOrDefault();
         }
@@ -522,15 +530,21 @@ namespace Namotion.Reflection
         }
 
         /// <exception cref="ArgumentException">Unknown member type.</exception>
-        private static string GetMemberElementName(dynamic member)
+        internal static string GetMemberElementName(dynamic member)
         {
             char prefixCode;
 
-            var memberName = member is Type memberType && !string.IsNullOrEmpty(memberType.FullName) ?
-                memberType.FullName :
-                member.DeclaringType.FullName + "." + member.Name;
+            string memberName = member is Type memberType && !string.IsNullOrEmpty(memberType.FullName) ?
+                   memberType.FullName :
+                   member.DeclaringType.FullName + "." + member.Name;
 
-            switch ((string)member.MemberType.ToString())
+            memberName = memberName.Replace("/", ".");
+
+            var type = ObjectExtensions.HasProperty(member, "MemberType") ? (string)member.MemberType.ToString() :
+                TypeExtensions.IsAssignableToTypeName(member.GetType(), "MethodDefinition", TypeNameStyle.Name) ? "Method" :
+                "TypeInfo";
+
+            switch (type)
             {
                 case "Constructor":
                     memberName = memberName.Replace(".ctor", "#ctor");
@@ -539,9 +553,15 @@ namespace Namotion.Reflection
                 case "Method":
                     prefixCode = 'M';
 
-                    var paramTypesList = string.Join(",", ((MethodBase)member).GetParameters()
+                    Func<dynamic, string> parameterTypeSelector = p => (string)p.ParameterType.FullName;
+
+                    var parameters = member is MethodBase ?
+                        ((MethodBase)member).GetParameters().Select(x => x.ParameterType.FullName) :
+                        (IEnumerable<string>)System.Linq.Enumerable.Select<dynamic, string>(member.Parameters, parameterTypeSelector);
+
+                    var paramTypesList = string.Join(",", parameters
                         .Select(x => Regex
-                            .Replace(x.ParameterType.FullName, "(`[0-9]+)|(, .*?PublicKeyToken=[0-9a-z]*)", string.Empty)
+                            .Replace(x, "(`[0-9]+)|(, .*?PublicKeyToken=[0-9a-z]*)", string.Empty)
                             .Replace("[[", "{")
                             .Replace("]]", "}"))
                         .ToArray());

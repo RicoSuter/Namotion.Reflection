@@ -1,28 +1,41 @@
 ﻿using Mono.Cecil;
 using Namotion.Reflection.Infrastructure;
 using System.Collections;
+using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using static Namotion.Reflection.XmlDocsExtensions;
 
 namespace Namotion.Reflection.Cecil
 {
-    /// <summary>Provides extension methods for reading XML comments from reflected members.</summary>
-    public static class XmlDocsExtensions
+    /// <summary>
+    /// Cecil xml docs.
+    /// </summary>
+    public static class XmlDocs
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="pathToXmlFile"></param>
-        /// <returns></returns>
+        /// <summary>Loads the XML docs from a path.</summary>
+        /// <param name="pathToXmlFile">The path.</param>
+        /// <returns>The document</returns>
         public static XDocument LoadDocumentAsync(string pathToXmlFile)
         {
             return XDocument.Load(pathToXmlFile, LoadOptions.PreserveWhitespace);
         }
 
+        /// <summary>Loads the XML docs from a stream.</summary>
+        /// <param name="stream">The stream.</param>
+        /// <returns>The document</returns>
+        public static XDocument LoadDocumentAsync(Stream stream)
+        {
+            return XDocument.Load(stream, LoadOptions.PreserveWhitespace);
+        }
+    }
+
+    /// <summary>Provides extension methods for reading XML comments from reflected members.</summary>
+    public static class XmlDocsExtensions
+    {
         /// <summary>Returns the contents of an XML documentation summary for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
-        /// <param name="tagName">Name of the tag.</param>
+        /// <param name="document">The document.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static string GetXmlDocsSummary(this IMemberDefinition member, XDocument document)
         {
@@ -32,6 +45,7 @@ namespace Namotion.Reflection.Cecil
         /// <summary>Returns the contents of an XML documentation remarks for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
         /// <param name="tagName">Name of the tag.</param>
+        /// <param name="document">The document.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static string GetXmlDocsRemarks(this IMemberDefinition member, string tagName, XDocument document)
         {
@@ -41,6 +55,7 @@ namespace Namotion.Reflection.Cecil
         /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
         /// <param name="tagName">Name of the tag.</param>
+        /// <param name="document">The document.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static string GetXmlDocsTag(this IMemberDefinition member, string tagName, XDocument document)
         {
@@ -56,6 +71,7 @@ namespace Namotion.Reflection.Cecil
 
         /// <summary>Returns the contents of an XML documentation for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
+        /// <param name="document">The document.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static string GetXmlDocs(this IMemberDefinition member, XDocument document)
         {
@@ -70,7 +86,8 @@ namespace Namotion.Reflection.Cecil
         }
 
         /// <summary>Returns the contents of an XML documentation for the specified member.</summary>
-        /// <param name="member">The reflected member.</param>
+        /// <param name="parameter">The reflected member.</param>
+        /// <param name="document">The document.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static string GetXmlDocs(this ParameterDefinition parameter, XDocument document)
         {
@@ -84,7 +101,8 @@ namespace Namotion.Reflection.Cecil
         }
 
         /// <summary>Returns the contents of an XML documentation for the specified member.</summary>
-        /// <param name="member">The reflected member.</param>
+        /// <param name="methodReturnType">The reflected member.</param>
+        /// <param name="document">The document.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static string GetXmlDocs(this MethodReturnType methodReturnType, XDocument document)
         {

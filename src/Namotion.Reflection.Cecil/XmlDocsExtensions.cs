@@ -16,7 +16,7 @@ namespace Namotion.Reflection.Cecil
         /// <summary>Loads the XML docs from a path.</summary>
         /// <param name="pathToXmlFile">The path.</param>
         /// <returns>The document</returns>
-        public static XDocument LoadDocumentAsync(string pathToXmlFile)
+        public static XDocument LoadDocument(string pathToXmlFile)
         {
             return XDocument.Load(pathToXmlFile, LoadOptions.PreserveWhitespace);
         }
@@ -24,7 +24,7 @@ namespace Namotion.Reflection.Cecil
         /// <summary>Loads the XML docs from a stream.</summary>
         /// <param name="stream">The stream.</param>
         /// <returns>The document</returns>
-        public static XDocument LoadDocumentAsync(Stream stream)
+        public static XDocument LoadDocument(Stream stream)
         {
             return XDocument.Load(stream, LoadOptions.PreserveWhitespace);
         }

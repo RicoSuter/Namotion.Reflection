@@ -38,7 +38,7 @@ namespace Namotion.Reflection.Cecil.Tests
             var module = assembly.Modules.Last();
             var type = module.GetTypes().Single(t => t.Name.Contains(nameof(MyTest)));
             var method = type.Methods.First(m => m.Name == nameof(MyTest.MyMethod));
-            var document = XmlDocsExtensions.LoadDocumentAsync(xmlPath);
+            var document = XmlDocs.LoadDocument(xmlPath);
 
             // Act
             var typeSummary = type.GetXmlDocsTag("summary", document);

@@ -533,18 +533,33 @@ namespace Namotion.Reflection
         internal static string GetMemberElementName(dynamic member)
         {
             char prefixCode;
+            string memberName;
+            string memberTypeName;
 
-            string memberName = member is Type memberType && !string.IsNullOrEmpty(memberType.FullName) ?
-                   memberType.FullName :
-                   member.DeclaringType.FullName + "." + member.Name;
+            var memberType = ((object)member).GetType();
+            if (memberType.FullName.Contains(".Cecil."))
+            {
+                memberName = TypeExtensions.IsAssignableToTypeName(memberType, "TypeDefinition", TypeNameStyle.Name) ?
+                    member.FullName : member.DeclaringType.FullName + "." + member.Name;
 
-            memberName = memberName.Replace("/", ".");
+                memberName = memberName
+                    .Replace("/", ".")
+                    .Replace('+', '.');
 
-            var type = ObjectExtensions.HasProperty(member, "MemberType") ? (string)member.MemberType.ToString() :
-                TypeExtensions.IsAssignableToTypeName(member.GetType(), "MethodDefinition", TypeNameStyle.Name) ? "Method" :
-                "TypeInfo";
+                memberTypeName =
+                    TypeExtensions.IsAssignableToTypeName(memberType, "MethodDefinition", TypeNameStyle.Name) ? (memberName.EndsWith("..ctor") ? "Constructor" : "Method") :
+                    TypeExtensions.IsAssignableToTypeName(memberType, "PropertyDefinition", TypeNameStyle.Name) ? "Property" :
+                    "TypeInfo";
+            }
+            else
+            {
+                memberName = member is Type type && !string.IsNullOrEmpty(memberType.FullName) ?
+                    type.FullName : member.DeclaringType.FullName + "." + member.Name;
 
-            switch (type)
+                memberTypeName = (string)member.MemberType.ToString();
+            }
+
+            switch (memberTypeName)
             {
                 case "Constructor":
                     memberName = memberName.Replace(".ctor", "#ctor");

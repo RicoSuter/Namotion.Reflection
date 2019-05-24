@@ -12,6 +12,13 @@ namespace Namotion.Reflection.Cecil.Tests
         public class MyTest
         {
             /// <summary>
+            /// My constructor.
+            /// </summary>
+            public MyTest()
+            {
+            }
+
+            /// <summary>
             /// My property.
             /// </summary>
             public string MyProperty { get; set; }
@@ -42,12 +49,16 @@ namespace Namotion.Reflection.Cecil.Tests
 
             // Act
             var typeSummary = type.GetXmlDocsTag("summary", document);
+            var constructorSummary = type.Methods.First(m => m.IsConstructor).GetXmlDocsTag("summary", document);
+            var property = type.Properties.First().GetXmlDocsSummary(document);
             var methodSummary = method.GetXmlDocsTag("summary", document);
             var parameter = method.Parameters.Last().GetXmlDocs(document);
             var returnParameter = method.MethodReturnType.GetXmlDocs(document);
 
             // Assert
             Assert.Equal("My class.", typeSummary);
+            Assert.Equal("My constructor.", constructorSummary);
+            Assert.Equal("My property.", property);
             Assert.Equal("My method.", methodSummary);
             Assert.Equal("My param.", parameter);
             Assert.Equal("My return.", returnParameter);

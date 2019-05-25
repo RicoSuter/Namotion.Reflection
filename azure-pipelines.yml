@@ -3,6 +3,7 @@ trigger:
       include:
       - master
       - release
+      - refs/tags/*
 pr:
 - master
 
@@ -20,23 +21,25 @@ steps:
   inputs:
     packageType: 'sdk'
     version: '2.2.203'
+
+# Patch preview project versions (only when on master branch)
 - task: CmdLine@2
   displayName: 'Install DNT'
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   inputs:
     script: 'npm i -g dotnettools'
-
-# Patch project versions
 - task: CmdLine@2
-  displayName: 'Update project version revision'
+  displayName: 'Update project version patch'
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   inputs:
-    script: 'dnt bump-versions revision "$(Build.BuildNumber)"'
+    script: 'dnt bump-versions patch'
+    failOnStderr: true
 - task: CmdLine@2
   displayName: 'Patch project version preview'
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   inputs:
-    script: 'dnt bump-versions preview "build.$(Build.BuildNumber)"'
+    script: 'dnt bump-versions preview "$(Build.BuildNumber)"'
+    failOnStderr: true
 
 # Build and test
 - task: DotNetCoreCLI@2
@@ -56,16 +59,14 @@ steps:
     feedsToUse: 'select'
     versioningScheme: 'off'
 
-# Pack and publish artifacts
-- task: DotNetCoreCLI@2
-  displayName: 'Create packages'
+# Publish artifacts
+- task: CopyFiles@2
+  displayName: 'Copy packages'
   condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
   inputs:
-    command: 'pack'
-    feedsToUse: 'select'
-    packagesToPack: '$(projects)'
-    arguments: '--configuration $(BuildConfiguration)'
-    versioningScheme: 'off'
+    Contents: '**/*.nupkg'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    flattenFolders: true
 - task: PublishBuildArtifacts@1
   displayName: 'Publish artifacts'
   condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))

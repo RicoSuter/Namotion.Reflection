@@ -2,6 +2,7 @@
 
 [![Azure DevOps](https://img.shields.io/azure-devops/build/rsuter/Namotion.Reflection/16/master.svg)](https://rsuter.visualstudio.com/Namotion.Reflection/_build?definitionId=16)
 [![Nuget](https://img.shields.io/nuget/v/Namotion.Reflection.svg)](https://www.nuget.org/packages/Namotion.Reflection/)
+[![MyGet](https://img.shields.io/myget/namotion-reflection/v/Namotion.Reflection.svg?label=preview%20nuget)](https://www.myget.org/feed/Packages/namotion-reflection)
 
 <img align="left" src="https://raw.githubusercontent.com/RicoSuter/Namotion.Reflection/master/assets/NuGetIcon.png">
 
@@ -70,14 +71,14 @@ Methods:
 
 **IEnumerable extensions**
 
-- GetAssignableToTypeName
-- FirstAssignableToTypeName
-- GetCommonBaseType
+- GetAssignableToTypeName: Tries to get the first object which is assignable to the given type nameHasProperty
+- FirstAssignableToTypeNameOrDefault: Tries to get the first object which is assignable to the given type name.
+- GetCommonBaseType: Finds the first common base type of the given types.
 
 **Object extensions**
 
-- HasProperty
-- TryGetPropertyValue
+- HasProperty: Determines whether the specified property name exists.
+- TryGetPropertyValue: Determines whether the specified property name exists.
 
 **Type extensions**
 

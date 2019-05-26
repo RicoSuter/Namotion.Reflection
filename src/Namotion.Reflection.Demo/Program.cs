@@ -30,7 +30,7 @@ namespace Namotion.Reflection.Demo
 
     class Program
     {
-        static async Task Main(string[] args)
+        static void Main(string[] args)
         {
             var properties = typeof(MySampleClass).GetContextualProperties();
             var parameters = typeof(MySampleClass)
@@ -43,14 +43,14 @@ namespace Namotion.Reflection.Demo
             foreach (var property in properties)
             {
                 Console.WriteLine(property);
-                Console.WriteLine("XML Description: " + await property.PropertyInfo.GetXmlDocsSummaryAsync());
+                Console.WriteLine("XML Description: " + property.PropertyInfo.GetXmlDocsSummary());
             }
 
             Console.WriteLine("# Parameters: " + nameof(MySampleClass.Update));
             foreach (var parameter in parameters)
             {
                 Console.WriteLine(parameter);
-                Console.WriteLine("XML Description: " + await parameter.ParameterInfo.GetXmlDocsAsync());
+                Console.WriteLine("XML Description: " + parameter.ParameterInfo.GetXmlDocs());
             }
         }
     }

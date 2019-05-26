@@ -8,8 +8,6 @@
 
 using System;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace Namotion.Reflection.Infrastructure
@@ -48,19 +46,19 @@ namespace Namotion.Reflection.Infrastructure
         /// <summary>Gets the current working directory.</summary>
         /// <returns>The directory path.</returns>
         /// <exception cref="NotSupportedException">The System.IO.Directory API is not available on this platform.</exception>
-        public static Task<string> DirectoryGetCurrentDirectoryAsync()
+        public static string DirectoryGetCurrentDirectory()
         {
             if (!SupportsDirectoryApis)
                 throw new NotSupportedException("The System.IO.Directory API is not available on this platform.");
 
-            return FromResult((string)DirectoryType.GetRuntimeMethod("GetCurrentDirectory", new Type[] { }).Invoke(null, new object[] { }));
+            return (string)DirectoryType.GetRuntimeMethod("GetCurrentDirectory", new Type[] { }).Invoke(null, new object[] { });
         }
 
         /// <summary>Checks whether a file exists.</summary>
         /// <param name="filePath">The file path.</param>
         /// <returns>true or false</returns>
         /// <exception cref="NotSupportedException">The System.IO.File API is not available on this platform.</exception>
-        public static async Task<bool> FileExistsAsync(string filePath)
+        public static bool FileExists(string filePath)
         {
             if (!SupportsFileApis)
                 throw new NotSupportedException("The System.IO.File API is not available on this platform.");
@@ -68,8 +66,7 @@ namespace Namotion.Reflection.Infrastructure
             if (string.IsNullOrEmpty(filePath))
                 return false;
 
-            return await FromResult((bool)FileType.GetRuntimeMethod("Exists",
-                new[] { typeof(string) }).Invoke(null, new object[] { filePath })).ConfigureAwait(false);
+            return (bool)FileType.GetRuntimeMethod("Exists", new[] { typeof(string) }).Invoke(null, new object[] { filePath });
         }
 
         /// <summary>Combines two paths.</summary>
@@ -109,19 +106,6 @@ namespace Namotion.Reflection.Infrastructure
 
             return XPathExtensionsType.GetRuntimeMethod("XPathEvaluate", new[] { typeof(XDocument), typeof(string) }).Invoke(null, new object[] { document, path });
         }
-
-#if NET40
-        internal static async Task<T> FromResult<T>(T result)
-        {
-            return result;
-        }
-#else
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static Task<T> FromResult<T>(T result)
-        {
-            return Task.FromResult(result);
-        }
-#endif
 
         private static Type TryLoadType(params string[] typeNames)
         {

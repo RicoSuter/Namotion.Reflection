@@ -24,13 +24,13 @@ namespace Namotion.Reflection.Tests
         }
 
         [Fact]
-        public async Task When_xml_doc_with_multiple_breaks_is_read_then_they_are_not_stripped_away()
+        public void When_xml_doc_with_multiple_breaks_is_read_then_they_are_not_stripped_away()
         {
             //// Arrange
             XmlDocs.ClearCache();
 
             //// Act
-            var summary = await typeof(WithComplexXmlDoc).GetProperty("Foo").GetXmlDocsSummaryAsync();
+            var summary = typeof(WithComplexXmlDoc).GetProperty("Foo").GetXmlDocsSummary();
 
             //// Assert
             Assert.Contains("\n\n", summary);
@@ -47,13 +47,13 @@ namespace Namotion.Reflection.Tests
         }
 
         [Fact]
-        public async Task When_xml_doc_contains_xml_then_it_is_fully_read()
+        public void When_xml_doc_contains_xml_then_it_is_fully_read()
         {
             //// Arrange
             XmlDocs.ClearCache();
 
             //// Act
-            var element = await typeof(WithTagsInXmlDoc).GetProperty("Foo").GetXmlDocsElementAsync();
+            var element = typeof(WithTagsInXmlDoc).GetProperty("Foo").GetXmlDocsElement();
             var responses = element.Elements("response");
 
             //// Assert
@@ -73,13 +73,13 @@ namespace Namotion.Reflection.Tests
         }
 
         [Fact]
-        public async Task When_summary_has_see_tag_then_it_is_converted()
+        public void When_summary_has_see_tag_then_it_is_converted()
         {
             //// Arrange
             XmlDocs.ClearCache();
 
             //// Act
-            var summary = await typeof(WithSeeTagInXmlDoc).GetProperty("Foo").GetXmlDocsSummaryAsync();
+            var summary = typeof(WithSeeTagInXmlDoc).GetProperty("Foo").GetXmlDocsSummary();
 
             //// Assert
             Assert.Equal("null for the default Record. See this and this at https://github.com/rsuter/njsonschema.", summary);
@@ -92,27 +92,27 @@ namespace Namotion.Reflection.Tests
         }
 
         [Fact]
-        public async Task When_summary_has_generic_tags_then_it_is_converted()
+        public void When_summary_has_generic_tags_then_it_is_converted()
         {
             //// Arrange
             XmlDocs.ClearCache();
 
             //// Act
-            var summary = await typeof(WithGenericTagsInXmlDoc).GetProperty("Foo").GetXmlDocsSummaryAsync();
+            var summary = typeof(WithGenericTagsInXmlDoc).GetProperty("Foo").GetXmlDocsSummary();
 
             //// Assert
             Assert.Equal("This are some tags.", summary);
         }
 
         [Fact]
-        public async Task When_xml_doc_is_missing_then_summary_is_missing()
+        public void When_xml_doc_is_missing_then_summary_is_missing()
         {
             //// Arrange
             XmlDocs.ClearCache();
 
             //// Act
-            var summary = await typeof(Point).GetXmlDocsSummaryAsync();
-            var summary2 = await typeof(Point).GetXmlDocsSummaryAsync();
+            var summary = typeof(Point).GetXmlDocsSummary();
+            var summary2 = typeof(Point).GetXmlDocsSummary();
 
             //// Assert
             Assert.Empty(summary);
@@ -147,40 +147,40 @@ namespace Namotion.Reflection.Tests
         }
 
         [Fact]
-        public async Task When_parameter_has_inheritdoc_then_it_is_resolved()
+        public void When_parameter_has_inheritdoc_then_it_is_resolved()
         {
             //// Arrange
             XmlDocs.ClearCache();
 
             //// Act
-            var parameterXml = await typeof(ClassWithInheritdoc).GetMethod("Bar").GetParameters()
-                .Single(p => p.Name == "baz").GetXmlDocsAsync();
+            var parameterXml = typeof(ClassWithInheritdoc).GetMethod("Bar").GetParameters()
+                .Single(p => p.Name == "baz").GetXmlDocs();
 
             //// Assert
             Assert.Equal("Baz.", parameterXml);
         }
 
         [Fact]
-        public async Task When_property_has_inheritdoc_then_it_is_resolved()
+        public void When_property_has_inheritdoc_then_it_is_resolved()
         {
             //// Arrange
             XmlDocs.ClearCache();
 
             //// Act
-            var propertySummary = await typeof(ClassWithInheritdoc).GetProperty("Foo").GetXmlDocsSummaryAsync();
+            var propertySummary = typeof(ClassWithInheritdoc).GetProperty("Foo").GetXmlDocsSummary();
 
             //// Assert
             Assert.Equal("Foo.", propertySummary);
         }
 
         [Fact]
-        public async Task When_method_has_inheritdoc_then_it_is_resolved()
+        public void When_method_has_inheritdoc_then_it_is_resolved()
         {
             //// Arrange
             XmlDocs.ClearCache();
 
             //// Act
-            var methodSummary = await typeof(ClassWithInheritdoc).GetMethod("Bar").GetXmlDocsSummaryAsync();
+            var methodSummary = typeof(ClassWithInheritdoc).GetMethod("Bar").GetXmlDocsSummary();
 
             //// Assert
             Assert.Equal("Bar.", methodSummary);
@@ -210,40 +210,40 @@ namespace Namotion.Reflection.Tests
         }
 
         [Fact]
-        public async Task When_parameter_has_inheritdoc_on_interface_then_it_is_resolved()
+        public void When_parameter_has_inheritdoc_on_interface_then_it_is_resolved()
         {
             //// Arrange
             XmlDocs.ClearCache();
 
             //// Act
-            var parameterXml = await typeof(ClassWithInheritdocOnInterface).GetMethod("Bar").GetParameters()
-                .Single(p => p.Name == "baz").GetXmlDocsAsync();
+            var parameterXml = typeof(ClassWithInheritdocOnInterface).GetMethod("Bar").GetParameters()
+                .Single(p => p.Name == "baz").GetXmlDocs();
 
             //// Assert
             Assert.Equal("Baz.", parameterXml);
         }
 
         [Fact]
-        public async Task When_property_has_inheritdoc_on_interface_then_it_is_resolved()
+        public void When_property_has_inheritdoc_on_interface_then_it_is_resolved()
         {
             //// Arrange
             XmlDocs.ClearCache();
 
             //// Act
-            var propertySummary = await typeof(ClassWithInheritdocOnInterface).GetProperty("Foo").GetXmlDocsSummaryAsync();
+            var propertySummary = typeof(ClassWithInheritdocOnInterface).GetProperty("Foo").GetXmlDocsSummary();
 
             //// Assert
             Assert.Equal("Foo.", propertySummary);
         }
 
         [Fact]
-        public async Task When_method_has_inheritdoc_then_on_interface_it_is_resolved()
+        public void When_method_has_inheritdoc_then_on_interface_it_is_resolved()
         {
             //// Arrange
             XmlDocs.ClearCache();
 
             //// Act
-            var methodSummary = await typeof(ClassWithInheritdocOnInterface).GetMethod("Bar").GetXmlDocsSummaryAsync();
+            var methodSummary = typeof(ClassWithInheritdocOnInterface).GetMethod("Bar").GetXmlDocsSummary();
 
             //// Assert
             Assert.Equal("Bar.", methodSummary);

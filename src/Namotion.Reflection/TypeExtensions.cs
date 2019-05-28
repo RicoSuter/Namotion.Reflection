@@ -141,19 +141,34 @@ namespace Namotion.Reflection
         /// <returns>The type name.</returns>
         public static string GetDisplayName(this Type type)
         {
-#if !NET40
-            if (type.IsConstructedGenericType)
-            {
-                return type.Name.Split('`').First() + "Of" + string.Join("And", type.GenericTypeArguments.Select(GetDisplayName));
-            }
-#else
-            if (type.IsGenericType)
-            {
-                return type.Name.Split('`').First() + "Of" + string.Join("And", type.GetGenericArguments().Select(GetDisplayName));
-            }
-#endif
+            var nType = type.ToCachedType();
 
-            return type.Name;
+#if !NET40
+            if (nType.Type.IsConstructedGenericType)
+#else
+            if (nType.Type.IsGenericType)
+#endif
+            {
+                return GetName(nType).Split('`').First() + "Of" +
+                       string.Join("And", nType.GenericArguments
+                                               .Select(a => GetDisplayName(a.OriginalType)));
+            }
+
+            return GetName(nType);
+        }
+
+        private static string GetName(CachedType cType)
+        {
+            return
+                cType.TypeName == "Int16" ? GetNullableDisplayName(cType, "Short") :
+                cType.TypeName == "Int32" ? GetNullableDisplayName(cType, "Integer") :
+                cType.TypeName == "Int64" ? GetNullableDisplayName(cType, "Long") :
+                GetNullableDisplayName(cType, cType.TypeName);
+        }
+
+        private static string GetNullableDisplayName(CachedType type, string actual)
+        {
+            return (type.IsNullableType ? "Nullable" : "") + actual;
         }
     }
 }

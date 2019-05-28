@@ -32,6 +32,8 @@ public class MyClass
 To reflect on the first parameter's nullability, we can load a `ContextualType` instance and display the nullability of the parameter's types:
 
 ```csharp
+using Namotion.Reflection;
+
 var method = typeof(MyClass).GetMethod(nameof(MyClass.MyMethod));
 var parameter = method.GetParameters().First();
 var contextualParameter = parameter.ToContextualParameter();
@@ -62,8 +64,11 @@ Methods:
 - **Type|MemberInfo.GetXmlDocsSummaryAsync():**
 - **Type|MemberInfo.GetXmlDocsRemarksAsync():**
 - **ParameterInfo.GetXmlDocsAsync():** Gets the XElement of the given type
+- ... and more
 
 - **XmlDocs.ClearCache()**
+
+Can also be used with [Cecil](https://github.com/jbevain/cecil) types, install [Namotion.Reflection.Cecil](https://www.nuget.org/packages/Namotion.Reflection.Cecil/).
 
 ## Extension methods
 
@@ -71,18 +76,18 @@ Methods:
 
 **IEnumerable extensions**
 
-- GetAssignableToTypeName: Tries to get the first object which is assignable to the given type nameHasProperty
-- FirstAssignableToTypeNameOrDefault: Tries to get the first object which is assignable to the given type name.
-- GetCommonBaseType: Finds the first common base type of the given types.
+- **GetAssignableToTypeName():**: Gets all objects which are assignable to the given type name as string.
+- **FirstAssignableToTypeNameOrDefault():**: Tries to get the first object which is assignable to the given type name as string.
+- **GetCommonBaseType():**: Finds the first common base type of the given types.
 
 **Object extensions**
 
-- HasProperty: Determines whether the specified property name exists.
-- TryGetPropertyValue: Determines whether the specified property name exists.
+- **HasProperty():** Determines whether the specified property name exists.
+- **TryGetPropertyValue():** Determines whether the specified property name exists.
 
 **Type extensions**
 
-- IsAssignableToTypeName
-- InheritsFromTypeName
-- GetEnumerableItemType
-- GetDisplayName
+- **IsAssignableToTypeName()**
+- **InheritsFromTypeName()**
+- **GetEnumerableItemType()** 
+- **GetDisplayName():** Gets a human readable identifier for the type (eg. "DictionaryOfStringAndInt32").

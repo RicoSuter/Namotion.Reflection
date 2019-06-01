@@ -12,7 +12,7 @@ This library is mainly used in [NJsonSchema](https://github.com/RicoSuter/NJsonS
 
 ## Contextual and cached types
 
-### C# 8 nullability reflection
+### Nullability reflection (C# 8)
 
 With the `ContextualType` class you can reflect on the nullability of properties, fields, method parameters and return types which will be available when compiling with the C# 8 compiler with the Nullable Reference Types feature enabled. 
 
@@ -56,6 +56,39 @@ For more details, see https://blog.rsuter.com/the-output-of-nullable-reference-t
 Methods: 
 
 - CachedType.ClearCache()
+
+### Validate nullability (C# 8)
+
+It is important to understand that Null Reference Types are a compiler feature only and the .NET runtime does not do any checks when your app is running. Consider the following class: 
+
+```csharp
+public class Person
+{
+    public string FirstName { get; set; }
+
+    public string? MiddleName { get; set; }
+
+    public string LastName { get; set; }
+}
+```
+
+Inside your application you'll get warnings when you forget to set the `FirstName`. However when data is coming from outside (e.g. via reflection, serialization, etc.) you could end up with invalid objects. This JSON.NET call throws no exception but will create an invalid object:
+
+```csharp
+var person = JsonConvert.DeserializeObject<Person>("{}");
+```
+
+The ensure that the object is in a valid state, you can now call `EnsureValidNullability()` which might throw an `InvalidOperationException`:
+
+```csharp
+person.EnsureValidNullability();
+```
+
+Methods: 
+
+- HasValidNullability();
+- EnsureValidNullability();
+- ValidateNullability();
 
 ## Read XML Documentation
 

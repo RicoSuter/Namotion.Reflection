@@ -14,12 +14,12 @@ This library is mainly used in [NJsonSchema](https://github.com/RicoSuter/NJsonS
 
 Inheritance hierarchy: 
 
-- `CachedType:` A cached `Type` object which does not have a context
-    - `ContextualType:` A cached `Type` with contextual attributes (e.g. property attributes)
-	    - `ContextualParameterInfo`
-	    - `ContextualMemberInfo`
-		    - `ContextualPropertyInfo`
-			- `ContextualFieldInfo`
+- **CachedType:** A cached `Type` object which does not have a context
+    - **ContextualType:** A cached `Type` with contextual attributes (e.g. property attributes)
+	    - **ContextualParameterInfo**
+	    - **ContextualMemberInfo**
+		    - **ContextualPropertyInfo**
+			- **ContextualFieldInfo**
 
 Behavior: 
 

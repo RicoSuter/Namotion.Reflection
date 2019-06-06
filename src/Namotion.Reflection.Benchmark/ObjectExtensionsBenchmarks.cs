@@ -55,12 +55,8 @@ namespace Namotion.Reflection.Benchmark
             };
         }
 
-        /// <summary>
-        /// Ensure that we can serialise at least 200 times per second (5ms).
-        /// </summary>
         [NBenchFact]
         [PerfBenchmark(
-            Description = "Ensure schema generation doesn't take too long",
             NumberOfIterations = 3,
             RunTimeMilliseconds = 1000,
             RunMode = RunMode.Throughput,

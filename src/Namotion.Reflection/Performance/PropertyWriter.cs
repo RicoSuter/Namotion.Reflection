@@ -22,11 +22,11 @@ namespace Namotion.Reflection
 
         public PropertyWriter(PropertyInfo propertyInfo)
         {
+            _propertyInfo = propertyInfo;
+
 #if !NET40 && !NETSTANDARD1_0
             var method = propertyInfo.SetMethod;
-            _setter = method != null ? (Action<TObject, TValue>)Delegate.CreateDelegate(typeof(Action<TObject, TValue>), null, method) : new Action<TObject, TValue>((o, v) => { });
-#else
-            _propertyInfo = propertyInfo;
+            _setter = method != null ? (Action<TObject, TValue>)Delegate.CreateDelegate(typeof(Action<TObject, TValue>), null, method) : null;
 #endif
         }
 
@@ -36,9 +36,16 @@ namespace Namotion.Reflection
         public void SetValue(TObject obj, TValue value)
         {
 #if !NET40 && !NETSTANDARD1_0
-            _setter(obj, value);
+            if (_setter != null)
+            {
+                _setter(obj, value);
+            }
+            else
+            {
+                _propertyInfo.SetValue(obj, value);
+            }
 #else
-            _propertyInfo.SetValue((TObject)obj, (TValue)value);
+            _propertyInfo.SetValue(obj, value);
 #endif
         }
 

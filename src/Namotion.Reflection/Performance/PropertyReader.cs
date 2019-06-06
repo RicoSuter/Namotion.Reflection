@@ -22,11 +22,11 @@ namespace Namotion.Reflection
 
         public PropertyReader(PropertyInfo propertyInfo)
         {
+            _propertyInfo = propertyInfo;
+
 #if !NET40 && !NETSTANDARD1_0
             var method = propertyInfo.GetMethod;
-            _getter = method != null ? (Func<TObject, TValue>)Delegate.CreateDelegate(typeof(Func<TObject, TValue>), null, method) : new Func<TObject, TValue>(o => default);
-#else
-            _propertyInfo = propertyInfo;
+            _getter = method != null ? (Func<TObject, TValue>)Delegate.CreateDelegate(typeof(Func<TObject, TValue>), null, method) : null;
 #endif
         }
 
@@ -36,7 +36,7 @@ namespace Namotion.Reflection
         public TValue GetValue(TObject obj)
         {
 #if !NET40 && !NETSTANDARD1_0
-            return _getter(obj);
+            return _getter != null ? _getter(obj) : (TValue)_propertyInfo.GetValue(obj);
 #else
             return (TValue)_propertyInfo.GetValue(obj);
 #endif

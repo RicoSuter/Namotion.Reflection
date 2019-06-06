@@ -71,14 +71,19 @@ namespace Namotion.Reflection.Tests
             }
         }
 
-        [Fact]
-        public void When_display_name_is_retrieved_then_string_is_correct()
+        [Theory]
+        [InlineData(typeof(Dictionary<string, int>), "DictionaryOfStringAndInteger")]
+        [InlineData(typeof(Dictionary<bool, long>), "DictionaryOfBooleanAndLong")]
+        [InlineData(typeof(Dictionary<decimal, short>), "DictionaryOfDecimalAndShort")]
+        [InlineData(typeof(Dictionary<Guid, DateTime>), "DictionaryOfGuidAndDateTime")]
+        [InlineData(typeof(Dictionary<decimal?, short?>), "DictionaryOfNullableDecimalAndNullableShort")]
+        public void When_display_name_is_retrieved_then_string_is_correct(Type type, string expectedName)
         {
             //// Act
-            var displayName = typeof(Dictionary<string, int>).GetDisplayName();
+            var displayName = type.GetDisplayName();
 
             //// Assert
-            Assert.Equal("DictionaryOfStringAndInt32", displayName);
+            Assert.Equal(expectedName, displayName);
         }
     }
 }

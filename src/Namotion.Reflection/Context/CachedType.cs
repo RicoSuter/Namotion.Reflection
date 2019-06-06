@@ -70,6 +70,7 @@ namespace Namotion.Reflection
         /// </summary>
 #if !NET40
         public TypeInfo TypeInfo => _typeInfo ?? (_typeInfo = Type.GetTypeInfo());
+
         private TypeInfo _typeInfo;
 #else
         public Type TypeInfo => Type;

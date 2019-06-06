@@ -6,6 +6,10 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace Namotion.Reflection
@@ -33,6 +37,117 @@ namespace Namotion.Reflection
         {
             var property = obj?.GetType().GetRuntimeProperty(propertyName);
             return property == null ? defaultValue : (T)property.GetValue(obj);
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to disable nullability validation completely (global).
+        /// </summary>
+        public static bool DisableNullabilityValidation { get; set; }
+
+        /// <summary>Checks whether the object has valid non nullable properties.</summary>
+        /// <param name="obj">The object.</param>
+        /// <param name="checkChildren">Specifies whether to also recursively check children.</param>
+        /// <returns>The result.</returns>
+        public static bool HasValidNullability(this object obj, bool checkChildren = true)
+        {
+            return !obj.ValidateNullability(checkChildren).Any();
+        }
+
+        /// <summary>Checks whether the object has valid non nullable properties.</summary>
+        /// <param name="obj">The object.</param>
+        /// <param name="checkChildren">Specifies whether to also recursively check children.</param>
+        /// <returns>The result.</returns>
+        public static void EnsureValidNullability(this object obj, bool checkChildren = true)
+        {
+            ValidateNullability(obj, checkChildren ? new HashSet<object>() : null, null, false);
+        }
+
+        /// <summary>Checks which non nullable properties are null (invalid).</summary>
+        /// <param name="obj">The object.</param>
+        /// <param name="checkChildren">Specifies whether to also recursively check children.</param>
+        /// <returns>The result.</returns>
+        public static IEnumerable<string> ValidateNullability(this object obj, bool checkChildren = true)
+        {
+            var errors = new List<string>();
+            ValidateNullability(obj, checkChildren ? new HashSet<object>() : null, errors, false);
+            return errors;
+        }
+
+        private static void ValidateNullability(object obj, HashSet<object> checkedObjects, List<string> errors, bool stopFirstFail)
+        {
+            if (DisableNullabilityValidation)
+            {
+                return;
+            }
+
+            if (stopFirstFail && errors.Any())
+            {
+                return;
+            }
+
+            if (checkedObjects != null)
+            {
+                if (checkedObjects.Contains(obj))
+                {
+                    return;
+                }
+                else
+                {
+                    checkedObjects.Add(obj);
+                }
+            }
+
+            var type = obj.GetType();
+            if (checkedObjects != null && obj is IDictionary dictionary)
+            {
+                foreach (var item in dictionary.Keys.Cast<object>()
+                    .Concat(dictionary.Values.Cast<object>()))
+                {
+                    ValidateNullability(item, checkedObjects, errors, stopFirstFail);
+                }
+            }
+            else if (checkedObjects != null && obj is IEnumerable enumerable && !(obj is string))
+            {
+                foreach (var item in enumerable.Cast<object>())
+                {
+                    ValidateNullability(item, checkedObjects, errors, stopFirstFail);
+                }
+            }
+            else if (!type.ToCachedType().TypeInfo.IsValueType)
+            {
+                var properties = type.GetContextualProperties();
+                for (int i = 0; i < properties.Length; i++)
+                {
+                    var property = properties[i];
+                    if (!property.IsValueType && property.CanWrite)
+                    {
+                        var value = property.GetValue(obj);
+                        if (value == null)
+                        {
+                            if (property.Nullability == Nullability.NotNullable)
+                            {
+                                if (errors != null)
+                                {
+                                    errors.Add(property.Name);
+                                    if (stopFirstFail)
+                                    {
+                                        return;
+                                    }
+                                }
+                                else
+                                {
+                                    throw new InvalidOperationException(
+                                        "The object's nullability is invalid, property: " + property.Type.FullName + "." + property.Name);
+                                }
+                            }
+                        }
+                        else if (checkedObjects != null)
+                        {
+                            ValidateNullability(value, checkedObjects, errors, stopFirstFail);
+                        }
+                    }
+                }
+            }
         }
     }
 }

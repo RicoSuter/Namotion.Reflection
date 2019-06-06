@@ -18,7 +18,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Namotion.Reflection.Demo", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Namotion.Reflection.Cecil", "Namotion.Reflection.Cecil\Namotion.Reflection.Cecil.csproj", "{2B8C1FB8-24E3-4F19-8DD2-FDABEF607B09}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Namotion.Reflection.Cecil.Tests", "Namotion.Reflection.Cecil.Tests\Namotion.Reflection.Cecil.Tests.csproj", "{4E2AE356-138B-4CA7-807A-B0D8B452E69D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Namotion.Reflection.Cecil.Tests", "Namotion.Reflection.Cecil.Tests\Namotion.Reflection.Cecil.Tests.csproj", "{4E2AE356-138B-4CA7-807A-B0D8B452E69D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Namotion.Reflection.Benchmark", "Namotion.Reflection.Benchmark\Namotion.Reflection.Benchmark.csproj", "{D0AD78E3-3057-4DC8-87F9-F91B2766DDB8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,6 +52,10 @@ Global
 		{4E2AE356-138B-4CA7-807A-B0D8B452E69D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4E2AE356-138B-4CA7-807A-B0D8B452E69D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4E2AE356-138B-4CA7-807A-B0D8B452E69D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0AD78E3-3057-4DC8-87F9-F91B2766DDB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0AD78E3-3057-4DC8-87F9-F91B2766DDB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0AD78E3-3057-4DC8-87F9-F91B2766DDB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0AD78E3-3057-4DC8-87F9-F91B2766DDB8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

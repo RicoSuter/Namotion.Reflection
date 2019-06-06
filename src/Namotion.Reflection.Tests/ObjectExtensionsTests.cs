@@ -1,5 +1,8 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using Xunit;
+
+#nullable enable
 
 namespace Namotion.Reflection.Tests
 {
@@ -27,6 +30,48 @@ namespace Namotion.Reflection.Tests
 
             //// Assert
             Assert.Equal(uri.Host, host);
+        }
+
+        public class Person
+        {
+            public string FirstName { get; set; }
+
+            public string? MiddleName { get; set; }
+
+            public string LastName { get; set; }
+        }
+
+        [Fact]
+        public void When_object_has_null_properties_then_errors_are_set()
+        {
+            //// Arrange
+            var person = JsonConvert.DeserializeObject<Person>("{}");
+
+            //// Act
+            var errors = person.ValidateNullability();
+            var valid = person.HasValidNullability();
+
+            //// Assert
+            Assert.False(valid);
+            Assert.Contains("FirstName", errors);
+            Assert.Contains("LastName", errors);
+            Assert.Throws<InvalidOperationException>(() => person.EnsureValidNullability());
+        }
+
+        [Fact]
+        public void When_object_has_no_null_properties_then_errors_is_empty()
+        {
+            //// Arrange
+            var person = JsonConvert.DeserializeObject<Person>(@"{ ""FirstName"": ""Abc"", ""LastName"": ""Def"" }");
+
+            //// Act
+            var errors = person.ValidateNullability();
+            var valid = person.HasValidNullability();
+            person.EnsureValidNullability(); // Does not throw
+
+            //// Assert
+            Assert.True(valid);
+            Assert.Empty(errors);
         }
     }
 }

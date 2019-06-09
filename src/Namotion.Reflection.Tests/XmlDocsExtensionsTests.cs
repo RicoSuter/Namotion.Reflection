@@ -248,5 +248,40 @@ namespace Namotion.Reflection.Tests
             //// Assert
             Assert.Equal("Bar.", methodSummary);
         }
+
+        public abstract class MyBaseClass
+        {
+            /// <summary>
+            /// Foo
+            /// </summary>
+            public void Foo(int p)
+            {
+            }
+        }
+
+        public class MyClass : MyBaseClass
+        {
+            /// <summary>
+            /// Bar
+            /// </summary>
+            public void Bar()
+            {
+            }
+        }
+
+        [Fact]
+        public void When_method_is_inherited_then_xml_docs_are_correct()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            var fooSummary = typeof(MyClass).GetMethod(nameof(MyClass.Foo)).GetXmlDocsSummary();
+            var barSummary = typeof(MyClass).GetMethod(nameof(MyClass.Bar)).GetXmlDocsSummary();
+
+            //// Assert
+            Assert.Equal("Foo", fooSummary);
+            Assert.Equal("Bar", barSummary);
+        }
     }
 }

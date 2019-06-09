@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
+#nullable enable
+
 namespace Namotion.Reflection.Demo
 {
     public class MySampleClass
@@ -14,7 +16,7 @@ namespace Namotion.Reflection.Demo
         /// <summary>
         /// Gets or sets the optional middle name.
         /// </summary>
-        //public string? MiddleName { get; set; }
+        public string? MiddleName { get; set; }
 
         /// <summary>
         /// 
@@ -22,7 +24,7 @@ namespace Namotion.Reflection.Demo
         /// <param name="firstName">The first name.</param>
         /// <param name="middleName">The optional middle name.</param>
         /// <param name="counter">The counter.</param>
-        public void Update(string firstName, /*string? middleName,*/ Dictionary<int, int?> counter)
+        public void Update(string firstName, string? middleName, Dictionary<int, int?> counter)
         {
 
         }

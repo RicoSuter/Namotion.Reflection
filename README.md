@@ -6,7 +6,7 @@
 
 <img align="left" src="https://raw.githubusercontent.com/RicoSuter/Namotion.Reflection/master/assets/NuGetIcon.png">
 
-.NET library with advanced reflection APIs like XML documentation reading, Null Reference Types (C# 8) reflection and string based type checks.
+.NET library with advanced reflection APIs like XML documentation reading, Nullable Reference Types (C# 8) reflection and string based type checks.
 
 This library is mainly used in [NJsonSchema](https://github.com/RicoSuter/NJsonSchema).
 

@@ -30,9 +30,9 @@ namespace Namotion.Reflection.Tests
             Assert.Equal(Nullability.NotNullable, typeWithContext.Nullability);
 
             Assert.Equal(Nullability.NotNullable, typeWithContext.GenericArguments[0].Nullability);
-            Assert.Equal(Nullability.NeverNull, typeWithContext.GenericArguments[1].Nullability);
+            Assert.Equal(Nullability.NotNullable, typeWithContext.GenericArguments[1].Nullability);
 
-            Assert.Equal(Nullability.NeverNull, typeWithContext.GenericArguments[2].OriginalNullability);
+            Assert.Equal(Nullability.NotNullable, typeWithContext.GenericArguments[2].OriginalNullability);
             Assert.Equal(Nullability.Nullable, typeWithContext.GenericArguments[2].Nullability);
 
             Assert.Equal(Nullability.NotNullable, typeWithContext.GenericArguments[3].Nullability);

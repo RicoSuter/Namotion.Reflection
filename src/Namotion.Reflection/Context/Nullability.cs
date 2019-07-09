@@ -10,10 +10,10 @@
         /// </summary>
         Unknown,
 
-        /// <summary>
-        /// Never null because this is not a reference type.
-        /// </summary>
-        NeverNull,
+        ///// <summary>
+        ///// Never null because this is not a reference type.
+        ///// </summary>
+        //NeverNull,
 
         /// <summary>
         /// Reference type is not nullable.

@@ -12,16 +12,15 @@ namespace Namotion.Reflection
     public class ContextualType : CachedType
     {
         private byte[] _nullableFlags;
-        private byte _nullableFlag = byte.MaxValue;
         private Nullability? nullability;
 
         internal static ContextualType ForType(Type type, IEnumerable<Attribute> contextAttributes)
         {
             var index = 0;
-            return new ContextualType(type, contextAttributes, null, null, ref index);
+            return new ContextualType(type, contextAttributes, null, null, ref index, null);
         }
 
-        internal ContextualType(Type type, IEnumerable<Attribute> contextAttributes, ContextualType parent, byte[] nullableFlags, ref int nullableFlagsIndex)
+        internal ContextualType(Type type, IEnumerable<Attribute> contextAttributes, ContextualType parent, byte[] nullableFlags, ref int nullableFlagsIndex, IEnumerable<dynamic> customAttributeProviders)
             : base(type)
         {
             Parent = parent;
@@ -31,8 +30,8 @@ namespace Namotion.Reflection
                 new Attribute[0];
 
             _nullableFlags = nullableFlags;
+            InitializeNullableFlagsAndOriginalNullability(ref nullableFlagsIndex, customAttributeProviders);
 
-            InitializeNullableFlagsAndOriginalNullability(ref nullableFlagsIndex);
             if (_nullableFlags != null)
             {
                 UpdateOriginalGenericArguments(ref nullableFlagsIndex);
@@ -181,75 +180,82 @@ namespace Namotion.Reflection
         /// <returns>The cached type.</returns>
         protected override CachedType GetCachedType(Type type, ref int nullableFlagsIndex)
         {
-            return new ContextualType(type, ContextAttributes, this, _nullableFlags, ref nullableFlagsIndex);
+            return new ContextualType(type, ContextAttributes, this, _nullableFlags, ref nullableFlagsIndex, null);
         }
 
-        private void InitializeNullableFlagsAndOriginalNullability(ref int nullableFlagsIndex)
+        private void InitializeNullableFlagsAndOriginalNullability(ref int nullableFlagsIndex, IEnumerable<dynamic> customAttributeProviders)
         {
             try
             {
                 if (_nullableFlags == null)
                 {
                     var nullableAttribute = ContextAttributes.FirstOrDefault(a => a.GetType().FullName == "System.Runtime.CompilerServices.NullableAttribute");
-                    if (nullableAttribute == null)
+                    if (nullableAttribute != null)
                     {
-                        _nullableFlags = new byte[0];
-
-                        var parent = this;
-                        do
-                        {
-                            var nullableContextAttribute = ContextAttributes.FirstOrDefault(a => a.GetType().FullName == "System.Runtime.CompilerServices.NullableContextAttribute");
-                            if (nullableContextAttribute != null)
-                            {
-#if NET40
-                                _nullableFlag = (byte)nullableContextAttribute.GetType().GetField("NullableFlags").GetValue(nullableContextAttribute);
-#else
-                                _nullableFlag = (byte)nullableContextAttribute.GetType().GetRuntimeField("Flag").GetValue(nullableContextAttribute);
-#endif
-                                break;
-                            }
-
-                            parent = parent.Parent;
-                        } while (parent != null);
-
-#if NET40
-                        var nullableContextAttribute2 = OriginalType.GetTypeInfo().Assembly.GetCustomAttributes(true)
-#else
-                        var nullableContextAttribute2 = OriginalType.GetTypeInfo().Assembly.GetCustomAttributes()
-#endif
-                            .FirstOrDefault(a => a.GetType().FullName == "System.Runtime.CompilerServices.NullableContextAttribute");
-
-                        if (nullableContextAttribute2 != null)
-                        {
-#if NET40
-                            _nullableFlag = (byte)nullableContextAttribute2.GetType().GetField("NullableFlags").GetValue(nullableContextAttribute2);
-#else
-                            _nullableFlag = (byte)nullableContextAttribute2.GetType().GetRuntimeField("Flag").GetValue(nullableContextAttribute2);
-#endif
-                        }
+                        _nullableFlags = GetFlagsFromNullableAttribute(nullableAttribute);
+                    }
+                    else if (customAttributeProviders != null)
+                    {
+                        _nullableFlags = GetFlagsFromCustomAttributeProviders(customAttributeProviders);
                     }
                     else
                     {
-#if NET40
-                        _nullableFlags = (byte[])nullableAttribute?.GetType().GetField("NullableFlags")?.GetValue(nullableAttribute) ?? new byte[0];
-#else
-                        _nullableFlags = (byte[])nullableAttribute?.GetType().GetRuntimeField("NullableFlags")?.GetValue(nullableAttribute) ?? new byte[0];
-#endif
+                        _nullableFlags = new byte[] { 0 };
                     }
                 }
             }
             catch
             {
-                _nullableFlags = new byte[0];
+                _nullableFlags = new byte[] { 0 };
+#if DEBUG
+                throw;
+#endif
             }
 
-            var nullableFlag = _nullableFlags.Length > nullableFlagsIndex ? _nullableFlags[nullableFlagsIndex] : _nullableFlag;
-            nullableFlagsIndex++;
+            if (OriginalType.GetTypeInfo().IsValueType)
+            {
+                OriginalNullability = Nullability.NotNullable;
+            }
+            else
+            {
+                var nullableFlag = _nullableFlags.Length > nullableFlagsIndex ? _nullableFlags[nullableFlagsIndex] : _nullableFlags.Last();
+                nullableFlagsIndex++;
 
-            OriginalNullability = nullableFlag == 0 ? Nullability.NotNullable :
-                nullableFlag == 1 ? Nullability.NotNullable :
-                nullableFlag == 2 ? Nullability.Nullable :
-                Nullability.Unknown;
+                OriginalNullability = nullableFlag == 0 ? Nullability.Unknown :
+                    nullableFlag == 1 ? Nullability.NotNullable :
+                    nullableFlag == 2 ? Nullability.Nullable :
+                    Nullability.Unknown;
+            }
+
+        }
+
+        private byte[] GetFlagsFromNullableAttribute(Attribute nullableAttribute)
+        {
+#if NET40
+            return (byte[])nullableAttribute?.GetType().GetField("NullableFlags")?.GetValue(nullableAttribute) ?? new byte[0];
+#else
+            return (byte[])nullableAttribute?.GetType().GetRuntimeField("NullableFlags")?.GetValue(nullableAttribute) ?? new byte[] { 0 };
+#endif
+        }
+
+        private byte[] GetFlagsFromCustomAttributeProviders(IEnumerable<dynamic> customAttributeProviders)
+        {
+            foreach (var provider in customAttributeProviders)
+            {
+                var attributes = (IEnumerable<object>)provider.GetCustomAttributes(false);
+                var nullableContextAttribute = attributes.FirstOrDefault(a => a.GetType().FullName == "System.Runtime.CompilerServices.NullableContextAttribute");
+                if (nullableContextAttribute != null)
+                {
+#if NET40
+                    return new byte[] { (byte)nullableContextAttribute.GetType().GetField("Flag").GetValue(nullableContextAttribute) };
+#else
+                    return new byte[] { (byte)nullableContextAttribute.GetType().GetRuntimeField("Flag").GetValue(nullableContextAttribute) };
+#endif
+                }
+            }
+
+            return new byte[] { 0 };
+
         }
     }
 }

@@ -226,7 +226,6 @@ namespace Namotion.Reflection
                     nullableFlag == 2 ? Nullability.Nullable :
                     Nullability.Unknown;
             }
-
         }
 
         private byte[] GetFlagsFromNullableAttribute(Attribute nullableAttribute)

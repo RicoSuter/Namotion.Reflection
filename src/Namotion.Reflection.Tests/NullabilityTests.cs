@@ -39,7 +39,7 @@ namespace Namotion.Reflection.Tests
             Assert.Equal(Nullability.Nullable, typeWithContext.GenericArguments[4].Nullability);
         }
 
-        class TestAction2
+        class MultiDimensionalArrayTest
         {
             public void Arrays(string[][]?[] arrays)
             {
@@ -50,7 +50,7 @@ namespace Namotion.Reflection.Tests
         public void MultiDimensionalArrays()
         {
             // Arrange
-            var method = typeof(TestAction2).GetMethod(nameof(TestAction2.Arrays));
+            var method = typeof(MultiDimensionalArrayTest).GetMethod(nameof(MultiDimensionalArrayTest.Arrays));
             var parameter = method.GetParameters().First();
 
             // Act
@@ -58,9 +58,54 @@ namespace Namotion.Reflection.Tests
 
             // Assert
             Assert.Equal(Nullability.NotNullable, typeWithContext.Nullability);
-            Assert.Equal(Nullability.Nullable,    typeWithContext.ElementType.Nullability);
+            Assert.Equal(Nullability.Nullable, typeWithContext.ElementType.Nullability);
             Assert.Equal(Nullability.NotNullable, typeWithContext.ElementType.ElementType.Nullability);
             Assert.Equal(Nullability.NotNullable, typeWithContext.ElementType.ElementType.ElementType.Nullability);
+        }
+
+
+        class NullableArrayItemTest
+        {
+            public void Arrays(string?[] arrays)
+            {
+            }
+        }
+
+        [Fact]
+        public void NullableArrayItem()
+        {
+            // Arrange
+            var method = typeof(NullableArrayItemTest).GetMethod(nameof(NullableArrayItemTest.Arrays));
+            var parameter = method.GetParameters().First();
+
+            // Act
+            var typeWithContext = parameter.ToContextualParameter();
+
+            // Assert
+            Assert.Equal(Nullability.NotNullable, typeWithContext.Nullability);
+            Assert.Equal(Nullability.Nullable, typeWithContext.ElementType.Nullability);
+        }
+
+        class NotNullableArrayItemTest
+        {
+            public void Arrays(string[] arrays)
+            {
+            }
+        }
+
+        [Fact]
+        public void NotNullableArrayItem()
+        {
+            // Arrange
+            var method = typeof(NotNullableArrayItemTest).GetMethod(nameof(NotNullableArrayItemTest.Arrays));
+            var parameter = method.GetParameters().First();
+
+            // Act
+            var typeWithContext = parameter.ToContextualParameter();
+
+            // Assert
+            Assert.Equal(Nullability.NotNullable, typeWithContext.Nullability);
+            Assert.Equal(Nullability.NotNullable, typeWithContext.ElementType.Nullability);
         }
 
         class TestFunction

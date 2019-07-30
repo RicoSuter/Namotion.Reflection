@@ -29,12 +29,17 @@ namespace Namotion.Reflection
         /// <summary>
         /// Internal generic arguments.
         /// </summary>
-        protected object genericArguments;
+        internal object _genericArguments;
 
         /// <summary>
         /// Internal original generic arguments.
         /// </summary>
-        protected object originalGenericArguments;
+        internal object _originalGenericArguments;
+
+        /// <summary>
+        /// Internal element type.
+        /// </summary>
+        internal object _elementType;
 
         /// <summary>
         /// Unwraps the OriginalType as <see cref="Type"/> from the context type.
@@ -133,7 +138,7 @@ namespace Namotion.Reflection
             get
             {
                 UpdateOriginalGenericArguments();
-                return (CachedType[])genericArguments;
+                return (CachedType[])_genericArguments;
             }
         }
 
@@ -145,7 +150,19 @@ namespace Namotion.Reflection
             get
             {
                 UpdateOriginalGenericArguments();
-                return (CachedType[])originalGenericArguments;
+                return (CachedType[])_originalGenericArguments;
+            }
+        }
+
+        /// <summary>
+        /// Gets the type's element type (i.e. array type).
+        /// </summary>
+        public CachedType ElementType
+        {
+            get
+            {
+                UpdateOriginalGenericArguments();
+                return _elementType as CachedType;
             }
         }
 
@@ -208,11 +225,11 @@ namespace Namotion.Reflection
 #endif
         protected void UpdateOriginalGenericArguments(ref int nullableFlagsIndex)
         {
-            if (originalGenericArguments == null)
+            if (_originalGenericArguments == null)
             {
                 lock (this)
                 {
-                    if (originalGenericArguments == null)
+                    if (_originalGenericArguments == null)
                     {
                         var arguments = new List<CachedType>();
 #if NET40
@@ -224,10 +241,19 @@ namespace Namotion.Reflection
                             arguments.Add(GetCachedType(type, ref nullableFlagsIndex));
                         }
 
-                        originalGenericArguments = arguments.ToArray();
+                        if (arguments.Count == 0)
+                        {
+                            var elementType = OriginalType.GetElementType();
+                            if (elementType != null)
+                            {
+                                _elementType = GetCachedType(elementType, ref nullableFlagsIndex);
+                            }
+                        }
+
+                        _originalGenericArguments = arguments.ToArray();
                         _isNullableType = OriginalType.Name == "Nullable`1";
-                        genericArguments = _isNullableType ? new CachedType[0] : originalGenericArguments;
-                        _type = _isNullableType ? ((IEnumerable)originalGenericArguments).Cast<CachedType>().First().OriginalType : OriginalType;
+                        _genericArguments = _isNullableType ? new CachedType[0] : _originalGenericArguments;
+                        _type = _isNullableType ? ((IEnumerable)_originalGenericArguments).Cast<CachedType>().First().OriginalType : OriginalType;
                     }
                 }
             }

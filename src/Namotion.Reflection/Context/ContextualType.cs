@@ -67,14 +67,14 @@ namespace Namotion.Reflection
             {
                 UpdateOriginalGenericArguments();
 
-                if (genericArguments is ContextualType[])
+                if (_genericArguments is ContextualType[])
                 {
-                    return (ContextualType[])genericArguments;
+                    return (ContextualType[])_genericArguments;
                 }
                 else
                 {
-                    genericArguments = ((IEnumerable)genericArguments).Cast<ContextualType>().ToArray();
-                    return (ContextualType[])genericArguments;
+                    _genericArguments = ((IEnumerable)_genericArguments).Cast<ContextualType>().ToArray();
+                    return (ContextualType[])_genericArguments;
                 }
             }
         }
@@ -88,15 +88,27 @@ namespace Namotion.Reflection
             {
                 UpdateOriginalGenericArguments();
 
-                if (originalGenericArguments is ContextualType[])
+                if (_originalGenericArguments is ContextualType[])
                 {
-                    return (ContextualType[])originalGenericArguments;
+                    return (ContextualType[])_originalGenericArguments;
                 }
                 else
                 {
-                    originalGenericArguments = ((IEnumerable)originalGenericArguments).Cast<ContextualType>().ToArray();
-                    return (ContextualType[])originalGenericArguments;
+                    _originalGenericArguments = ((IEnumerable)_originalGenericArguments).Cast<ContextualType>().ToArray();
+                    return (ContextualType[])_originalGenericArguments;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Gets the type's element type (i.e. array type).
+        /// </summary>
+        public new ContextualType ElementType
+        {
+            get
+            {
+                UpdateOriginalGenericArguments();
+                return _elementType as ContextualType;
             }
         }
 

@@ -4,7 +4,7 @@
 [![Nuget](https://img.shields.io/nuget/v/Namotion.Reflection.svg)](https://www.nuget.org/packages/Namotion.Reflection/)
 [![MyGet](https://img.shields.io/myget/namotion-reflection/v/Namotion.Reflection.svg?label=preview%20nuget)](https://www.myget.org/feed/Packages/namotion-reflection)
 
-<img align="left" src="https://raw.githubusercontent.com/RicoSuter/Namotion.Reflection/master/assets/Icon.png" width="64px" height="64px">
+<img align="left" src="https://raw.githubusercontent.com/RicoSuter/Namotion.Reflection/master/assets/Icon.png" width="48px" height="48px">
 
 .NET library with advanced reflection APIs like XML documentation reading, Nullable Reference Types (C# 8) reflection and string based type checks.
 

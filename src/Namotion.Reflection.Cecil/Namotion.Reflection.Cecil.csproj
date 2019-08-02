@@ -4,7 +4,7 @@
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>../Namotion.Reflection.snk</AssemblyOriginatorKeyFile>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Version>1.0.5</Version>
+    <Version>1.0.6</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageIconUrl>https://raw.githubusercontent.com/RicoSuter/Namotion.Reflection/master/assets/NuGetIcon.png</PackageIconUrl>
     <PackageLicenseUrl>https://github.com/RicoSuter/Namotion.Reflection/blob/master/LICENSE.md</PackageLicenseUrl>

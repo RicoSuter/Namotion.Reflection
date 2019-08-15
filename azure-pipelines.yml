@@ -55,7 +55,8 @@ steps:
   inputs:
     command: 'test'
     projects: '$(Projects)'
-    arguments: '--configuration $(BuildConfiguration)'
+    arguments: '--configuration $(BuildConfiguration) --collect "Code Coverage"'
+    publishTestResults: true
     feedsToUse: 'select'
     versioningScheme: 'off'
 

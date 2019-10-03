@@ -252,7 +252,7 @@ namespace Namotion.Reflection
 
                         _originalGenericArguments = arguments.ToArray();
                         _isNullableType = OriginalType.Name == "Nullable`1";
-                        _genericArguments = _isNullableType ? new CachedType[0] : _originalGenericArguments;
+                        _genericArguments = _isNullableType ? arguments[0]._originalGenericArguments : _originalGenericArguments;
                         _type = _isNullableType ? ((IEnumerable)_originalGenericArguments).Cast<CachedType>().First().OriginalType : OriginalType;
                     }
                 }

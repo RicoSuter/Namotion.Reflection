@@ -224,10 +224,13 @@ namespace Namotion.Reflection
 #endif
             }
 
-            if (OriginalType.GetTypeInfo() is var t && t.IsValueType)
+            if (OriginalType.GetTypeInfo() is var typeInfo && typeInfo.IsValueType)
             {
-                if (t.IsGenericType && t.GetGenericTypeDefinition() != typeof(Nullable<>))
-                    nullableFlagsIndex++;
+                if (typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() != typeof(Nullable<>))
+                {
+                    nullableFlagsIndex++;                
+                }
+
                 OriginalNullability = Nullability.NotNullable;
             }
             else

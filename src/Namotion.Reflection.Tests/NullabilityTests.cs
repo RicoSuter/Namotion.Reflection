@@ -110,9 +110,19 @@ namespace Namotion.Reflection.Tests
 
         class TestFunction
         {
-            public Tuple<string, string?> Function()
+            public Tuple<string, string?> ReferenceTupleFunction()
             {
                 return new Tuple<string, string?>("", "");
+            }
+
+            public (string, string?) ValueTupleFunction()
+            {
+                return ("", "");
+            }
+
+            public (string, (string?, Tuple<(string, string?), string>, Tuple<int, int?>?)?, (int?, int, string?)) ComplexNestedTypeFunction()
+            {
+                return default;
             }
         }
 
@@ -120,7 +130,7 @@ namespace Namotion.Reflection.Tests
         public void MixedTupleReturnParameter()
         {
             // Arrange
-            var method = typeof(TestFunction).GetMethod(nameof(TestFunction.Function));
+            var method = typeof(TestFunction).GetMethod(nameof(TestFunction.ReferenceTupleFunction));
             var parameter = method.ReturnParameter;
 
             // Act
@@ -130,6 +140,56 @@ namespace Namotion.Reflection.Tests
             Assert.Equal(Nullability.NotNullable, typeWithContext.Nullability);
             Assert.Equal(Nullability.NotNullable, typeWithContext.GenericArguments[0].Nullability);
             Assert.Equal(Nullability.Nullable, typeWithContext.GenericArguments[1].Nullability);
+        }
+
+        [Fact]
+        public void MixedValueTupleReturnParameter()
+        {
+            // Arrange
+            var method = typeof(TestFunction).GetMethod(nameof(TestFunction.ValueTupleFunction));
+            var parameter = method.ReturnParameter;
+
+            // Act
+            var typeWithContext = parameter.ToContextualParameter();
+
+            // Assert
+            Assert.Equal(Nullability.NotNullable, typeWithContext.Nullability);
+            Assert.Equal(Nullability.NotNullable, typeWithContext.GenericArguments[0].Nullability);
+            Assert.Equal(Nullability.Nullable, typeWithContext.GenericArguments[1].Nullability);
+        }
+
+        [Fact]
+        public void ComplexNestedTypeReturnParameter()
+        {
+            // Arrange
+            var method = typeof(TestFunction).GetMethod(nameof(TestFunction.ComplexNestedTypeFunction));
+            var parameter = method.ReturnParameter;
+
+            // Act
+            var typeWithContext = parameter.ToContextualParameter();
+
+            // Assert
+            Assert.Equal(Nullability.NotNullable, typeWithContext.Nullability);
+            Assert.Equal(Nullability.NotNullable, typeWithContext.GenericArguments[0].Nullability);
+            Assert.Equal(Nullability.Nullable,    typeWithContext.GenericArguments[1].Nullability);
+            Assert.Equal(Nullability.NotNullable, typeWithContext.GenericArguments[2].Nullability);
+
+            Assert.Equal(Nullability.Nullable,    typeWithContext.GenericArguments[1].GenericArguments[0].Nullability);
+            Assert.Equal(Nullability.NotNullable, typeWithContext.GenericArguments[1].GenericArguments[1].Nullability);
+            Assert.Equal(Nullability.Nullable,    typeWithContext.GenericArguments[1].GenericArguments[2].Nullability);
+
+            Assert.Equal(Nullability.Nullable,    typeWithContext.GenericArguments[2].GenericArguments[0].Nullability);
+            Assert.Equal(Nullability.NotNullable, typeWithContext.GenericArguments[2].GenericArguments[1].Nullability);
+            Assert.Equal(Nullability.Nullable,    typeWithContext.GenericArguments[2].GenericArguments[2].Nullability);
+
+            Assert.Equal(Nullability.NotNullable, typeWithContext.GenericArguments[1].GenericArguments[1].GenericArguments[0].Nullability);
+            Assert.Equal(Nullability.NotNullable, typeWithContext.GenericArguments[1].GenericArguments[1].GenericArguments[1].Nullability);
+
+            Assert.Equal(Nullability.NotNullable, typeWithContext.GenericArguments[1].GenericArguments[2].GenericArguments[0].Nullability);
+            Assert.Equal(Nullability.Nullable,    typeWithContext.GenericArguments[1].GenericArguments[2].GenericArguments[1].Nullability);
+
+            Assert.Equal(Nullability.NotNullable, typeWithContext.GenericArguments[1].GenericArguments[1].GenericArguments[0].GenericArguments[0].Nullability);
+            Assert.Equal(Nullability.Nullable,    typeWithContext.GenericArguments[1].GenericArguments[1].GenericArguments[0].GenericArguments[1].Nullability);
         }
 
         class TestProperty

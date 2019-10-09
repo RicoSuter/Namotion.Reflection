@@ -1,10 +1,13 @@
 # Namotion.Reflection
 
-[![Azure DevOps](https://img.shields.io/azure-devops/build/rsuter/Namotion.Reflection/16/master.svg)](https://rsuter.visualstudio.com/Namotion.Reflection/_build?definitionId=16)
+[Storage](https://github.com/RicoSuter/Namotion.Storage) | [Messaging](https://github.com/RicoSuter/Namotion.Messaging) | Reflection
+
+[![Azure DevOps](https://img.shields.io/azure-devops/build/rsuter/Namotion.Reflection/16/master.svg)](https://dev.azure.com/rsuter/Namotion/_build?definitionId=16)
+[![Azure DevOps](https://img.shields.io/azure-devops/coverage/rsuter/Namotion/16/master.svg)](https://dev.azure.com/rsuter/Namotion/_build?definitionId=16)
 [![Nuget](https://img.shields.io/nuget/v/Namotion.Reflection.svg)](https://www.nuget.org/packages/Namotion.Reflection/)
 [![MyGet](https://img.shields.io/myget/namotion-reflection/v/Namotion.Reflection.svg?label=preview%20nuget)](https://www.myget.org/feed/Packages/namotion-reflection)
 
-<img align="left" src="https://raw.githubusercontent.com/RicoSuter/Namotion.Reflection/master/assets/GitHubIcon.png">
+<img align="left" src="https://raw.githubusercontent.com/RicoSuter/Namotion.Reflection/master/assets/Icon.png" width="48px" height="48px">
 
 .NET library with advanced reflection APIs like XML documentation reading, Nullable Reference Types (C# 8) reflection and string based type checks.
 

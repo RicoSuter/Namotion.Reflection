@@ -423,7 +423,7 @@ namespace Namotion.Reflection
 
         private static XElement GetXmlDocsElement(this MemberInfo member, XDocument xml)
         {
-            var name = GetMemberElementName(member);
+            var name = DotNetReflection.GetMemberElementName(member);
             return GetXmlDocsElement(xml, name);
         }
 
@@ -435,7 +435,7 @@ namespace Namotion.Reflection
 
         private static XElement GetXmlDocsElement(this ParameterInfo parameter, XDocument xml)
         {
-            var name = GetMemberElementName(parameter.Member);
+            var name = DotNetReflection.GetMemberElementName(parameter.Member);
             var result = (IEnumerable)DynamicApis.XPathEvaluate(xml, $"/doc/members/member[@name='{name}']");
 
             var element = result.OfType<XElement>().FirstOrDefault();
@@ -526,93 +526,7 @@ namespace Namotion.Reflection
 
             return documentation.Trim('\n');
         }
-
-        /// <exception cref="ArgumentException">Unknown member type.</exception>
-        internal static string GetMemberElementName(dynamic member)
-        {
-            char prefixCode;
-            string memberName;
-            string memberTypeName;
-
-            var memberType = ((object)member).GetType();
-            if (memberType.FullName.Contains(".Cecil."))
-            {
-                memberName = TypeExtensions.IsAssignableToTypeName(memberType, "TypeDefinition", TypeNameStyle.Name) ?
-                    member.FullName : member.DeclaringType.FullName + "." + member.Name;
-
-                memberName = memberName
-                    .Replace("/", ".")
-                    .Replace('+', '.');
-
-                memberTypeName =
-                    TypeExtensions.IsAssignableToTypeName(memberType, "MethodDefinition", TypeNameStyle.Name) ? (memberName.EndsWith("..ctor") ? "Constructor" : "Method") :
-                    TypeExtensions.IsAssignableToTypeName(memberType, "PropertyDefinition", TypeNameStyle.Name) ? "Property" :
-                    "TypeInfo";
-            }
-            else
-            {
-                memberName = member is Type type && !string.IsNullOrEmpty(memberType.FullName) ?
-                    type.FullName : member.DeclaringType.FullName + "." + member.Name;
-
-                memberTypeName = (string)member.MemberType.ToString();
-            }
-
-            switch (memberTypeName)
-            {
-                case "Constructor":
-                    memberName = memberName.Replace(".ctor", "#ctor");
-                    goto case "Method";
-
-                case "Method":
-                    prefixCode = 'M';
-
-                    Func<dynamic, string> parameterTypeSelector = p => (string)p.ParameterType.FullName;
-
-                    var parameters = member is MethodBase ?
-                        ((MethodBase)member).GetParameters().Select(x => x.ParameterType.FullName) :
-                        (IEnumerable<string>)System.Linq.Enumerable.Select<dynamic, string>(member.Parameters, parameterTypeSelector);
-
-                    var paramTypesList = string.Join(",", parameters
-                        .Select(x => Regex
-                            .Replace(x, "(`[0-9]+)|(, .*?PublicKeyToken=[0-9a-z]*)", string.Empty)
-                            .Replace("[[", "{")
-                            .Replace("]]", "}"))
-                        .ToArray());
-
-                    if (!string.IsNullOrEmpty(paramTypesList))
-                    {
-                        memberName += "(" + paramTypesList + ")";
-                    }
-
-                    break;
-
-                case "Event":
-                    prefixCode = 'E';
-                    break;
-
-                case "Field":
-                    prefixCode = 'F';
-                    break;
-
-                case "NestedType":
-                    memberName = memberName.Replace('+', '.');
-                    goto case "TypeInfo";
-
-                case "TypeInfo":
-                    prefixCode = 'T';
-                    break;
-
-                case "Property":
-                    prefixCode = 'P';
-                    break;
-
-                default:
-                    throw new ArgumentException("Unknown member type.", "member");
-            }
-
-            return string.Format("{0}:{1}", prefixCode, memberName.Replace("+", "."));
-        }
-
+        
         private static string GetXmlDocsPath(dynamic assembly)
         {
             string path;
@@ -694,6 +608,228 @@ namespace Namotion.Reflection
             catch
             {
                 return null;
+            }
+        }
+
+        private static class DotNetReflection
+        {
+
+            /// <exception cref="ArgumentException">Unknown member type.</exception>
+            internal static string GetMemberElementName(MemberInfo member)
+            {
+                member = ResolveClosedGenerics(member);
+
+                var asType = (object)member as Type;
+                if (asType != null)
+                    return GetTypeXmlDocName(asType);
+
+                var asField = member as FieldInfo;
+                if (asField != null)
+                    return GetFieldDocName(asField);
+
+                var asProperty = member as PropertyInfo;
+                if (asProperty != null)
+                    return GetPropertyDocName(asProperty);
+
+                var asEvent = member as EventInfo;
+                if (asEvent != null)
+                    return GetEventDocName(asEvent);
+
+                var asMethod = member as MethodBase;
+                if (asMethod != null)
+                    return GetMethodXmlDocName((MethodBase) member);
+
+                throw new ArgumentException(
+                    String.Format(
+                        "Unknown member info type '{0}' ({1}.{2})",
+                        member.GetType().Name, member.DeclaringType?.Name, member.Name),
+                    "member");
+            }
+
+            /// <summary>
+            /// Resolve closed generic types or members of closed generic types to their open
+            /// generic base definition.
+            /// </summary>
+            /// <param name="member">The member or type to try to resolve.</param>
+            /// <returns>
+            /// <paramref name="member"/> if <paramref name="member"/> has nothing do to with closed generics;
+            /// The real definition of <paramref name="member"/> if <paramref name="member"/> is a closed generic
+            /// type or it's <see cref="MemberInfo.DeclaringType"/> is a closed generic.
+            /// </returns>
+            private static MemberInfo ResolveClosedGenerics(dynamic member)
+            {
+#if !NETSTANDARD1_0
+                // Handles closed generic types
+                if (member is Type type && type.IsGenericType)
+                    return type.Module.ResolveType(type.MetadataToken);
+
+                // Handles closed generic members
+                if (member.DeclaringType?.IsGenericType == true)
+                    return member.DeclaringType.Module.ResolveMember(member.MetadataToken);
+#endif
+                // It's OK, there is nothing to do here
+                return member;
+            }
+
+            private static string GetTypeXmlDocName(Type type)
+            {
+                return "T:" + FormatSimpleMemberXmlDocString(type, null);
+            }
+
+            private static string GetPropertyDocName(PropertyInfo property)
+            {
+                return "P:" + FormatSimpleMemberXmlDocString(property.DeclaringType, property.Name);
+            }
+
+            private static string GetFieldDocName(FieldInfo field)
+            {
+                return "P:" + FormatSimpleMemberXmlDocString(field.DeclaringType, field.Name);
+            }
+
+            private static string GetEventDocName(EventInfo @event)
+            {
+                return "E:" + FormatSimpleMemberXmlDocString(@event.DeclaringType, @event.Name);
+            }
+
+            private static string GetMethodXmlDocName(MethodBase method)
+            {
+                var genericArgsMap = new GenericArgsMap(method);
+                var parameters = method.GetParameters();
+
+                StringBuilder nameBuilder = new StringBuilder();
+
+                nameBuilder.Append("M:");
+                nameBuilder.Append(GetTypeXmlDocString(method.DeclaringType, false, genericArgsMap));
+                nameBuilder.Append(".");
+                nameBuilder.Append(method.IsConstructor ? "#ctor" : method.Name);
+
+                if (genericArgsMap.MethodMap.Count > 0)
+                {
+                    nameBuilder.Append("``").Append(genericArgsMap.MethodMap.Count);
+                }
+
+                if (parameters.Length > 0)
+                {
+                    char sep = '(';
+                    foreach (var parameter in parameters)
+                    {
+                        nameBuilder.Append(sep);
+                        nameBuilder.Append(GetTypeXmlDocString(parameter.ParameterType, true, genericArgsMap));
+                        sep = ',';
+                    }
+
+                    nameBuilder.Append(')');
+                }
+
+                if (method is MethodInfo methodInfo && (method.Name == "op_Implicit" || method.Name == "op_Explicit"))
+                {
+                    nameBuilder.Append("~");
+                    nameBuilder.Append(GetTypeXmlDocString(methodInfo.ReturnType, true, genericArgsMap));
+                }
+
+                return nameBuilder.ToString();
+            }
+
+            private static string FormatSimpleMemberXmlDocString(Type type, string memberName)
+            {
+                var docStr = type.FullName;
+                if (memberName != null)
+                    docStr = docStr + "." + memberName;
+                if (docStr != null)
+                    docStr = Regex.Replace(docStr, @"\[.*\]", "").Replace('+', '.');
+                return docStr;
+            }
+
+            private static string GetTypeXmlDocString(
+                Type type,
+                bool isMethodParameter,
+                GenericArgsMap genericArgsMap)
+            {
+                if (type.IsGenericParameter)
+                {
+                    int index;
+                    if (genericArgsMap.MethodMap.TryGetValue(type, out index))
+                        return "``" + index;
+                    if (genericArgsMap.TypeMap.TryGetValue(type, out index))
+                        return "`" + index;
+                    throw new InvalidOperationException(
+                        "No matching generic argument mapping found for generic parameter " + type);
+                }
+
+                if (type.HasElementType)
+                {
+                    var elementTypeStr = GetTypeXmlDocString(
+                        type.GetElementType(),
+                        isMethodParameter,
+                        genericArgsMap);
+
+                    if (type.IsPointer)
+                    {
+                        return elementTypeStr + "*";
+                    }
+
+                    if (type.IsArray)
+                    {
+                        var arrayRank = type.GetArrayRank();
+                        return arrayRank == 1 ? "[]" : "[" + string.Join(",", Enumerable.Repeat("0:", arrayRank)) + "]";
+                    }
+
+                    if (type.IsByRef)
+                    {
+                        return elementTypeStr + "@";
+                    }
+
+                    throw new NotSupportedException("Unhandled element type for type " + type);
+                }
+
+                StringBuilder docStr = new StringBuilder();
+
+                docStr.Append(type.IsNested
+                    ? GetTypeXmlDocString(type.DeclaringType, isMethodParameter, genericArgsMap)
+                    : type.Namespace);
+
+                docStr.Append(".");
+
+                docStr.Append(isMethodParameter ? Regex.Replace(type.Name, @"`\d+", "") : type.Name);
+
+#if !NETSTANDARD1_0
+                if (type.GetTypeInfo().IsGenericType && isMethodParameter)
+                {
+                    var genericArgsStrList = type.GetGenericArguments()
+                        .Select(arg => GetTypeXmlDocString(arg, isMethodParameter, genericArgsMap));
+                    docStr.Append("{").Append(string.Join(",", genericArgsStrList)).Append("}");
+                }
+#endif
+                return docStr.ToString();
+            }
+
+            private class GenericArgsMap
+            {
+                public GenericArgsMap(MethodBase method)
+                {
+                    MethodMap = new Dictionary<Type, int>();
+                    TypeMap = new Dictionary<Type, int>();
+
+#if !NETSTANDARD1_0
+                    var methodGenericArgs = method.GetGenericArguments();
+                    for (int i = 0; i < methodGenericArgs.Length; i++)
+                    {
+                        MethodMap.Add(methodGenericArgs[i], i);
+                    }
+
+                    if (method.DeclaringType != null)
+                    {
+                        var typeGenericArgs = method.DeclaringType.GetGenericArguments();
+                        for (int i = 0; i < typeGenericArgs.Length; i++)
+                        {
+                            TypeMap.Add(typeGenericArgs[i], i);
+                        }
+                    }
+#endif
+                }
+
+                public Dictionary<Type, int> MethodMap { get; }
+                public Dictionary<Type, int> TypeMap { get; }
             }
         }
     }

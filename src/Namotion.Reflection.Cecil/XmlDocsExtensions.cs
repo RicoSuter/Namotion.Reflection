@@ -1,10 +1,13 @@
-﻿using Mono.Cecil;
+﻿using System;
+using Mono.Cecil;
 using Namotion.Reflection.Infrastructure;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
-using static Namotion.Reflection.XmlDocsExtensions;
 
 namespace Namotion.Reflection.Cecil
 {
@@ -63,7 +66,7 @@ namespace Namotion.Reflection.Cecil
                 return string.Empty;
             }
 
-            var name = GetMemberElementName(member);
+            var name = CecilReflection.GetMemberElementName(member);
             var element = document.GetXmlDocsElement(name);
             return element?.Element(tagName).ToXmlDocsContent();
         }
@@ -79,7 +82,7 @@ namespace Namotion.Reflection.Cecil
                 return null;
             }
 
-            var name = GetMemberElementName(member);
+            var name = CecilReflection.GetMemberElementName(member);
             return document.GetXmlDocsElement(name);
         }
 
@@ -115,7 +118,7 @@ namespace Namotion.Reflection.Cecil
 
         private static XElement GetXmlDocsElement(this MethodReturnType parameter, XDocument xml)
         {
-            var name = GetMemberElementName(parameter.Method);
+            var name = CecilReflection.GetMemberElementName(parameter.Method);
             var result = (IEnumerable)DynamicApis.XPathEvaluate(xml, $"/doc/members/member[@name='{name}']");
 
             var element = result.OfType<XElement>().FirstOrDefault();
@@ -132,7 +135,7 @@ namespace Namotion.Reflection.Cecil
 
         private static XElement GetXmlDocsElement(this ParameterDefinition parameter, XDocument xml)
         {
-            var name = GetMemberElementName(parameter.Method);
+            var name = CecilReflection.GetMemberElementName(parameter.Method);
             var result = (IEnumerable)DynamicApis.XPathEvaluate(xml, $"/doc/members/member[@name='{name}']");
 
             var element = result.OfType<XElement>().FirstOrDefault();
@@ -145,6 +148,97 @@ namespace Namotion.Reflection.Cecil
             }
 
             return null;
+        }
+        
+        
+        private static class CecilReflection
+        {
+
+        /// <exception cref="ArgumentException">Unknown member type.</exception>
+        internal static string GetMemberElementName(dynamic member)
+        {
+            char prefixCode;
+            string memberName;
+            string memberTypeName;
+
+            var memberType = ((object)member).GetType();
+            if (memberType.FullName.Contains(".Cecil."))
+            {
+                memberName = TypeExtensions.IsAssignableToTypeName(memberType, "TypeDefinition", TypeNameStyle.Name) ?
+                    member.FullName : member.DeclaringType.FullName + "." + member.Name;
+
+                memberName = memberName
+                    .Replace("/", ".")
+                    .Replace('+', '.');
+
+                memberTypeName =
+                    TypeExtensions.IsAssignableToTypeName(memberType, "MethodDefinition", TypeNameStyle.Name) ? (memberName.EndsWith("..ctor") ? "Constructor" : "Method") :
+                    TypeExtensions.IsAssignableToTypeName(memberType, "PropertyDefinition", TypeNameStyle.Name) ? "Property" :
+                    "TypeInfo";
+            }
+            else
+            {
+                memberName = member is Type type && !string.IsNullOrEmpty(memberType.FullName) ?
+                    type.FullName : member.DeclaringType.FullName + "." + member.Name;
+
+                memberTypeName = (string)member.MemberType.ToString();
+            }
+
+            switch (memberTypeName)
+            {
+                case "Constructor":
+                    memberName = memberName.Replace(".ctor", "#ctor");
+                    goto case "Method";
+
+                case "Method":
+                    prefixCode = 'M';
+
+                    Func<dynamic, string> parameterTypeSelector = p => (string)p.ParameterType.FullName;
+
+                    var parameters = member is MethodBase ?
+                        ((MethodBase)member).GetParameters().Select(x => x.ParameterType.FullName) :
+                        (IEnumerable<string>)System.Linq.Enumerable.Select<dynamic, string>(member.Parameters, parameterTypeSelector);
+
+                    var paramTypesList = string.Join(",", parameters
+                        .Select(x => Regex
+                            .Replace(x, "(`[0-9]+)|(, .*?PublicKeyToken=[0-9a-z]*)", string.Empty)
+                            .Replace("[[", "{")
+                            .Replace("]]", "}"))
+                        .ToArray());
+
+                    if (!string.IsNullOrEmpty(paramTypesList))
+                    {
+                        memberName += "(" + paramTypesList + ")";
+                    }
+
+                    break;
+
+                case "Event":
+                    prefixCode = 'E';
+                    break;
+
+                case "Field":
+                    prefixCode = 'F';
+                    break;
+
+                case "NestedType":
+                    memberName = memberName.Replace('+', '.');
+                    goto case "TypeInfo";
+
+                case "TypeInfo":
+                    prefixCode = 'T';
+                    break;
+
+                case "Property":
+                    prefixCode = 'P';
+                    break;
+
+                default:
+                    throw new ArgumentException("Unknown member type.", "member");
+            }
+
+            return string.Format("{0}:{1}", prefixCode, memberName.Replace("+", "."));
+        }
         }
     }
 }

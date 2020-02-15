@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
@@ -282,6 +283,65 @@ namespace Namotion.Reflection.Tests
             //// Assert
             Assert.Equal("Foo", fooSummary);
             Assert.Equal("Bar", barSummary);
+        }
+
+        public abstract class BaseController<T>
+        {
+            /// <summary>Base method.</summary>
+            public string Test()
+            {
+                return null;
+            }
+        }
+
+        public class MyController : BaseController<string>
+        {
+        }
+
+        [Fact]
+        public void WhenTypeInheritsFromGenericType_ThenXmlDocsIsFound()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            var fooSummary = typeof(MyController).GetMethod(nameof(BaseController<string>.Test)).GetXmlDocsSummary();
+
+            //// Assert
+            Assert.Equal("Base method.", fooSummary);
+        }
+
+        public class BaseGenericClass<T1, T2>
+        {
+            /// <summary>
+            /// SingleAsync
+            /// </summary>
+            public Task<T1> SingleAsync(T2 foo, T1 bar)
+            {
+                throw new NotImplementedException();
+            }
+
+            /// <summary>Baz</summary>
+            public T2 Baz { get; set; }
+        }
+
+        public class InheritedGenericClass : BaseGenericClass<string, int>
+        {
+        }
+
+        [Fact]
+        public void WhenTypeInheritsFromGenericType_ThenMethodAndPropertyWithGenericParametersResolvesCorrectXml()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            var summaryMethod = typeof(InheritedGenericClass).GetMethod("SingleAsync").GetXmlDocsSummary();
+            var summaryProperty = typeof(InheritedGenericClass).GetProperty("Baz").GetXmlDocsSummary();
+
+            //// Assert
+            Assert.Equal("SingleAsync", summaryMethod);
+            Assert.Equal("Baz", summaryProperty);
         }
     }
 }

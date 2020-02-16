@@ -385,19 +385,6 @@ namespace Namotion.Reflection
                     return null;
                 }
 
-                if (member.DeclaringType.GetTypeInfo().IsGenericType)
-                {
-                    // Resolve member with generic arguments (Ts instead of actual types)
-                    if (member is PropertyInfo propertyInfo)
-                    {
-                        member = propertyInfo.DeclaringType.GetRuntimeProperty(propertyInfo.Name);
-                    }
-                    else
-                    {
-                        member = ((dynamic)member).Module.ResolveMember(((dynamic)member).MetadataToken);
-                    }
-                }
-
                 var element = GetXmlDocsElement(member, document);
                 ReplaceInheritdocElements(member, element);
                 return element;
@@ -547,6 +534,19 @@ namespace Namotion.Reflection
             string memberName;
             string memberTypeName;
 
+            if (member is MemberInfo memberInfo && memberInfo.DeclaringType.GetTypeInfo().IsGenericType)
+            {
+                // Resolve member with generic arguments (Ts instead of actual types)
+                if (member is PropertyInfo propertyInfo)
+                {
+                    member = propertyInfo.DeclaringType.GetRuntimeProperty(propertyInfo.Name);
+                }
+                else
+                {
+                    member = ((dynamic)member).Module.ResolveMember(((dynamic)member).MetadataToken);
+                }
+            }
+
             var memberType = ((object)member).GetType();
             if (memberType.FullName.Contains(".Cecil."))
             {
@@ -581,13 +581,18 @@ namespace Namotion.Reflection
 
                     Func<dynamic, string> parameterTypeSelector = p =>
                         p.ParameterType.ContainsGenericParameter ?
-                        "||" + p.ParameterType.Position : 
+                        (ObjectExtensions.HasProperty(p.ParameterType, "GenericArguments") && p.ParameterType.GenericArguments.Count > 0 ?
+                            ((string)p.ParameterType.FullName).Split('`')[0] + "{" + string.Join(",", ((ICollection)p.ParameterType.GenericArguments).Cast<dynamic>().Select(u => "||" + u.Position)) + "}" :
+                            "||" + p.ParameterType.Position) :
                         (string)p.ParameterType.FullName;
 
                     var parameters = member is MethodBase ?
                         ((MethodBase)member).GetParameters().Select(x =>
                             x.ParameterType.FullName ??
-                            "||" + x.ParameterType.GenericParameterPosition) :
+                            (((dynamic)x.ParameterType).GenericTypeArguments.Length > 0 ?
+                                x.ParameterType.Namespace + "." + x.ParameterType.Name.Split('`')[0] +
+                                    "{" + string.Join(",", ((Type[])((dynamic)x.ParameterType).GenericTypeArguments).Select(a => "||" + a.GenericParameterPosition.ToString())) + "}" :
+                                "||" + x.ParameterType.GenericParameterPosition)) :
                         (IEnumerable<string>)System.Linq.Enumerable.Select<dynamic, string>(member.Parameters, parameterTypeSelector);
 
                     var paramTypesList = string.Join(",", parameters

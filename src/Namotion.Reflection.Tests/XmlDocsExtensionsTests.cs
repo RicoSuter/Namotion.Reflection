@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
@@ -342,6 +343,64 @@ namespace Namotion.Reflection.Tests
             //// Assert
             Assert.Equal("SingleAsync", summaryMethod);
             Assert.Equal("Baz", summaryProperty);
+        }
+
+        public class BaseGenericClass<T>
+        {
+            /// <summary>
+            /// Single
+            /// </summary>
+            public T Single(T input)
+            {
+                throw new NotImplementedException();
+            }
+
+            /// <summary>
+            /// Multi
+            /// </summary>
+            public ICollection<T> Multi(ICollection<T> input)
+            {
+                throw new NotImplementedException();
+            }
+
+            /// <summary>
+            /// SingleAsync
+            /// </summary>
+            public Task<T> SingleAsync(T input)
+            {
+                throw new NotImplementedException();
+            }
+
+            /// <summary>
+            /// MultiAsync
+            /// </summary>
+            public Task<ICollection<T>> MultiAsync(ICollection<T> input)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public class InheritedGenericClass2 : BaseGenericClass<string>
+        {
+        }
+
+        [Fact]
+        public void When_method_is_inherited_from_generic_class_then_xml_docs_are_correct()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            var singleSummary = typeof(InheritedGenericClass2).GetMethod(nameof(InheritedGenericClass2.Single)).GetXmlDocsSummary();
+            var multiSummary = typeof(InheritedGenericClass2).GetMethod(nameof(InheritedGenericClass2.Multi)).GetXmlDocsSummary();
+            var singleAsyncSummary = typeof(InheritedGenericClass2).GetMethod(nameof(InheritedGenericClass2.SingleAsync)).GetXmlDocsSummary();
+            var multiAsyncSummary = typeof(InheritedGenericClass2).GetMethod(nameof(InheritedGenericClass2.MultiAsync)).GetXmlDocsSummary();
+
+            //// Assert
+            Assert.Equal("Single", singleSummary);
+            Assert.Equal("Multi", multiSummary);
+            Assert.Equal("SingleAsync", singleAsyncSummary);
+            Assert.Equal("MultiAsync", multiAsyncSummary);
         }
     }
 }

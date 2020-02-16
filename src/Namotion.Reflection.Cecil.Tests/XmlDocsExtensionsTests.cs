@@ -1,5 +1,6 @@
 using Mono.Cecil;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
@@ -76,6 +77,14 @@ namespace Namotion.Reflection.Cecil.Tests
                 throw new NotImplementedException();
             }
 
+            /// <summary>
+            /// MultiAsync
+            /// </summary>
+            public Task<ICollection<T1>> MultiAsync(ICollection<T2> input)
+            {
+                throw new NotImplementedException();
+            }
+
             /// <summary>Baz</summary>
             public T2 Baz { get; set; }
         }
@@ -95,14 +104,17 @@ namespace Namotion.Reflection.Cecil.Tests
             var module = assembly.Modules.Last();
             var type = module.GetTypes().Single(t => t.Name.Contains("BaseGenericClass"));
             var method = type.Methods.First(m => m.Name == nameof(InheritedGenericClass.SingleAsync));
+            var method2 = type.Methods.First(m => m.Name == nameof(InheritedGenericClass.MultiAsync));
             var document = XmlDocs.LoadDocument(xmlPath);
 
             //// Act
             var summaryMethod = method.GetXmlDocsTag("summary", document);
+            var summaryMethod2 = method2.GetXmlDocsTag("summary", document);
             var summaryProperty = type.Properties.First().GetXmlDocsSummary(document);
 
             //// Assert
             Assert.Equal("SingleAsync", summaryMethod);
+            Assert.Equal("MultiAsync", summaryMethod2);
             Assert.Equal("Baz", summaryProperty);
         }
     }

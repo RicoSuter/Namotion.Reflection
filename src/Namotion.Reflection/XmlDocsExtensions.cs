@@ -204,6 +204,9 @@ namespace Namotion.Reflection
                 return string.Empty;
             }
 
+            _ = member ?? throw new ArgumentNullException(nameof(member));
+            _ = tagName ?? throw new ArgumentNullException(nameof(tagName));
+
             var assemblyName = member.Module.Assembly.GetName();
             lock (Lock)
             {

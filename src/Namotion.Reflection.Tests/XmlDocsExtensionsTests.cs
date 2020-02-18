@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -401,6 +402,71 @@ namespace Namotion.Reflection.Tests
             Assert.Equal("Multi", multiSummary);
             Assert.Equal("SingleAsync", singleAsyncSummary);
             Assert.Equal("MultiAsync", multiAsyncSummary);
+        }
+
+        public class BusinessProcessSearchResult : SearchBehaviorBaseResult<BusinessProcess>
+        {
+        }
+
+        public class BusinessProcess
+        {
+        }
+
+        public class SearchBehaviorBaseResult<T> : BaseResult<T>, ISearchBehaviorResult
+        {
+            /// <inheritdoc />
+            public string SearchString { get; set; }
+
+            /// <inheritdoc />
+            public bool IsSearchStringRewritten { get; set; }
+        }
+
+        public interface ISearchBehaviorResult
+        {
+            /// <summary>
+            /// The search string used to query the data
+            /// </summary>
+            string SearchString { get; set; }
+
+            /// <summary>
+            /// Flag to notify if the SearchString was modified compared to the original requested one
+            /// </summary>
+            bool IsSearchStringRewritten { get; set; }
+        }
+
+        /// <summary>
+        /// Base class for search results
+        /// </summary>
+        /// <typeparam name="T">Type of the results</typeparam>
+        public class BaseResult<T> : IPagedSearchResult
+        {
+            /// <inheritdoc />
+            public string PageToken { get; set; }
+        }
+
+        public interface IPagedSearchResult
+        {
+            /// <summary>
+            /// An optional token to access the next page of results for those endpoints that support a backend scrolling logic.
+            /// </summary>
+            string PageToken { get; set; }
+        }
+
+        [Fact]
+        public void When_inheritdocs_is_availble_in_inheritance_chain_then_it_is_resolved()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            var searchStringProperty = typeof(BusinessProcessSearchResult).GetRuntimeProperty("SearchString").GetXmlDocsSummary();
+            var isSearchStringRewrittenProperty = typeof(BusinessProcessSearchResult).GetRuntimeProperty("IsSearchStringRewritten").GetXmlDocsSummary();
+            var pageTokenProperty = typeof(BusinessProcessSearchResult).GetRuntimeProperty("PageToken").GetXmlDocsSummary();
+
+            //// Assert
+            Assert.True(!string.IsNullOrWhiteSpace(searchStringProperty));
+            Assert.True(!string.IsNullOrWhiteSpace(isSearchStringRewrittenProperty));
+            Assert.True(!string.IsNullOrWhiteSpace(pageTokenProperty));
         }
     }
 }

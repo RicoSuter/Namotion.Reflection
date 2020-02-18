@@ -1,5 +1,8 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -282,6 +285,188 @@ namespace Namotion.Reflection.Tests
             //// Assert
             Assert.Equal("Foo", fooSummary);
             Assert.Equal("Bar", barSummary);
+        }
+
+        public abstract class BaseController<T>
+        {
+            /// <summary>Base method.</summary>
+            public string Test()
+            {
+                return null;
+            }
+        }
+
+        public class MyController : BaseController<string>
+        {
+        }
+
+        [Fact]
+        public void WhenTypeInheritsFromGenericType_ThenXmlDocsIsFound()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            var fooSummary = typeof(MyController).GetMethod(nameof(BaseController<string>.Test)).GetXmlDocsSummary();
+
+            //// Assert
+            Assert.Equal("Base method.", fooSummary);
+        }
+
+        public class BaseGenericClass<T1, T2>
+        {
+            /// <summary>
+            /// SingleAsync
+            /// </summary>
+            public Task<T1> SingleAsync(T2 foo, T1 bar)
+            {
+                throw new NotImplementedException();
+            }
+
+            /// <summary>Baz</summary>
+            public T2 Baz { get; set; }
+        }
+
+        public class InheritedGenericClass : BaseGenericClass<string, int>
+        {
+        }
+
+        [Fact]
+        public void WhenTypeInheritsFromGenericType_ThenMethodAndPropertyWithGenericParametersResolvesCorrectXml()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            var summaryMethod = typeof(InheritedGenericClass).GetMethod("SingleAsync").GetXmlDocsSummary();
+            var summaryProperty = typeof(InheritedGenericClass).GetProperty("Baz").GetXmlDocsSummary();
+
+            //// Assert
+            Assert.Equal("SingleAsync", summaryMethod);
+            Assert.Equal("Baz", summaryProperty);
+        }
+
+        public class BaseGenericClass<T>
+        {
+            /// <summary>
+            /// Single
+            /// </summary>
+            public T Single(T input)
+            {
+                throw new NotImplementedException();
+            }
+
+            /// <summary>
+            /// Multi
+            /// </summary>
+            public ICollection<T> Multi(ICollection<T> input)
+            {
+                throw new NotImplementedException();
+            }
+
+            /// <summary>
+            /// SingleAsync
+            /// </summary>
+            public Task<T> SingleAsync(T input)
+            {
+                throw new NotImplementedException();
+            }
+
+            /// <summary>
+            /// MultiAsync
+            /// </summary>
+            public Task<ICollection<T>> MultiAsync(ICollection<T> input)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public class InheritedGenericClass2 : BaseGenericClass<string>
+        {
+        }
+
+        [Fact]
+        public void When_method_is_inherited_from_generic_class_then_xml_docs_are_correct()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            var singleSummary = typeof(InheritedGenericClass2).GetMethod(nameof(InheritedGenericClass2.Single)).GetXmlDocsSummary();
+            var multiSummary = typeof(InheritedGenericClass2).GetMethod(nameof(InheritedGenericClass2.Multi)).GetXmlDocsSummary();
+            var singleAsyncSummary = typeof(InheritedGenericClass2).GetMethod(nameof(InheritedGenericClass2.SingleAsync)).GetXmlDocsSummary();
+            var multiAsyncSummary = typeof(InheritedGenericClass2).GetMethod(nameof(InheritedGenericClass2.MultiAsync)).GetXmlDocsSummary();
+
+            //// Assert
+            Assert.Equal("Single", singleSummary);
+            Assert.Equal("Multi", multiSummary);
+            Assert.Equal("SingleAsync", singleAsyncSummary);
+            Assert.Equal("MultiAsync", multiAsyncSummary);
+        }
+
+        public class BusinessProcessSearchResult : SearchBehaviorBaseResult<BusinessProcess>
+        {
+        }
+
+        public class BusinessProcess
+        {
+        }
+
+        public class SearchBehaviorBaseResult<T> : BaseResult<T>, ISearchBehaviorResult
+        {
+            /// <inheritdoc />
+            public string SearchString { get; set; }
+
+            /// <inheritdoc />
+            public bool IsSearchStringRewritten { get; set; }
+        }
+
+        public interface ISearchBehaviorResult
+        {
+            /// <summary>
+            /// The search string used to query the data
+            /// </summary>
+            string SearchString { get; set; }
+
+            /// <summary>
+            /// Flag to notify if the SearchString was modified compared to the original requested one
+            /// </summary>
+            bool IsSearchStringRewritten { get; set; }
+        }
+
+        /// <summary>
+        /// Base class for search results
+        /// </summary>
+        /// <typeparam name="T">Type of the results</typeparam>
+        public class BaseResult<T> : IPagedSearchResult
+        {
+            /// <inheritdoc />
+            public string PageToken { get; set; }
+        }
+
+        public interface IPagedSearchResult
+        {
+            /// <summary>
+            /// An optional token to access the next page of results for those endpoints that support a backend scrolling logic.
+            /// </summary>
+            string PageToken { get; set; }
+        }
+
+        [Fact]
+        public void When_inheritdocs_is_availble_in_inheritance_chain_then_it_is_resolved()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            var searchStringProperty = typeof(BusinessProcessSearchResult).GetRuntimeProperty("SearchString").GetXmlDocsSummary();
+            var isSearchStringRewrittenProperty = typeof(BusinessProcessSearchResult).GetRuntimeProperty("IsSearchStringRewritten").GetXmlDocsSummary();
+            var pageTokenProperty = typeof(BusinessProcessSearchResult).GetRuntimeProperty("PageToken").GetXmlDocsSummary();
+
+            //// Assert
+            Assert.True(!string.IsNullOrWhiteSpace(searchStringProperty));
+            Assert.True(!string.IsNullOrWhiteSpace(isSearchStringRewrittenProperty));
+            Assert.True(!string.IsNullOrWhiteSpace(pageTokenProperty));
         }
     }
 }

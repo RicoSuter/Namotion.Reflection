@@ -11,6 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Namotion.Reflection.Tests.F
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F50FE573-405B-46A4-B8BE-3224547FF5AF}"
 	ProjectSection(SolutionItems) = preProject
+		..\azure-pipelines.yml = ..\azure-pipelines.yml
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
@@ -20,7 +21,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Namotion.Reflection.Cecil",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Namotion.Reflection.Cecil.Tests", "Namotion.Reflection.Cecil.Tests\Namotion.Reflection.Cecil.Tests.csproj", "{4E2AE356-138B-4CA7-807A-B0D8B452E69D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Namotion.Reflection.Benchmark", "Namotion.Reflection.Benchmark\Namotion.Reflection.Benchmark.csproj", "{D0AD78E3-3057-4DC8-87F9-F91B2766DDB8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Namotion.Reflection.Benchmark", "Namotion.Reflection.Benchmark\Namotion.Reflection.Benchmark.csproj", "{D0AD78E3-3057-4DC8-87F9-F91B2766DDB8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

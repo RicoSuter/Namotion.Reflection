@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Namotion.Reflection.Demo
 {
-    public class MySampleClass
+    public class Person
     {
         /// <summary>
         /// Gets or sets the first name.
@@ -19,7 +19,7 @@ namespace Namotion.Reflection.Demo
         public string? MiddleName { get; set; }
 
         /// <summary>
-        /// 
+        /// Updates the person.
         /// </summary>
         /// <param name="firstName">The first name.</param>
         /// <param name="middleName">The optional middle name.</param>
@@ -34,26 +34,31 @@ namespace Namotion.Reflection.Demo
     {
         static void Main(string[] args)
         {
-            var properties = typeof(MySampleClass).GetContextualProperties();
-            var parameters = typeof(MySampleClass)
-                .GetMethod(nameof(MySampleClass.Update))
+            var properties = typeof(Person)
+                .GetContextualProperties();
+
+            var parameters = typeof(Person)
+                .GetMethod(nameof(Person.Update))
                 .GetContextualParameters();
 
-            Console.WriteLine(nameof(MySampleClass));
+            Console.WriteLine(nameof(Person));
 
-            Console.WriteLine("# Properties");
+            Console.WriteLine("# Person Properties: ");
             foreach (var property in properties)
             {
-                Console.WriteLine(property);
-                Console.WriteLine("XML Description: " + property.PropertyInfo.GetXmlDocsSummary());
+                Console.WriteLine("  " + property);
+                Console.WriteLine("    XML Description: " + property.PropertyInfo.GetXmlDocsSummary());
             }
 
-            Console.WriteLine("# Parameters: " + nameof(MySampleClass.Update));
+            Console.WriteLine("# Update Method Parameters: ");
             foreach (var parameter in parameters)
             {
-                Console.WriteLine(parameter);
-                Console.WriteLine("XML Description: " + parameter.ParameterInfo.GetXmlDocs());
+                Console.WriteLine("  " + parameter);
+                Console.WriteLine("    XML Description: " + parameter.ParameterInfo.GetXmlDocs());
             }
+
+            Console.WriteLine("Press <any> key to quit...");
+            Console.ReadKey();
         }
     }
 }

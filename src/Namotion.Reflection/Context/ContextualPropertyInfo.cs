@@ -11,6 +11,7 @@ namespace Namotion.Reflection
         private string _name;
         private bool? _isValueType;
         private bool? _canWrite;
+        private bool? _canRead;
 
         internal ContextualPropertyInfo(PropertyInfo propertyInfo, ref int nullableFlagsIndex)
             : base(propertyInfo, propertyInfo.PropertyType, ref nullableFlagsIndex)
@@ -42,6 +43,11 @@ namespace Namotion.Reflection
         /// Gets a value indicating whether the property can be written to.
         /// </summary>
         public bool CanWrite => _canWrite ?? ((bool)(_canWrite = PropertyInfo.CanWrite));
+
+        /// <summary>
+        /// Gets a value indicating whether the property can be read from.
+        /// </summary>
+        public bool CanRead => _canRead ?? ((bool)(_canRead = PropertyInfo.CanRead));
 
         /// <summary>
         /// Returns the value of a field supported by a given object.

@@ -86,16 +86,17 @@ namespace Namotion.Reflection.Tests
             //// Act and assert
             Assert.Throws<InvalidOperationException>(() => person.EnsureValidNullability());
         }
-    }
 
-    public sealed class PersonDetails
-    {
-        public PersonDetails(int id, string name)
+        private sealed class PersonDetails
         {
-            ID = id;
-            Name = name;
+            public PersonDetails(int id, string name)
+            private sealed class PersonDetails
+            {
+                ID = id;
+                Name = name;
+            }
+            public int ID { get; }
+            public string Name { get; }
         }
-        public int ID { get; }
-        public string Name { get; }
     }
 }

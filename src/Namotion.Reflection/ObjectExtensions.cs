@@ -119,7 +119,7 @@ namespace Namotion.Reflection
                 for (int i = 0; i < properties.Length; i++)
                 {
                     var property = properties[i];
-                    if (!property.IsValueType && property.CanWrite)
+                    if (!property.IsValueType && property.CanRead)
                     {
                         var value = property.GetValue(obj);
                         if (value == null)

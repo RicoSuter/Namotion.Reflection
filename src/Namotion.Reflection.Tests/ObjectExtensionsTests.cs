@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
+using Newtonsoft.Json;
 using Xunit;
 
 #nullable enable
@@ -73,5 +73,77 @@ namespace Namotion.Reflection.Tests
             Assert.True(valid);
             Assert.Empty(errors);
         }
+
+        /// <summary>
+        /// This is a reproduce case for Issue 24
+        /// </summary>
+        [Fact]
+        public void When_object_that_is_non_nested_public_type_has_a_null_value_for_a_non_nullable_property_then_EnsureValidNullability_should_throw()
+        {
+            //// Arrange
+            var person = JsonConvert.DeserializeObject<PersonDetails_PublicNonNested>("{ \"ID\": 123, \"Name\": null }");
+
+            //// Act and assert
+            Assert.Throws<InvalidOperationException>(() => person.EnsureValidNullability());
+        }
+
+        /// <summary>
+        /// Variation on Issue 24, related to discussions in that thread
+        /// </summary>
+        [Fact]
+        public void When_object_that_is_a_nested_public_type_has_a_null_value_for_a_non_nullable_property_then_EnsureValidNullability_should_throw()
+        {
+            //// Arrange
+            var person = JsonConvert.DeserializeObject<PersonDetails_PublicNested>("{ \"ID\": 123, \"Name\": null }");
+
+            //// Act and assert
+            Assert.Throws<InvalidOperationException>(() => person.EnsureValidNullability());
+        }
+
+        /// <summary>
+        /// Variation on Issue 24, related to discussions in that thread
+        /// </summary>
+        [Fact]
+        public void When_object_that_is_a_nested_private_type_has_a_null_value_for_a_non_nullable_property_then_EnsureValidNullability_should_throw()
+        {
+            //// Arrange
+            var person = JsonConvert.DeserializeObject<PersonDetails_PrivateNested>("{ \"ID\": 123, \"Name\": null }");
+
+            //// Act and assert
+            Assert.Throws<InvalidOperationException>(() => person.EnsureValidNullability());
+        }
+
+        public sealed class PersonDetails_PublicNested
+        {
+            public PersonDetails_PublicNested(int id, string name)
+            {
+                ID = id;
+                Name = name;
+            }
+            public int ID { get; }
+            public string Name { get; }
+        }
+
+        private sealed class PersonDetails_PrivateNested
+        {
+            public PersonDetails_PrivateNested(int id, string name)
+            {
+                ID = id;
+                Name = name;
+            }
+            public int ID { get; }
+            public string Name { get; }
+        }
+    }
+
+    public sealed class PersonDetails_PublicNonNested
+    {
+        public PersonDetails_PublicNonNested(int id, string name)
+        {
+            ID = id;
+            Name = name;
+        }
+        public int ID { get; }
+        public string Name { get; }
     }
 }

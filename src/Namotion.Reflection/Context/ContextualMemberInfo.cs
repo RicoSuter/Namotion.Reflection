@@ -13,7 +13,9 @@ namespace Namotion.Reflection
             : base(memberType,
                 memberInfo.GetCustomAttributes(true).OfType<Attribute>().ToArray(),
                 null, null, ref nullableFlagsIndex,
-                new dynamic[] { memberInfo.DeclaringType, memberInfo.DeclaringType.GetTypeInfo().Assembly })
+                memberInfo.DeclaringType.IsNested ?
+                    new dynamic[] { memberInfo.DeclaringType, memberInfo.DeclaringType.DeclaringType, memberInfo.DeclaringType.GetTypeInfo().Assembly } :
+                    new dynamic[] { memberInfo.DeclaringType, memberInfo.DeclaringType.GetTypeInfo().Assembly })
         {
         }
 

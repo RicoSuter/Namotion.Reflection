@@ -73,5 +73,29 @@ namespace Namotion.Reflection.Tests
             Assert.True(valid);
             Assert.Empty(errors);
         }
+
+        /// <summary>
+        /// This is a reproduce case for Issue 24
+        /// </summary>
+        [Fact]
+        public void When_object_has_a_null_value_for_a_non_nullable_property_then_EnsureValidNullability_should_throw()
+        {
+            //// Arrange
+            var person = JsonConvert.DeserializeObject<PersonDetails>("{ \"ID\": 123, \"Name\": null }");
+
+            //// Act and assert
+            Assert.Throws<InvalidOperationException>(() => person.EnsureValidNullability());
+        }
+
+        private sealed class PersonDetails
+        {
+            public PersonDetails(int id, string name)
+            {
+                ID = id;
+                Name = name;
+            }
+            public int ID { get; }
+            public string Name { get; }
+        }
     }
 }

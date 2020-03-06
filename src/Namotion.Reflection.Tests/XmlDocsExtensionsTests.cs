@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Schema;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -467,6 +468,19 @@ namespace Namotion.Reflection.Tests
             Assert.True(!string.IsNullOrWhiteSpace(searchStringProperty));
             Assert.True(!string.IsNullOrWhiteSpace(isSearchStringRewrittenProperty));
             Assert.True(!string.IsNullOrWhiteSpace(pageTokenProperty));
+        }
+
+        [Fact]
+        public void When_type_is_in_NuGet_then_xml_docs_should_be_found()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            var summary = typeof(JsonSchema).GetXmlDocsSummary();
+
+            //// Assert
+            Assert.False(string.IsNullOrWhiteSpace(summary));
         }
     }
 }

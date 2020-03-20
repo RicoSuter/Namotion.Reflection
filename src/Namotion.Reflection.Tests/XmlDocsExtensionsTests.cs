@@ -468,5 +468,29 @@ namespace Namotion.Reflection.Tests
             Assert.True(!string.IsNullOrWhiteSpace(isSearchStringRewrittenProperty));
             Assert.True(!string.IsNullOrWhiteSpace(pageTokenProperty));
         }
+
+        /// <summary>
+        /// The publisher.
+        /// </summary>
+        public class Publisher
+        {
+            /// <summary>
+            /// The name of the publisher.
+            /// </summary>
+            public string Name { get; set; }
+        }
+
+        [Fact]
+        public void When_type_has_summary_then_it_is_read()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            var summary = typeof(Publisher).GetXmlDocsSummary();
+
+            //// Assert
+            Assert.False(string.IsNullOrWhiteSpace(summary));
+        }
     }
 }

@@ -75,6 +75,58 @@ namespace Namotion.Reflection.Tests
         }
 
         /// <summary>
+        /// One of the reproduce cases for issue 39 - should throw InvalidOperationException as 'nullable enable' is set for this file
+        /// </summary>
+        [Fact]
+        public void When_array_of_non_nullable_strings_contains_null_then_EnsureValidNullability_should_throw_InvalidOperationException()
+        {
+            //// Arrange
+            var arrayOfNonNulllableStrings = JsonConvert.DeserializeObject<string[]>("[ null ]");
+
+            //// Act and assert
+            Assert.Throws<InvalidOperationException>(() => arrayOfNonNulllableStrings.EnsureValidNullability());
+        }
+
+        /// <summary>
+        /// One of the reproduce cases for issue 39 - should not throw anything because a non-null string value is being deserialised into an array
+        /// </summary>
+        [Fact]
+        public void When_array_of_non_nullable_strings_contains_single_non_null_string_then_EnsureValidNullability_should_not_throw()
+        {
+            //// Arrange
+            var arrayOfNonNulllableStrings = JsonConvert.DeserializeObject<string[]>("[ \"ok\" ]");
+
+            //// Act and assert
+            arrayOfNonNulllableStrings.EnsureValidNullability();
+        }
+
+        /// <summary>
+        /// One of the reproduce cases for issue 39 - should not throw anything because a null string value is being deserialised into an array of strings that are allowed to be null
+        /// </summary>
+        [Fact]
+        public void When_array_of_nullable_strings_contains_null_then_EnsureValidNullability_should_not_throw()
+        {
+            //// Arrange
+            var arrayOfNonNulllableStrings = JsonConvert.DeserializeObject<string?[]>("[ null ]");
+
+            //// Act and assert
+            arrayOfNonNulllableStrings.EnsureValidNullability();
+        }
+
+        /// <summary>
+        /// One of the reproduce cases for issue 39 - should not throw anything because a non-null string value is being deserialised into an array of strings (that are allowed to be null)
+        /// </summary>
+        [Fact]
+        public void When_array_of_nullable_strings_contains_single_non_null_string_then_EnsureValidNullability_should_not_throw()
+        {
+            //// Arrange
+            var arrayOfNonNulllableStrings = JsonConvert.DeserializeObject<string?[]>("[ \"ok\" ]");
+
+            //// Act and assert
+            arrayOfNonNulllableStrings.EnsureValidNullability();
+        }
+
+        /// <summary>
         /// This is a reproduce case for Issue 24
         /// </summary>
         [Fact]

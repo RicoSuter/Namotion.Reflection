@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using Xunit;
 
@@ -124,6 +125,68 @@ namespace Namotion.Reflection.Tests
 
             //// Act and assert
             arrayOfNonNulllableStrings.EnsureValidNullability();
+        }
+
+        /// <summary>
+        /// One of the reproduce cases for issue 39 - should not throw anything because a non-null string value is being deserialised into a property that is a list of non-nullable strings
+        /// </summary>
+        [Fact]
+        public void When_property_list_of_non_nullable_strings_contains_single_non_null_string_then_EnsureValidNullability_should_not_throw()
+        {
+            //// Arrange
+            var objectWithItemsListContainingSingleNonNullEntry = JsonConvert.DeserializeObject<SomethingWithListOfNonNullableStringItems>("{ \"Items\": [ \"ok\" ] }");
+
+            //// Act and assert
+            objectWithItemsListContainingSingleNonNullEntry.EnsureValidNullability();
+        }
+
+        /// <summary>
+        /// One of the reproduce cases for issue 39 - should not throw anything because a non-null string value is being deserialised into a property that is a list of non-nullable strings
+        /// </summary>
+        [Fact]
+        public void When_property_list_of_non_nullable_strings_contains_null_string_then_EnsureValidNullability_should_throw_InvalidOperationException()
+        {
+            //// Arrange
+            var objectWithItemsListContainingSingleNullEntry = JsonConvert.DeserializeObject<SomethingWithListOfNonNullableStringItems>("{ \"Items\": [ null ] }");
+
+            //// Act and assert
+            Assert.Throws<InvalidOperationException>(() => objectWithItemsListContainingSingleNullEntry.EnsureValidNullability());
+        }
+
+        /// <summary>
+        /// One of the reproduce cases for issue 39 - should not throw anything because a non-null string value is being deserialised into a property that is a list of (non-nullable) strings
+        /// </summary>
+        [Fact]
+        public void When_property_list_of_nullable_strings_contains_single_non_null_string_then_EnsureValidNullability_should_not_throw()
+        {
+            //// Arrange
+            var objectWithItemsListContainingSingleNonNullEntry = JsonConvert.DeserializeObject<SomethingWithListOfNullableStringItems>("{ \"Items\": [ \"ok\" ] }");
+
+            //// Act and assert
+            objectWithItemsListContainingSingleNonNullEntry.EnsureValidNullability();
+        }
+
+        /// <summary>
+        /// One of the reproduce cases for issue 39 - should not throw anything because a non-null string value is being deserialised into a property that is a list of non-nullable strings
+        /// </summary>
+        [Fact]
+        public void When_property_list_of_nullable_strings_contains_null_string_then_EnsureValidNullability_should_not_throw()
+        {
+            //// Arrange
+            var objectWithItemsListContainingSingleNullEntry = JsonConvert.DeserializeObject<SomethingWithListOfNullableStringItems>("{ \"Items\": [ null ] }");
+
+            //// Act and assert
+            objectWithItemsListContainingSingleNullEntry.EnsureValidNullability();
+        }
+
+        private sealed class SomethingWithListOfNonNullableStringItems
+        {
+            public List<string> Items { get; set; } = new List<string>();
+        }
+
+        private sealed class SomethingWithListOfNullableStringItems
+        {
+            public List<string?> Items { get; set; } = new List<string?>();
         }
 
         /// <summary>

@@ -16,6 +16,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using System.Runtime.CompilerServices;
+using Namotion.Reflection.Markdown;
 
 [assembly: InternalsVisibleTo("Namotion.Reflection.Cecil, PublicKey=0024000004800000940000000602000000240000525341310004000001000100337d8a0b73ac39048dc55d8e48dd86dcebd0af16aa514c73fbf5f283a8e94d7075b4152e5621e18d234bf7a5aafcb6683091f79d87b80c3be3e806f688e6f940adf92b28cedf1f8f69aa443699c235fa049204b56b83d94f599dd9800171f28e45ab74351acab17d889cd65961354d2f6405bddb9e896956e69e60033c2574f1")]
 
@@ -130,7 +131,7 @@ namespace Namotion.Reflection
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static string GetXmlDocsRemarks(this Type type)
         {
-            return GetXmlDocsTag((MemberInfo)type.GetTypeInfo(), "remarks");
+            return GetXmlDocsTagMarkdown((MemberInfo)type.GetTypeInfo(), "remarks");
         }
 
         /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
@@ -155,7 +156,7 @@ namespace Namotion.Reflection
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static string GetXmlDocsRemarks(this MemberInfo member)
         {
-            return GetXmlDocsTag(member, "remarks");
+            return GetXmlDocsTagMarkdown(member, "remarks");
         }
 
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
@@ -199,6 +200,25 @@ namespace Namotion.Reflection
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static string GetXmlDocsTag(this MemberInfo member, string tagName)
         {
+            return GetXmlDocsTag(member, tagName, ToXmlDocsContent);
+        }
+
+        /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
+        /// <param name="member">The reflected member.</param>
+        /// <param name="tagName">Name of the tag.</param>
+        /// <returns>The contents of the "summary" tag for the member.</returns>
+        public static string GetXmlDocsTagMarkdown(this MemberInfo member, string tagName)
+        {
+            return GetXmlDocsTag(member, tagName, XmlTransform.ToMarkdown);
+        }
+
+        /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
+        /// <param name="member">The reflected member.</param>
+        /// <param name="tagName">Name of the tag.</param>
+        /// <param name="convert">Converts XML documentation to textural format</param>
+        /// <returns>The contents of the tag for the member.</returns>
+        private static string GetXmlDocsTag(this MemberInfo member, string tagName, Func<XElement, string> convert)
+        {
             if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false || DynamicApis.SupportsPathApis == false)
             {
                 return string.Empty;
@@ -217,7 +237,7 @@ namespace Namotion.Reflection
 
                 var documentationPath = GetXmlDocsPath(member.Module.Assembly);
                 var element = GetXmlDocsWithoutLock(member, documentationPath);
-                return ToXmlDocsContent(element?.Element(tagName));
+                return convert(element?.Element(tagName));
             }
         }
 
@@ -408,7 +428,11 @@ namespace Namotion.Reflection
                     return null;
                 }
 
-                Cache[assemblyName.FullName] = XDocument.Load(pathToXmlFile, LoadOptions.PreserveWhitespace);
+                Cache[assemblyName.FullName] = XDocument.Load(
+                    pathToXmlFile,
+                    LoadOptions.PreserveWhitespace |
+                    LoadOptions.SetLineInfo // To get XNode.LinePosition property for Markdown.XmlTransform.Dedent*()
+                );
             }
 
             return Cache[assemblyName.FullName];

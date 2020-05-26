@@ -59,7 +59,7 @@ namespace Namotion.Reflection
         /// <returns>The result.</returns>
         public static void EnsureValidNullability(this object obj, bool checkChildren = true)
         {
-            ValidateNullability(obj, checkChildren ? new HashSet<object>() : null, null, false);
+            ValidateNullability(obj, obj?.GetType().ToContextualType(), checkChildren ? new HashSet<object>() : null, null, false);
         }
 
         /// <summary>Checks which non nullable properties are null (invalid).</summary>
@@ -69,11 +69,11 @@ namespace Namotion.Reflection
         public static IEnumerable<string> ValidateNullability(this object obj, bool checkChildren = true)
         {
             var errors = new List<string>();
-            ValidateNullability(obj, checkChildren ? new HashSet<object>() : null, errors, false);
+            ValidateNullability(obj, obj?.GetType().ToContextualType(), checkChildren ? new HashSet<object>() : null, errors, false);
             return errors;
         }
 
-        private static void ValidateNullability(object obj, HashSet<object> checkedObjects, List<string> errors, bool stopFirstFail)
+        private static void ValidateNullability(object obj, ContextualType type, HashSet<object> checkedObjects, List<string> errors, bool stopFirstFail)
         {
             if (DisableNullabilityValidation)
             {
@@ -97,25 +97,36 @@ namespace Namotion.Reflection
                 }
             }
 
-            var type = obj.GetType();
             if (checkedObjects != null && obj is IDictionary dictionary)
             {
                 foreach (var item in dictionary.Keys.Cast<object>()
                     .Concat(dictionary.Values.Cast<object>()))
                 {
-                    ValidateNullability(item, checkedObjects, errors, stopFirstFail);
+                    ValidateNullability(item, type.GenericArguments[1], checkedObjects, errors, stopFirstFail);
                 }
             }
             else if (checkedObjects != null && obj is IEnumerable enumerable && !(obj is string))
             {
+                var itemType = type.ElementType ?? type.GenericArguments[0];
                 foreach (var item in enumerable.Cast<object>())
                 {
-                    ValidateNullability(item, checkedObjects, errors, stopFirstFail);
+                    if (item == null)
+                    {
+                        if (itemType.Nullability == Nullability.NotNullable)
+                        {
+                            throw new InvalidOperationException(
+                                "The object's nullability is invalid, item in enumerable.");
+                        }
+                    }
+                    else
+                    {
+                        ValidateNullability(item, itemType, checkedObjects, errors, stopFirstFail);
+                    }
                 }
             }
-            else if (!type.ToCachedType().TypeInfo.IsValueType)
+            else if (!type.TypeInfo.IsValueType)
             {
-                var properties = type.GetContextualProperties();
+                var properties = type.Type.GetContextualProperties();
                 for (int i = 0; i < properties.Length; i++)
                 {
                     var property = properties[i];
@@ -143,7 +154,7 @@ namespace Namotion.Reflection
                         }
                         else if (checkedObjects != null)
                         {
-                            ValidateNullability(value, checkedObjects, errors, stopFirstFail);
+                            ValidateNullability(value, property.MemberInfo.ToContextualMember(), checkedObjects, errors, stopFirstFail);
                         }
                     }
                 }

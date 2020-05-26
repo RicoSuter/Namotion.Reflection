@@ -75,18 +75,20 @@ namespace Namotion.Reflection.Tests
             Assert.Empty(errors);
         }
 
-        /// <summary>
-        /// One of the reproduce cases for issue 39 - should throw InvalidOperationException as 'nullable enable' is set for this file
-        /// </summary>
-        [Fact]
-        public void When_array_of_non_nullable_strings_contains_null_then_EnsureValidNullability_should_throw_InvalidOperationException()
-        {
-            //// Arrange
-            var arrayOfNonNulllableStrings = JsonConvert.DeserializeObject<string[]>("[ null ]");
+        ///// <summary>
+        ///// One of the reproduce cases for issue 39 - should throw InvalidOperationException as 'nullable enable' is set for this file
+        ///// </summary>
+        //[Fact]
+        //public void When_array_of_non_nullable_strings_contains_null_then_EnsureValidNullability_should_throw_InvalidOperationException()
+        //{
+        //    //// Arrange
+        //    var arrayOfNonNulllableStrings = JsonConvert.DeserializeObject<string[]>("[ null ]");
 
-            //// Act and assert
-            Assert.Throws<InvalidOperationException>(() => arrayOfNonNulllableStrings.EnsureValidNullability());
-        }
+        //    //// Act and assert
+        //    Assert.Throws<InvalidOperationException>(() => arrayOfNonNulllableStrings.EnsureValidNullability());
+
+              // TODO: This here is not possible because string[] (without property or parameter) has no context and nullability information.
+        //}
 
         /// <summary>
         /// One of the reproduce cases for issue 39 - should not throw anything because a non-null string value is being deserialised into an array

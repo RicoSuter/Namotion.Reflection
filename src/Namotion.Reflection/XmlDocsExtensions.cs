@@ -314,6 +314,11 @@ namespace Namotion.Reflection
                                 }
                             }
                         }
+                        else if (e.Name == "paramref")
+                        {
+                            var nameAttribute = e.Attribute("name");
+                            value.Append(nameAttribute?.Value ?? e.Value);
+                        }
                         else
                         {
                             value.Append(e.Value);

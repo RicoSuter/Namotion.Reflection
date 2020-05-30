@@ -88,6 +88,26 @@ namespace Namotion.Reflection.Tests
             Assert.Equal("null for the default Record. See this and this at https://github.com/rsuter/njsonschema.", summary);
         }
 
+        public class WithParamrefTagInXmlDoc
+        {
+            /// <summary>Returns <paramref name="name"/>.</summary>
+            /// <param name="name">The name to return.</param>
+            public string Foo(string name) => name;
+        }
+
+        [Fact]
+        public void When_summary_has_paramref_tag_then_it_is_converted()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            var summary = typeof(WithParamrefTagInXmlDoc).GetMethod("Foo").GetXmlDocsSummary();
+
+            //// Assert
+            Assert.Equal("Returns name.", summary);
+        }
+
         public class WithGenericTagsInXmlDoc
         {
             /// <summary>This <c>are</c> <strong>some</strong> tags.</summary>

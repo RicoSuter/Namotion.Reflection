@@ -310,5 +310,22 @@ namespace Namotion.Reflection.Tests
             // Act & Assert
             Assert.Equal(Nullability.Nullable, property.Nullability);
         }
+
+        public class MyBase<T1, T2, T3, T4, T5> { }
+        public class Derived : MyBase<string?, object, object?, int, int?> { }
+
+        [Fact]
+        public void BaseClassWithNullableGenericParameter()
+        {
+            // Arrange
+            var drived = typeof(Derived).ToContextualType();
+
+            // Act & Assert
+            Assert.Equal(Nullability.Nullable, drived.BaseType.GenericArguments[0].Nullability);
+            Assert.Equal(Nullability.NotNullable, drived.BaseType.GenericArguments[1].Nullability);
+            Assert.Equal(Nullability.Nullable, drived.BaseType.GenericArguments[2].Nullability);
+            Assert.Equal(Nullability.NotNullable, drived.BaseType.GenericArguments[3].Nullability);
+            Assert.Equal(Nullability.Nullable, drived.BaseType.GenericArguments[4].Nullability);
+        }
     }
 }

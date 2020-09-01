@@ -113,6 +113,12 @@ namespace Namotion.Reflection
         }
 
         /// <summary>
+        /// Gets the type's base type
+        /// </summary>
+        public ContextualType BaseType =>
+            Type.GetTypeInfo().BaseType?.ToContextualType(Type.GetTypeInfo().GetCustomAttributes());
+
+        /// <summary>
         /// Gets the nullability information of this type in the given context by unwrapping Nullable{T} into account.
         /// </summary>
         public Nullability Nullability

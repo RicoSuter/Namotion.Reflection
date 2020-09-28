@@ -542,8 +542,8 @@ namespace Namotion.Reflection
             string memberName;
             string memberTypeName;
 
-            if (member is MemberInfo memberInfo && 
-                memberInfo.DeclaringType != null && 
+            if (member is MemberInfo memberInfo &&
+                memberInfo.DeclaringType != null &&
                 memberInfo.DeclaringType.GetTypeInfo().IsGenericType)
             {
                 // Resolve member with generic arguments (Ts instead of actual types)

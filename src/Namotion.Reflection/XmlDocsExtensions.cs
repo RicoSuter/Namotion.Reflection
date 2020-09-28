@@ -542,8 +542,8 @@ namespace Namotion.Reflection
             string memberName;
             string memberTypeName;
 
-            if (member is MemberInfo memberInfo && 
-                memberInfo.DeclaringType != null && 
+            if (member is MemberInfo memberInfo &&
+                memberInfo.DeclaringType != null &&
                 memberInfo.DeclaringType.GetTypeInfo().IsGenericType)
             {
                 // Resolve member with generic arguments (Ts instead of actual types)
@@ -608,6 +608,7 @@ namespace Namotion.Reflection
                     var paramTypesList = string.Join(",", parameters
                         .Select(x => Regex
                             .Replace(x, "(`[0-9]+)|(, .*?PublicKeyToken=[0-9a-z]*)", string.Empty)
+                            .Replace("],[", ",")
                             .Replace("||", "`")
                             .Replace("[[", "{")
                             .Replace("]]", "}"))

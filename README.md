@@ -121,7 +121,7 @@ Methods:
 
 - **XmlDocs.ClearCache()**
 
-This functionality can also be used with [Cecil](https://github.com/jbevain/cecil) types with the [Namotion.Reflection.Cecil](https://www.nuget.org/packages/Namotion.Reflection.Cecil/) package.
+This functionality can also be used with [Cecil](https://github.com/jbevain/cecil) types with the [Namotion.Reflection.Cecil](https://apimundo.com/organizations/nuget-org/nuget-feeds/public/packages/Namotion.Reflection.Cecil/versions/latest/) package.
 
 ## Extension methods
 

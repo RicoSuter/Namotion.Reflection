@@ -29,7 +29,7 @@ Behavior:
 
 - Each `CachedType` instance is cached per `Type`, `ParameterInfo` or `MemberInfo`.
 - Contextual and type attributes are evaluated only once and then cached for higher performance.
-- If the original `Type` is `Nullable<T>` then `T` is unwrapped and stored in the `Type` property - the original type can be accessed with the `OriginalType`.
+- If the original `Type` is `Nullable<T>` then `T` is unwrapped and stored in the `Type` property - the original type can be accessed with the `OriginalType` property.
 
 ### Nullability reflection (C# 8)
 
@@ -129,9 +129,9 @@ Methods:
 
 **IEnumerable extensions**
 
-- **GetAssignableToTypeName():**: Gets all objects which are assignable to the given type name as string.
-- **FirstAssignableToTypeNameOrDefault():**: Tries to get the first object which is assignable to the given type name as string.
-- **GetCommonBaseType():**: Finds the first common base type of the given types.
+- **GetAssignableToTypeName():** Gets all objects which are assignable to the given type name as string.
+- **FirstAssignableToTypeNameOrDefault():** Tries to get the first object which is assignable to the given type name as string.
+- **GetCommonBaseType():** Finds the first common base type of the given types.
 
 **Object extensions**
 

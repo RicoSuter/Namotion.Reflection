@@ -314,6 +314,11 @@ namespace Namotion.Reflection
                                 }
                             }
                         }
+                        else if (e.Name == "paramref")
+                        {
+                            var nameAttribute = e.Attribute("name");
+                            value.Append(nameAttribute?.Value ?? e.Value);
+                        }
                         else
                         {
                             value.Append(e.Value);
@@ -537,7 +542,9 @@ namespace Namotion.Reflection
             string memberName;
             string memberTypeName;
 
-            if (member is MemberInfo memberInfo && memberInfo.DeclaringType?.GetTypeInfo().IsGenericType == true)
+            if (member is MemberInfo memberInfo &&
+                memberInfo.DeclaringType != null &&
+                memberInfo.DeclaringType.GetTypeInfo().IsGenericType)
             {
                 // Resolve member with generic arguments (Ts instead of actual types)
                 if (member is PropertyInfo propertyInfo)
@@ -601,6 +608,7 @@ namespace Namotion.Reflection
                     var paramTypesList = string.Join(",", parameters
                         .Select(x => Regex
                             .Replace(x, "(`[0-9]+)|(, .*?PublicKeyToken=[0-9a-z]*)", string.Empty)
+                            .Replace("],[", ",")
                             .Replace("||", "`")
                             .Replace("[[", "{")
                             .Replace("]]", "}"))

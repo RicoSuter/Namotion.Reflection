@@ -327,5 +327,43 @@ namespace Namotion.Reflection.Tests
             Assert.Equal(Nullability.NotNullable, drived.BaseType.GenericArguments[3].Nullability);
             Assert.Equal(Nullability.Nullable, drived.BaseType.GenericArguments[4].Nullability);
         }
+
+        public class Overloads {
+            public string? Test1(int i) {
+                return null;
+            }
+            public Overloads Test1(double? j) {
+                return null;
+            }
+            public string? Test2(int i) {
+                return null;
+            }
+            public Overloads Test2(double? j) {
+                return null;
+            }
+        }
+
+        [Fact]
+        public void OverloadedMethods() {
+
+            // Arrange
+            var overloads = typeof(Overloads);
+            var methodTest1a = overloads.GetMethod("Test1", new[] { typeof(int) });
+            var methodTest1b = overloads.GetMethod("Test1", new[] { typeof(double?) });
+            var methodTest2a = overloads.GetMethod("Test2", new[] { typeof(int) });
+            var methodTest2b = overloads.GetMethod("Test2", new[] { typeof(double?) });
+
+            // Act & Assert
+            Assert.Equal(Nullability.Nullable, methodTest1a.ReturnParameter.ToContextualParameter().Nullability);
+            Assert.Equal(Nullability.NotNullable, methodTest1b.ReturnParameter.ToContextualParameter().Nullability);
+            Assert.Equal(Nullability.Nullable, methodTest2a.ReturnParameter.ToContextualParameter().Nullability);
+            Assert.Equal(Nullability.NotNullable, methodTest2b.ReturnParameter.ToContextualParameter().Nullability);
+
+            Assert.Equal(Nullability.NotNullable, methodTest1a.GetContextualParameters()[0].Nullability);
+            Assert.Equal(Nullability.Nullable, methodTest1b.GetContextualParameters()[0].Nullability);
+            Assert.Equal(Nullability.NotNullable, methodTest1a.GetContextualParameters()[0].Nullability);
+            Assert.Equal(Nullability.Nullable, methodTest1b.GetContextualParameters()[0].Nullability);
+
+        }
     }
 }

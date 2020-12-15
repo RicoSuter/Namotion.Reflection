@@ -48,11 +48,11 @@ namespace Namotion.Reflection
         }
 
         /// <summary>
-        /// Gets an array of <see cref="ContextualParameterInfo"/> for the given <see cref="MethodInfo"/> instance.
+        /// Gets an array of <see cref="ContextualParameterInfo"/> for the given <see cref="MethodBase"/> instance.
         /// </summary>
         /// <param name="method">The method.</param>
         /// <returns>The runtime properties.</returns>
-        public static ContextualParameterInfo[] GetContextualParameters(this MethodInfo method)
+        public static ContextualParameterInfo[] GetContextualParameters(this MethodBase method)
         {
             var key = "Parameters:" + method.Name + ":" + method.DeclaringType.FullName + ":" + EnumeratedParameters(method.GetParameters());
 

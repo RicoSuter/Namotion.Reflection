@@ -327,5 +327,28 @@ namespace Namotion.Reflection.Tests
             Assert.Equal(Nullability.NotNullable, drived.BaseType.GenericArguments[3].Nullability);
             Assert.Equal(Nullability.Nullable, drived.BaseType.GenericArguments[4].Nullability);
         }
+
+        [Fact]
+        public void ConstructorParameters() {
+
+            var constructors = typeof(FullAssemblyTestAction).GetConstructors();
+
+            Assert.Single(constructors);
+            var constructor = constructors[0];
+
+            // verify: public FullAssemblyTestAction(string p1, string? p2, int p3, int? p4, Action p5, Action? p6, Tuple<string, string?, int, int?, Action, Action?>? t) { }
+            var paramInfos = constructor.GetParameters();
+            Assert.Equal(7, paramInfos.Length);
+
+            var paramContexts = paramInfos.Select(p => p.ToContextualParameter()).ToArray();
+
+            Assert.Equal(Nullability.NotNullable, paramContexts[0].Nullability);
+            Assert.Equal(Nullability.Nullable, paramContexts[1].Nullability);
+            Assert.Equal(Nullability.NotNullable, paramContexts[2].Nullability);
+            Assert.Equal(Nullability.Nullable, paramContexts[3].Nullability);
+            Assert.Equal(Nullability.NotNullable, paramContexts[4].Nullability);
+            Assert.Equal(Nullability.Nullable, paramContexts[5].Nullability);
+            Assert.Equal(Nullability.Nullable, paramContexts[6].Nullability);
+        }
     }
 }

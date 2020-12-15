@@ -365,7 +365,7 @@ namespace Namotion.Reflection.Tests
             Assert.Equal(Nullability.Nullable, methodTest1b.GetContextualParameters()[0].Nullability);
 
         }
-
+        
         [Fact]
         public void ConstructorParameters() {
 

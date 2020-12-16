@@ -54,7 +54,7 @@ namespace Namotion.Reflection
         /// <returns>The runtime properties.</returns>
         public static ContextualParameterInfo[] GetContextualParameters(this MethodBase method)
         {
-            var key = "Parameters:" + method.Name + ":" + method.DeclaringType.FullName;
+            var key = "Parameters:" + method.Name + ":" + method.DeclaringType.FullName + ":" + EnumeratedParameters(method.GetParameters());
 
             if (!Cache.ContainsKey(key))
             {
@@ -70,6 +70,11 @@ namespace Namotion.Reflection
             }
 
             return (ContextualParameterInfo[])Cache[key];
+        }
+
+        private static string EnumeratedParameters(ParameterInfo[] parameters)
+        {
+            return string.Join("-", parameters.Select(p => p.ParameterType.FullName));
         }
 
         /// <summary>
@@ -134,7 +139,7 @@ namespace Namotion.Reflection
         /// <returns>The <see cref="ContextualParameterInfo"/>.</returns>
         public static ContextualParameterInfo ToContextualParameter(this ParameterInfo parameterInfo)
         {
-            var key = "Parameter:" + parameterInfo.Name + ":" + parameterInfo.Member.Name + ":" + parameterInfo.Member.DeclaringType.FullName;
+            var key = "Parameter:" + parameterInfo.Name + ":" + parameterInfo.ParameterType.FullName + ":" + parameterInfo.Member.Name + ":" + parameterInfo.Member.DeclaringType.FullName;
             if (!Cache.ContainsKey(key))
             {
                 lock (Lock)

@@ -327,5 +327,66 @@ namespace Namotion.Reflection.Tests
             Assert.Equal(Nullability.NotNullable, drived.BaseType.GenericArguments[3].Nullability);
             Assert.Equal(Nullability.Nullable, drived.BaseType.GenericArguments[4].Nullability);
         }
+
+        public class Overloads {
+            public string? Test1(int i) {
+                return null;
+            }
+            public Overloads Test1(double? j) {
+                return null;
+            }
+            public string? Test2(int i) {
+                return null;
+            }
+            public Overloads Test2(double? j) {
+                return null;
+            }
+        }
+
+        [Fact]
+        public void OverloadedMethods() {
+
+            // Arrange
+            var overloads = typeof(Overloads);
+            var methodTest1a = overloads.GetMethod("Test1", new[] { typeof(int) });
+            var methodTest1b = overloads.GetMethod("Test1", new[] { typeof(double?) });
+            var methodTest2a = overloads.GetMethod("Test2", new[] { typeof(int) });
+            var methodTest2b = overloads.GetMethod("Test2", new[] { typeof(double?) });
+
+            // Act & Assert
+            Assert.Equal(Nullability.Nullable, methodTest1a.ReturnParameter.ToContextualParameter().Nullability);
+            Assert.Equal(Nullability.NotNullable, methodTest1b.ReturnParameter.ToContextualParameter().Nullability);
+            Assert.Equal(Nullability.Nullable, methodTest2a.ReturnParameter.ToContextualParameter().Nullability);
+            Assert.Equal(Nullability.NotNullable, methodTest2b.ReturnParameter.ToContextualParameter().Nullability);
+
+            Assert.Equal(Nullability.NotNullable, methodTest1a.GetContextualParameters()[0].Nullability);
+            Assert.Equal(Nullability.Nullable, methodTest1b.GetContextualParameters()[0].Nullability);
+            Assert.Equal(Nullability.NotNullable, methodTest1a.GetContextualParameters()[0].Nullability);
+            Assert.Equal(Nullability.Nullable, methodTest1b.GetContextualParameters()[0].Nullability);
+
+        }
+        
+        [Fact]
+        public void ConstructorParameters() {
+
+            var constructors = typeof(FullAssemblyTestAction).GetConstructors();
+
+            Assert.Single(constructors);
+            var constructor = constructors[0];
+
+            // verify: public FullAssemblyTestAction(string p1, string? p2, int p3, int? p4, Action p5, Action? p6, Tuple<string, string?, int, int?, Action, Action?>? t) { }
+            var paramInfos = constructor.GetParameters();
+            Assert.Equal(7, paramInfos.Length);
+
+            var paramContexts = paramInfos.Select(p => p.ToContextualParameter()).ToArray();
+
+            Assert.Equal(Nullability.NotNullable, paramContexts[0].Nullability);
+            Assert.Equal(Nullability.Nullable, paramContexts[1].Nullability);
+            Assert.Equal(Nullability.NotNullable, paramContexts[2].Nullability);
+            Assert.Equal(Nullability.Nullable, paramContexts[3].Nullability);
+            Assert.Equal(Nullability.NotNullable, paramContexts[4].Nullability);
+            Assert.Equal(Nullability.Nullable, paramContexts[5].Nullability);
+            Assert.Equal(Nullability.Nullable, paramContexts[6].Nullability);
+        }
     }
 }

@@ -249,7 +249,7 @@ namespace Namotion.Reflection
         /// <param name="parameter">The reflected parameter or return info.</param>
         /// <param name="pathToXmlFile">The path to the XML documentation file.</param>
         /// <returns>The contents of the "returns" or "param" tag.</returns>
-        public static XElement? GetXmlDocsElement(this ParameterInfo parameter, string? pathToXmlFile)
+        public static XElement? GetXmlDocsElement(this ParameterInfo parameter, string pathToXmlFile)
         {
             try
             {
@@ -407,7 +407,11 @@ namespace Namotion.Reflection
         {
             if (!Cache.ContainsKey(assemblyName.FullName))
             {
-                if (pathToXmlFile is null || DynamicApis.FileExists(pathToXmlFile) == false)
+                if (pathToXmlFile is null)
+                {
+                    return null;
+                }
+                if (DynamicApis.FileExists(pathToXmlFile) == false)
                 {
                     Cache[assemblyName.FullName] = null;
                     return null;

@@ -23,7 +23,7 @@ namespace Namotion.Reflection
         /// <param name="obj">The object.</param>
         /// <param name="propertyName">Name of the property.</param>
         /// <returns><c>true</c> if the property exists; otherwise, <c>false</c>.</returns>
-        public static bool HasProperty(this object obj, string propertyName)
+        public static bool HasProperty(this object? obj, string propertyName)
         {
             return obj?.GetType().GetRuntimeProperty(propertyName) != null;
         }
@@ -33,7 +33,7 @@ namespace Namotion.Reflection
         /// <param name="propertyName">Name of the property.</param>
         /// <param name="defaultValue">The default value if the property does not exist.</param>
         /// <returns>The property or the default value.</returns>
-        public static T TryGetPropertyValue<T>(this object obj, string propertyName, T defaultValue = default)
+        public static T? TryGetPropertyValue<T>(this object? obj, string propertyName, T? defaultValue = default)
         {
             var property = obj?.GetType().GetRuntimeProperty(propertyName);
             return property == null ? defaultValue : (T)property.GetValue(obj);
@@ -59,7 +59,7 @@ namespace Namotion.Reflection
         /// <returns>The result.</returns>
         public static void EnsureValidNullability(this object obj, bool checkChildren = true)
         {
-            ValidateNullability(obj, obj?.GetType().ToContextualType(), checkChildren ? new HashSet<object>() : null, null, false);
+            ValidateNullability(obj, obj.GetType().ToContextualType(), checkChildren ? new HashSet<object>() : null, null, false);
         }
 
         /// <summary>Checks which non nullable properties are null (invalid).</summary>
@@ -69,18 +69,18 @@ namespace Namotion.Reflection
         public static IEnumerable<string> ValidateNullability(this object obj, bool checkChildren = true)
         {
             var errors = new List<string>();
-            ValidateNullability(obj, obj?.GetType().ToContextualType(), checkChildren ? new HashSet<object>() : null, errors, false);
+            ValidateNullability(obj, obj.GetType().ToContextualType(), checkChildren ? new HashSet<object>() : null, errors, false);
             return errors;
         }
 
-        private static void ValidateNullability(object obj, ContextualType type, HashSet<object> checkedObjects, List<string> errors, bool stopFirstFail)
+        private static void ValidateNullability(object obj, ContextualType type, HashSet<object>? checkedObjects, List<string>? errors, bool stopFirstFail)
         {
             if (DisableNullabilityValidation)
             {
                 return;
             }
 
-            if (stopFirstFail && errors.Any())
+            if (stopFirstFail && errors is not null && errors.Any())
             {
                 return;
             }

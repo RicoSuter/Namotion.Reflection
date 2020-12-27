@@ -11,7 +11,7 @@ namespace Namotion.Reflection
     /// </summary>
     public class ContextualType : CachedType
     {
-        private byte[] _nullableFlags;
+        private byte[]? _nullableFlags;
         private Nullability? nullability;
 
         internal static ContextualType ForType(Type type, IEnumerable<Attribute> contextAttributes)
@@ -20,7 +20,7 @@ namespace Namotion.Reflection
             return new ContextualType(type, contextAttributes, null, null, ref index, null);
         }
 
-        internal ContextualType(Type type, IEnumerable<Attribute> contextAttributes, ContextualType parent, byte[] nullableFlags, ref int nullableFlagsIndex, IEnumerable<dynamic> customAttributeProviders)
+        internal ContextualType(Type type, IEnumerable<Attribute> contextAttributes, ContextualType? parent, byte[]? nullableFlags, ref int nullableFlagsIndex, IEnumerable<dynamic>? customAttributeProviders)
             : base(type)
         {
             Parent = parent;
@@ -41,7 +41,7 @@ namespace Namotion.Reflection
         /// <summary>
         /// Gets the parent type with context.
         /// </summary>
-        public ContextualType Parent { get; }
+        public ContextualType? Parent { get; }
 
         /// <summary>
         /// Gets the type's associated attributes of the given context (inherited).
@@ -66,7 +66,10 @@ namespace Namotion.Reflection
             get
             {
                 UpdateOriginalGenericArguments();
-
+                if (_genericArguments is null)
+                {
+                    throw new InvalidOperationException("_genericArguments is not initialized");
+                }
                 if (_genericArguments is ContextualType[])
                 {
                     return (ContextualType[])_genericArguments;
@@ -88,6 +91,10 @@ namespace Namotion.Reflection
             {
                 UpdateOriginalGenericArguments();
 
+                if (_originalGenericArguments is null)
+                {
+                    throw new InvalidOperationException("_originalGenericArguments is not initialized");
+                }
                 if (_originalGenericArguments is ContextualType[])
                 {
                     return (ContextualType[])_originalGenericArguments;
@@ -103,7 +110,7 @@ namespace Namotion.Reflection
         /// <summary>
         /// Gets the type's element type (i.e. array type).
         /// </summary>
-        public new ContextualType ElementType
+        public new ContextualType? ElementType
         {
             get
             {
@@ -115,7 +122,7 @@ namespace Namotion.Reflection
         /// <summary>
         /// Gets the type's base type
         /// </summary>
-        public ContextualType BaseType =>
+        public ContextualType? BaseType =>
             Type.GetTypeInfo().BaseType?.ToContextualType(Type.GetTypeInfo().GetCustomAttributes());
 
         /// <summary>
@@ -148,7 +155,7 @@ namespace Namotion.Reflection
         /// </summary>
         /// <typeparam name="T">The attribute type.</typeparam>
         /// <returns>The attribute or null.</returns>
-        public T GetContextAttribute<T>()
+        public T? GetContextAttribute<T>()
         {
             return ContextAttributes.OfType<T>().SingleOrDefault();
         }
@@ -201,7 +208,7 @@ namespace Namotion.Reflection
             return new ContextualType(type, ContextAttributes, this, _nullableFlags, ref nullableFlagsIndex, null);
         }
 
-        private void InitializeNullableFlagsAndOriginalNullability(ref int nullableFlagsIndex, IEnumerable<dynamic> customAttributeProviders)
+        private void InitializeNullableFlagsAndOriginalNullability(ref int nullableFlagsIndex, IEnumerable<dynamic>? customAttributeProviders)
         {
             try
             {
@@ -254,9 +261,9 @@ namespace Namotion.Reflection
         private byte[] GetFlagsFromNullableAttribute(Attribute nullableAttribute)
         {
 #if NET40
-            return (byte[])nullableAttribute?.GetType().GetField("NullableFlags")?.GetValue(nullableAttribute) ?? new byte[0];
+            return (byte[]?)nullableAttribute?.GetType().GetField("NullableFlags")?.GetValue(nullableAttribute) ?? new byte[0];
 #else
-            return (byte[])nullableAttribute?.GetType().GetRuntimeField("NullableFlags")?.GetValue(nullableAttribute) ?? new byte[] { 0 };
+            return (byte[]?)nullableAttribute?.GetType().GetRuntimeField("NullableFlags")?.GetValue(nullableAttribute) ?? new byte[] { 0 };
 #endif
         }
 

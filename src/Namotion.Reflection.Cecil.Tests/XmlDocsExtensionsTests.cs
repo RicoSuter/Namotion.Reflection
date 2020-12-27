@@ -24,7 +24,7 @@ namespace Namotion.Reflection.Cecil.Tests
             /// <summary>
             /// My property.
             /// </summary>
-            public string MyProperty { get; set; }
+            public string MyProperty { get; set; } = default!;
 
             /// <summary>
             /// My method.
@@ -41,7 +41,7 @@ namespace Namotion.Reflection.Cecil.Tests
         public void When_xml_docs_is_read_for_cecil_type_then_it_works()
         {
             // Arranage
-            var assemblyPath = typeof(XmlDocsExtensionsTests).Assembly.CodeBase.Replace("file:///", string.Empty);
+            var assemblyPath = typeof(XmlDocsExtensionsTests).Assembly.CodeBase!.Replace("file:///", string.Empty);
             var xmlPath = assemblyPath.Replace(".dll", ".xml");
 
             var assembly = AssemblyDefinition.ReadAssembly(assemblyPath);
@@ -86,7 +86,7 @@ namespace Namotion.Reflection.Cecil.Tests
             }
 
             /// <summary>Baz</summary>
-            public T2 Baz { get; set; }
+            public T2 Baz { get; set; } = default!;
         }
 
         public class InheritedGenericClass : BaseGenericClass<string, int>
@@ -97,7 +97,7 @@ namespace Namotion.Reflection.Cecil.Tests
         public void WhenTypeInheritsFromGenericType_ThenMethodAndPropertyWithGenericParametersResolvesCorrectXml()
         {
             // Arranage
-            var assemblyPath = typeof(XmlDocsExtensionsTests).Assembly.CodeBase.Replace("file:///", string.Empty);
+            var assemblyPath = typeof(XmlDocsExtensionsTests).Assembly.CodeBase!.Replace("file:///", string.Empty);
             var xmlPath = assemblyPath.Replace(".dll", ".xml");
 
             var assembly = AssemblyDefinition.ReadAssembly(assemblyPath);

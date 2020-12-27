@@ -2,6 +2,6 @@
 {
     internal interface IPropertyWriter
     {
-        void SetValue(object obj, object value);
+        void SetValue(object? obj, object? value);
     }
 }

@@ -20,11 +20,11 @@ namespace Namotion.Reflection.Tests
             // Arrange
             var param1 = typeof(MultipleParametersWithSameName)
                 .GetMethod(nameof(MultipleParametersWithSameName.Foo))
-                .GetParameters().First();
+                !.GetParameters().First();
 
             var param2 = typeof(MultipleParametersWithSameName)
                 .GetMethod(nameof(MultipleParametersWithSameName.Bar))
-                .GetParameters().First();
+                !.GetParameters().First();
 
             // Act
             var type1 = param1.ToContextualParameter().TypeName;

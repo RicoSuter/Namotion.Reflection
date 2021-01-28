@@ -119,6 +119,37 @@ namespace Namotion.Reflection
             }
         }
 
+        private ContextualType? _enumerableItemType;
+
+        /// <summary>
+        /// Gets the type's element type (i.e. array type).
+        /// </summary>
+        public ContextualType? EnumerableItemType
+        {
+            get
+            {
+                var elementType = this.ElementType;
+                if (elementType != null)
+                {
+                    return elementType;
+                }
+
+                if (_enumerableItemType != null)
+                {
+                    return _enumerableItemType;
+                }
+                
+                var returnParam = Type.GetTypeInfo().GetDeclaredMethod("GetEnumerator")?.ReturnParameter?.ToContextualParameter();
+                if (returnParam == null || returnParam.GenericArguments.Length != 1)
+                {
+                    return null;
+                }
+
+                _enumerableItemType = returnParam.GenericArguments[0];
+                return _enumerableItemType;
+            }
+        }
+
         /// <summary>
         /// Gets the type's base type
         /// </summary>

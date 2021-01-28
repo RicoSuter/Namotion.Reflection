@@ -1,5 +1,7 @@
 using Namotion.Reflection.Tests.FullAssembly;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
@@ -387,6 +389,42 @@ namespace Namotion.Reflection.Tests
             Assert.Equal(Nullability.NotNullable, paramContexts[4].Nullability);
             Assert.Equal(Nullability.Nullable, paramContexts[5].Nullability);
             Assert.Equal(Nullability.Nullable, paramContexts[6].Nullability);
+        }
+
+        public class NullableStringCollection: IEnumerable<string?>
+        {
+            private List<string?> _list = new List<string?>();
+
+            public IEnumerator<string?> GetEnumerator()
+            {
+                return this._list.GetEnumerator();
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return this._list.GetEnumerator();
+            }
+        }
+
+        public class NullableStringCollectionTestClass
+        {
+            public NullableStringCollection OwnImplementation { get; set; }
+
+            public string?[] Array { get; set; }
+
+            public List<string?> List { get; set; }
+        }
+
+        [Fact]
+        public void NullableStringCollectionTests()
+        {
+            var properties = typeof(NullableStringCollectionTestClass).GetProperties();
+            foreach (var prop in properties)
+            {
+                var itemType = prop.ToContextualProperty().EnumerableItemType;
+                Assert.Equal("String", itemType!.TypeName);
+                Assert.Equal(Nullability.Nullable, itemType!.Nullability);
+            }
         }
     }
 }

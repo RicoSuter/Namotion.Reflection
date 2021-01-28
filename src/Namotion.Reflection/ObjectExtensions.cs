@@ -57,8 +57,12 @@ namespace Namotion.Reflection
         /// <param name="obj">The object.</param>
         /// <param name="checkChildren">Specifies whether to also recursively check children.</param>
         /// <returns>The result.</returns>
-        public static void EnsureValidNullability(this object obj, bool checkChildren = true)
+        public static void EnsureValidNullability(this object? obj, bool checkChildren = true)
         {
+            if (obj is null)
+            {
+                return;
+            }
             ValidateNullability(obj, obj.GetType().ToContextualType(), checkChildren ? new HashSet<object>() : null, null, false);
         }
 

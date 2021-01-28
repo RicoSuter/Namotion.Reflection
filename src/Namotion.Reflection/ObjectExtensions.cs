@@ -84,7 +84,7 @@ namespace Namotion.Reflection
                 return;
             }
 
-            if (stopFirstFail && errors != null && errors.Any())
+            if (stopFirstFail && errors is not null && errors.Any())
             {
                 return;
             }

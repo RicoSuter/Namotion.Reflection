@@ -21,10 +21,10 @@ namespace Namotion.Reflection.Infrastructure
     internal static class DynamicApis
     {
 #if NETSTANDARD1_0
-        private static readonly Type XPathExtensionsType;
-        private static readonly Type FileType;
-        private static readonly Type DirectoryType;
-        private static readonly Type PathType;
+        private static readonly Type? XPathExtensionsType;
+        private static readonly Type? FileType;
+        private static readonly Type? DirectoryType;
+        private static readonly Type? PathType;
 
         static DynamicApis()
         {
@@ -150,7 +150,7 @@ namespace Namotion.Reflection.Infrastructure
         }
 
 #if NETSTANDARD1_0
-        private static Type TryLoadType(params string[] typeNames)
+        private static Type? TryLoadType(params string[] typeNames)
         {
             foreach (var typeName in typeNames)
             {

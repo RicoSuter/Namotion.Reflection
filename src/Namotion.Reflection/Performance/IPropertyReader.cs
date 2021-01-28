@@ -2,6 +2,6 @@
 {
     internal interface IPropertyReader
     {
-        object GetValue(object obj);
+        object? GetValue(object? obj);
     }
 }

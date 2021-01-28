@@ -34,14 +34,14 @@ namespace Namotion.Reflection
         /// </summary>
         /// <param name="obj">The object.</param>
         /// <returns>The value.</returns>
-        public abstract object GetValue(object obj);
+        public abstract object? GetValue(object? obj);
 
         /// <summary>
         /// Sets the value of the field supported by the given object.
         /// </summary>
         /// <param name="obj">The object.</param>
         /// <param name="value">The value.</param>
-        public abstract void SetValue(object obj, object value);
+        public abstract void SetValue(object? obj, object? value);
 
         /// <inheritdocs />
         public override string ToString()

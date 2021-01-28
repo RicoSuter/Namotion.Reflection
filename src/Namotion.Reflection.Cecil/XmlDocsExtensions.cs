@@ -37,7 +37,7 @@ namespace Namotion.Reflection.Cecil
         /// <param name="member">The reflected member.</param>
         /// <param name="document">The document.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsSummary(this IMemberDefinition member, XDocument document)
+        public static string? GetXmlDocsSummary(this IMemberDefinition member, XDocument document)
         {
             return member.GetXmlDocsTag("summary", document);
         }
@@ -46,7 +46,7 @@ namespace Namotion.Reflection.Cecil
         /// <param name="member">The reflected member.</param>
         /// <param name="document">The document.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsRemarks(this IMemberDefinition member, XDocument document)
+        public static string? GetXmlDocsRemarks(this IMemberDefinition member, XDocument document)
         {
             return member.GetXmlDocsTag("remarks", document);
         }
@@ -56,7 +56,7 @@ namespace Namotion.Reflection.Cecil
         /// <param name="tagName">Name of the tag.</param>
         /// <param name="document">The document.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsTag(this IMemberDefinition member, string tagName, XDocument document)
+        public static string? GetXmlDocsTag(this IMemberDefinition member, string tagName, XDocument document)
         {
             if (DynamicApis.SupportsXPathApis == false)
             {
@@ -72,7 +72,7 @@ namespace Namotion.Reflection.Cecil
         /// <param name="member">The reflected member.</param>
         /// <param name="document">The document.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static XElement GetXmlDocsElement(this IMemberDefinition member, XDocument document)
+        public static XElement? GetXmlDocsElement(this IMemberDefinition member, XDocument document)
         {
             if (DynamicApis.SupportsXPathApis == false)
             {
@@ -113,7 +113,7 @@ namespace Namotion.Reflection.Cecil
             return element.ToXmlDocsContent();
         }
 
-        private static XElement GetXmlDocsElement(this MethodReturnType parameter, XDocument xml)
+        private static XElement? GetXmlDocsElement(this MethodReturnType parameter, XDocument xml)
         {
             var name = GetMemberElementName(parameter.Method);
             var result = (IEnumerable)DynamicApis.XPathEvaluate(xml, $"/doc/members/member[@name='{name}']");
@@ -130,7 +130,7 @@ namespace Namotion.Reflection.Cecil
             return null;
         }
 
-        private static XElement GetXmlDocsElement(this ParameterDefinition parameter, XDocument xml)
+        private static XElement? GetXmlDocsElement(this ParameterDefinition parameter, XDocument xml)
         {
             var name = GetMemberElementName(parameter.Method);
             var result = (IEnumerable)DynamicApis.XPathEvaluate(xml, $"/doc/members/member[@name='{name}']");

@@ -8,27 +8,27 @@ namespace Namotion.Reflection.Benchmark
 {
     public class ObjectExtensionsBenchmarks
     {
-        private Foo _object;
+        private Foo _object = default!;
 
         public class Foo
         {
-            public string Name { get; set; }
+            public string Name { get; set; } = default!;
 
-            public List<string> Strings { get; set; }
+            public List<string> Strings { get; set; } = default!;
 
-            public Dictionary<string, Bar> Bars { get; set; }
+            public Dictionary<string, Bar> Bars { get; set; } = default!;
 
-            public List<Foo> Foos { get; set; }
+            public List<Foo> Foos { get; set; } = default!;
         }
 
         public class Bar
         {
             public int Abc { get; set; }
 
-            public string Def { get; set; }
+            public string Def { get; set; } = default!;
         }
 
-        private Counter _counter;
+        private Counter _counter = default!;
 
         public ObjectExtensionsBenchmarks(ITestOutputHelper output)
         {

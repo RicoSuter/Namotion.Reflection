@@ -74,11 +74,11 @@ namespace Namotion.Reflection
         }
 
         /// <summary>Gets the type of the array item.</summary>
-        public static Type GetEnumerableItemType(this Type type)
+        public static Type? GetEnumerableItemType(this Type type)
         {
             var genericTypeArguments = type.GetGenericTypeArgumentsOfTypeOrBaseTypes();
 
-            var itemType = genericTypeArguments.Length == 0 ? type.GetElementType() : genericTypeArguments[0];
+            var itemType = genericTypeArguments.Length == 0 ? type.GetElementType() : (Type?)genericTypeArguments[0];
             if (itemType == null)
             {
 #if !NET40

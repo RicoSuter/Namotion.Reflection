@@ -9,7 +9,7 @@ namespace Namotion.Reflection
     /// </summary>
     public class ContextualParameterInfo : ContextualType
     {
-        private string _name;
+        private string? _name;
 
         internal ContextualParameterInfo(ParameterInfo parameterInfo, ref int nullableFlagsIndex)
             : base(parameterInfo.ParameterType, GetContextualAttributes(parameterInfo),

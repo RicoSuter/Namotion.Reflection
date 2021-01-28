@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>9</LangVersion>
+    <LangVersion>8.0</LangVersion>
     <Nullable>enable</Nullable>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>../Namotion.Reflection.snk</AssemblyOriginatorKeyFile>

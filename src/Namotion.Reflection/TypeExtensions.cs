@@ -81,7 +81,7 @@ namespace Namotion.Reflection
                 return elementType;
             }
 
-            var returnParam = type.GetTypeInfo().GetDeclaredMethod("GetEnumerator")?.ReturnParameter?.ToContextualParameter();
+            var returnParam = type.GetRuntimeMethod("GetEnumerator", new Type[0])?.ReturnParameter?.ToContextualParameter();
             if (returnParam == null || returnParam.GenericArguments.Length != 1)
             {
                 return null;

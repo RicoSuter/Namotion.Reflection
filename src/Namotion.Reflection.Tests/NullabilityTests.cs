@@ -426,5 +426,34 @@ namespace Namotion.Reflection.Tests
                 Assert.Equal(Nullability.Nullable, itemType!.Nullability);
             }
         }
+
+        public class GenericClass<T>
+        {
+            public T GetT()
+            {
+                return default!;
+            }
+
+            public void SetT(T value)
+            {
+            }
+
+            public T Prop { get; set; } = default!;
+        }
+
+        public class GenericClassContainer
+        {
+            public GenericClass<string?> Nullable = new GenericClass<string?>();
+            public GenericClass<string> NonNullable = new GenericClass<string>();
+        }
+
+        [Fact]
+        public void GenericClassResolutionTest()
+        {
+            var nullableField = typeof(GenericClassContainer).GetField(nameof(GenericClassContainer.Nullable))!.ToContextualField();
+            var nonNullableField = typeof(GenericClassContainer).GetField(nameof(GenericClassContainer.NonNullable))!.ToContextualField();
+            Assert.Equal(Nullability.NotNullable, nonNullableField.Type.GetProperty("Prop")!.ToContextualProperty().Nullability);
+            Assert.Equal(Nullability.Nullable, nullableField.Type.GetProperty("Prop")!.ToContextualProperty().Nullability);
+        }
     }
 }

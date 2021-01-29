@@ -45,7 +45,7 @@ namespace Namotion.Reflection
         /// <returns>The common base type.</returns>
         public static Type GetCommonBaseType(this IEnumerable<Type> types)
         {
-            types = types.ToList()
+            types = types.ToList();
             var baseType = types.First();
             while (baseType != typeof(object) && baseType != null)
             {

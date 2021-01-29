@@ -711,7 +711,11 @@ namespace Namotion.Reflection
                             return path;
                         }
 
-                        return DynamicApis.PathCombine(baseDirectory, "bin\\" + assemblyName.Name + ".xml");
+                        path = DynamicApis.PathCombine(baseDirectory, "bin/" + assemblyName.Name + ".xml");
+                        if (DynamicApis.FileExists(path))
+                        {
+                            return path;
+                        }
                     }
                 }
 
@@ -722,7 +726,7 @@ namespace Namotion.Reflection
                     return path;
                 }
 
-                path = DynamicApis.PathCombine(currentDirectory, "bin\\" + assembly.GetName().Name + ".xml");
+                path = DynamicApis.PathCombine(currentDirectory, "bin/" + assembly.GetName().Name + ".xml");
                 if (DynamicApis.FileExists(path))
                 {
                     return path;

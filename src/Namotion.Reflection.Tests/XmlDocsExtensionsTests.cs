@@ -561,7 +561,7 @@ namespace Namotion.Reflection.Tests
             //// Arrange
             XmlDocs.ClearCache();
             _ = Directory.CreateDirectory("./wd");
-            File.AppendAllText("./wd/System.Drawing.Primitives.xml", @"<?xml version=""1.0""?>
+            File.WriteAllText("./wd/System.Drawing.Primitives.xml", @"<?xml version=""1.0""?>
                 <doc>
                     <assembly><name>System.Drawing.Primitives</name></assembly>
                     <members>

@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-#nullable enable
-
 namespace Namotion.Reflection.Demo
 {
     public class Person
@@ -11,7 +9,7 @@ namespace Namotion.Reflection.Demo
         /// <summary>
         /// Gets or sets the first name.
         /// </summary>
-        public string FirstName { get; set; }
+        public string FirstName { get; set; } = default!;
 
         /// <summary>
         /// Gets or sets the optional middle name.

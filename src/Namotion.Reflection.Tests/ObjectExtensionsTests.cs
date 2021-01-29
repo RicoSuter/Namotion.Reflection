@@ -35,11 +35,11 @@ namespace Namotion.Reflection.Tests
 
         public class Person
         {
-            public string FirstName { get; set; }
+            public string FirstName { get; set; } = default!;
 
             public string? MiddleName { get; set; }
 
-            public string LastName { get; set; }
+            public string LastName { get; set; } = default!;
         }
 
         [Fact]

@@ -242,6 +242,10 @@ namespace Namotion.Reflection
         /// <returns>The <see cref="CachedType"/>.</returns>
         public static ContextualType ToContextualType(this Type type)
         {
+            if (type.FullName == null)
+            {
+                return ContextualType.ForType(type, new Attribute[0]);
+            }
             var key = "Type:Context:" + type.FullName;
             lock (Lock)
             {
@@ -261,6 +265,11 @@ namespace Namotion.Reflection
         /// <returns>The <see cref="CachedType"/>.</returns>
         public static CachedType ToCachedType(this Type type)
         {
+            if (type.FullName == null)
+            {
+                // Returns an uncached version of the type since we can't build a cache key
+                return new CachedType(type);
+            }
             var key = "Type:" + type.FullName;
             if (!Cache.ContainsKey(key))
             {

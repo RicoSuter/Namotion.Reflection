@@ -9,7 +9,7 @@ namespace Namotion.Reflection
     /// </summary>
     public abstract class ContextualMemberInfo : ContextualType
     {
-        internal ContextualMemberInfo(MemberInfo memberInfo, Type memberType, ref int nullableFlagsIndex)
+        internal ContextualMemberInfo(MemberInfo memberInfo, Type memberType, ref int nullableFlagsIndex, ContextualType[]? genericArguments = null)
             : base(memberType,
                 memberInfo.GetCustomAttributes(true).OfType<Attribute>().ToArray(),
                 null, null, ref nullableFlagsIndex,

@@ -14,23 +14,22 @@ namespace Namotion.Reflection
         private byte[]? _nullableFlags;
         private Nullability? nullability;
 
-        internal static ContextualType ForType(Type type, IEnumerable<Attribute> contextAttributes)
+        internal static ContextualType ForType(Type type, IEnumerable<Attribute> contextAttributes, ContextualType[]? genericArguments = null)
         {
             var index = 0;
-            return new ContextualType(type, contextAttributes, null, null, ref index, null);
+            return new ContextualType(type, contextAttributes, null, null, ref index, null, genericArguments);
         }
 
-        internal ContextualType(Type type, IEnumerable<Attribute> contextAttributes, ContextualType? parent, byte[]? nullableFlags, ref int nullableFlagsIndex, IEnumerable<dynamic>? customAttributeProviders)
+        internal ContextualType(Type type, IEnumerable<Attribute> contextAttributes, ContextualType? parent, byte[]? nullableFlags, ref int nullableFlagsIndex, IEnumerable<dynamic>? customAttributeProviders, ContextualType[]? genericArguments = null)
             : base(type)
         {
             Parent = parent;
-            ContextAttributes = contextAttributes is Attribute[]?
-                (Attribute[])contextAttributes :
-                contextAttributes?.ToArray() ??
+            ContextAttributes = contextAttributes is Attribute[] attributesArray ?
+                attributesArray : contextAttributes?.ToArray() ??
                 new Attribute[0];
 
             _nullableFlags = nullableFlags;
-            InitializeNullableFlagsAndOriginalNullability(ref nullableFlagsIndex, customAttributeProviders);
+            InitializeNullableFlagsAndOriginalNullability(ref nullableFlagsIndex, customAttributeProviders, genericArguments);
 
             if (_nullableFlags != null)
             {
@@ -175,7 +174,7 @@ namespace Namotion.Reflection
         /// </summary>
         /// <typeparam name="T">The attribute type.</typeparam>
         /// <returns>The attribute or null.</returns>
-        public T GetAttribute<T>()
+        public T? GetAttribute<T>()
         {
             return ContextAttributes.OfType<T>().Concat(TypeAttributes.OfType<T>()).FirstOrDefault();
         }
@@ -188,6 +187,30 @@ namespace Namotion.Reflection
         public IEnumerable<T> GetAttributes<T>()
         {
             return ContextAttributes.OfType<T>().Concat(TypeAttributes.OfType<T>());
+        }
+
+        public ContextualPropertyInfo? GetProperty(string propertyName)
+        {
+            var property = this.Type.GetRuntimeProperty(propertyName);
+            if (property is null)
+            {
+                return null;
+            }
+
+            var index = 0;
+            if (this.TypeInfo.IsGenericType && !this.TypeInfo.ContainsGenericParameters)
+            {// We have a generic type. We need to pass the generic arguments so that the property can extract nullability infos
+                return new ContextualPropertyInfo(property, ref index, this.GenericArguments);
+                /* var genericProperty = property.DeclaringType.GetGenericTypeDefinition().GetRuntimeProperty(propertyName);
+                if (genericProperty is not null)
+                {
+                    if (genericProperty.PropertyType.IsGenericParameter)
+                    {// This is the generic type T directly, return the property
+                        return new ContextualPropertyInfo(property, this.GenericArguments[genericProperty.PropertyType.GenericParameterPosition];
+                    }
+                } */
+            }
+            return new ContextualPropertyInfo(property, ref index);
         }
 
         /// <inheritdocs />
@@ -208,24 +231,38 @@ namespace Namotion.Reflection
             return new ContextualType(type, ContextAttributes, this, _nullableFlags, ref nullableFlagsIndex, null);
         }
 
-        private void InitializeNullableFlagsAndOriginalNullability(ref int nullableFlagsIndex, IEnumerable<dynamic>? customAttributeProviders)
+        private void InitializeNullableFlagsAndOriginalNullability(ref int nullableFlagsIndex, IEnumerable<dynamic>? customAttributeProviders, ContextualType[]? genericArguments)
         {
+            var typeInfo = OriginalType.GetTypeInfo();
+
             try
             {
                 if (_nullableFlags == null)
                 {
                     var nullableAttribute = ContextAttributes.FirstOrDefault(a => a.GetType().FullName == "System.Runtime.CompilerServices.NullableAttribute");
-                    if (nullableAttribute != null)
+                    if (nullableAttribute is not null)
                     {
                         _nullableFlags = GetFlagsFromNullableAttribute(nullableAttribute);
                     }
-                    else if (customAttributeProviders != null)
+                    else if (typeInfo.IsGenericParameter)
                     {
+                        nullableAttribute = typeInfo.GetCustomAttributes().FirstOrDefault(a => a.GetType().FullName == "System.Runtime.CompilerServices.NullableAttribute");
+                        if (nullableAttribute is not null)
+                        {
+                            _nullableFlags = GetFlagsFromNullableAttribute(nullableAttribute);
+                        }
+                        else
+                        {// Default nullability (NullableContextAttribute) from the context
+                            _nullableFlags = GetFlagsFromCustomAttributeProviders( typeInfo.DeclaringType.IsNested ? new dynamic[] { typeInfo.DeclaringType, typeInfo.DeclaringType.DeclaringType} : new dynamic[] { typeInfo.DeclaringType });
+                        }
+                    }
+                    else if (customAttributeProviders is not null)
+                    {// Default nullability (NullableContextAttribute) from the context
                         _nullableFlags = GetFlagsFromCustomAttributeProviders(customAttributeProviders);
                     }
                     else
                     {
-                        _nullableFlags = new byte[] { 0 };
+                        _nullableFlags = new byte[] {0}; // Unknown
                     }
                 }
             }
@@ -237,7 +274,13 @@ namespace Namotion.Reflection
 #endif
             }
 
-            if (OriginalType.GetTypeInfo() is var typeInfo && typeInfo.IsValueType)
+            if (genericArguments != null)
+            {
+                //TODO: I'm giving up here. I don't know how I could detect that this type is the T from the generics, and that we should use the nullability from genericArguments
+                // TODO : Even worse, if something returns IInterface<T>, how do I tell it that the T has the nullability from elsewhere.
+            }
+
+            if (typeInfo.IsValueType)
             {
                 if (typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() != typeof(Nullable<>))
                 {

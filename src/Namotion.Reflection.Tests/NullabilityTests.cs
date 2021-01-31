@@ -426,19 +426,5 @@ namespace Namotion.Reflection.Tests
                 Assert.Equal(Nullability.Nullable, itemType!.Nullability);
             }
         }
-
-        public class GenericClass<T>
-        {
-            public T GetT()
-            {
-                return default!;
-            }
-
-            public void SetT(T value)
-            {
-            }
-
-            public T Prop { get; set; } = default!;
-        }
     }
 }

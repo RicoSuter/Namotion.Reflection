@@ -124,36 +124,36 @@ namespace Namotion.Reflection
         /// <summary>
         /// Gets the type's element type (i.e. array type).
         /// </summary>
-    public ContextualType? EnumerableItemType
-    {
-        get
+        public ContextualType? EnumerableItemType
         {
-            var elementType = ElementType;
-            if (elementType != null)
+            get
             {
-                return elementType;
-            }
+                var elementType = ElementType;
+                if (elementType != null)
+                {
+                    return elementType;
+                }
 
-            if (GenericArguments?.Length == 1)
-            {
-                return GenericArguments[0];
-            }
+                if (GenericArguments?.Length == 1)
+                {
+                    return GenericArguments[0];
+                }
 
-            if (_enumerableItemType != null)
-            {
+                if (_enumerableItemType != null)
+                {
+                    return _enumerableItemType;
+                }
+
+                var returnParam = Type.GetTypeInfo().GetDeclaredMethod("GetEnumerator")?.ReturnParameter?.ToContextualParameter();
+                if (returnParam == null || returnParam.GenericArguments.Length != 1)
+                {
+                    return null;
+                }
+
+                _enumerableItemType = returnParam.GenericArguments[0];
                 return _enumerableItemType;
             }
-
-            var returnParam = Type.GetTypeInfo().GetDeclaredMethod("GetEnumerator")?.ReturnParameter?.ToContextualParameter();
-            if (returnParam == null || returnParam.GenericArguments.Length != 1)
-            {
-                return null;
-            }
-
-            _enumerableItemType = returnParam.GenericArguments[0];
-            return _enumerableItemType;
         }
-    }
 
         /// <summary>
         /// Gets the type's base type

@@ -75,20 +75,29 @@ namespace Namotion.Reflection
         /// <summary>Gets the type of the array item.</summary>
         public static Type? GetEnumerableItemType(this Type type)
         {
-            var genericTypeArguments = type.GetGenericTypeArgumentsOfTypeOrBaseTypes();
-            var itemType = genericTypeArguments.Length == 1 ? genericTypeArguments[0] : type.GetElementType();
-            if (itemType != null)
+            var elementType = type.GetElementType();
+            if (elementType != null)
             {
-                return itemType;
+                return elementType;
             }
 
-            var returnParam = type.GetRuntimeMethod("GetEnumerator", new Type[0])?.ReturnParameter?.ToContextualParameter();
-            if (returnParam == null || returnParam.GenericArguments.Length != 1)
+            var getEnumeratorMethod = type.GetTypeInfo().GetDeclaredMethod("GetEnumerator");
+            if (getEnumeratorMethod != null)
             {
-                return null;
+                var genericTypeArguments = type.GetGenericTypeArgumentsOfTypeOrBaseTypes();
+                if (genericTypeArguments?.Length == 1)
+                {
+                    return genericTypeArguments[0];
+                }
+
+                var returnParam = getEnumeratorMethod.ReturnParameter?.ToContextualParameter();
+                if (returnParam?.GenericArguments.Length == 1)
+                {
+                    return returnParam.GenericArguments[0];
+                }
             }
 
-            return returnParam.GenericArguments[0];
+            return null;
         }
 
         /// <summary>Gets the generic type arguments of a type or its base type.</summary>

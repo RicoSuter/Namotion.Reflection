@@ -134,24 +134,28 @@ namespace Namotion.Reflection
                     return elementType;
                 }
 
-                if (GenericArguments?.Length == 1)
+                var getEnumeratorMethod = Type.GetTypeInfo().GetDeclaredMethod("GetEnumerator");
+                if (getEnumeratorMethod != null)
                 {
-                    return GenericArguments[0];
+                    if (GenericArguments?.Length == 1)
+                    {
+                        return GenericArguments[0];
+                    }
+
+                    if (_enumerableItemType != null)
+                    {
+                        return _enumerableItemType;
+                    }
+
+                    var returnParam = getEnumeratorMethod.ReturnParameter?.ToContextualParameter();
+                    if (returnParam?.GenericArguments.Length == 1)
+                    {
+                        _enumerableItemType = returnParam.GenericArguments[0];
+                        return _enumerableItemType;
+                    }
                 }
 
-                if (_enumerableItemType != null)
-                {
-                    return _enumerableItemType;
-                }
-
-                var returnParam = Type.GetTypeInfo().GetDeclaredMethod("GetEnumerator")?.ReturnParameter?.ToContextualParameter();
-                if (returnParam == null || returnParam.GenericArguments.Length != 1)
-                {
-                    return null;
-                }
-
-                _enumerableItemType = returnParam.GenericArguments[0];
-                return _enumerableItemType;
+                return null;
             }
         }
 

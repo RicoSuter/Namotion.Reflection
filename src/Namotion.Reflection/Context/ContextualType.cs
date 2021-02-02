@@ -118,6 +118,46 @@ namespace Namotion.Reflection
             }
         }
 
+        private ContextualType? _enumerableItemType;
+
+        /// <summary>
+        /// Gets the type's element type (i.e. array type).
+        /// </summary>
+        public ContextualType? EnumerableItemType
+        {
+            get
+            {
+                var elementType = ElementType;
+                if (elementType != null)
+                {
+                    return elementType;
+                }
+
+                var getEnumeratorMethod = Type.GetTypeInfo().GetDeclaredMethod("GetEnumerator");
+                if (getEnumeratorMethod != null)
+                {
+                    if (GenericArguments?.Length == 1)
+                    {
+                        return GenericArguments[0];
+                    }
+
+                    if (_enumerableItemType != null)
+                    {
+                        return _enumerableItemType;
+                    }
+
+                    var returnParam = getEnumeratorMethod.ReturnParameter?.ToContextualParameter();
+                    if (returnParam?.GenericArguments.Length == 1)
+                    {
+                        _enumerableItemType = returnParam.GenericArguments[0];
+                        return _enumerableItemType;
+                    }
+                }
+
+                return null;
+            }
+        }
+
         /// <summary>
         /// Gets the type's base type
         /// </summary>
@@ -284,7 +324,7 @@ namespace Namotion.Reflection
             {
                 if (typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() != typeof(Nullable<>))
                 {
-                    nullableFlagsIndex++;                
+                    nullableFlagsIndex++;
                 }
 
                 OriginalNullability = Nullability.NotNullable;

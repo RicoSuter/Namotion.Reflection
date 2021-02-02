@@ -7,7 +7,6 @@
 //-----------------------------------------------------------------------
 
 using System;
-using System.Collections;
 using System.Linq;
 using System.Reflection;
 
@@ -76,28 +75,29 @@ namespace Namotion.Reflection
         /// <summary>Gets the type of the array item.</summary>
         public static Type? GetEnumerableItemType(this Type type)
         {
-            var genericTypeArguments = type.GetGenericTypeArgumentsOfTypeOrBaseTypes();
-
-            var itemType = genericTypeArguments.Length == 0 ? type.GetElementType() : (Type?)genericTypeArguments[0];
-            if (itemType == null)
+            var elementType = type.GetElementType();
+            if (elementType != null)
             {
-#if !NET40
-                foreach (var iface in type.GetTypeInfo().ImplementedInterfaces)
-#else
-                foreach (var iface in type.GetTypeInfo().GetInterfaces())
-#endif
+                return elementType;
+            }
+
+            var getEnumeratorMethod = type.GetTypeInfo().GetDeclaredMethod("GetEnumerator");
+            if (getEnumeratorMethod != null)
+            {
+                var genericTypeArguments = type.GetGenericTypeArgumentsOfTypeOrBaseTypes();
+                if (genericTypeArguments?.Length == 1)
                 {
-                    if (typeof(IEnumerable).GetTypeInfo()
-                        .IsAssignableFrom(iface.GetTypeInfo()))
-                    {
-                        itemType = iface.GetEnumerableItemType();
-                        if (itemType != null)
-                            return itemType;
-                    }
+                    return genericTypeArguments[0];
+                }
+
+                var returnParam = getEnumeratorMethod.ReturnParameter?.ToContextualParameter();
+                if (returnParam?.GenericArguments.Length == 1)
+                {
+                    return returnParam.GenericArguments[0];
                 }
             }
 
-            return itemType;
+            return null;
         }
 
         /// <summary>Gets the generic type arguments of a type or its base type.</summary>

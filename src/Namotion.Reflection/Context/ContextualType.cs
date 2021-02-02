@@ -21,8 +21,8 @@ namespace Namotion.Reflection
             return new ContextualType(type, contextAttributes, null, null, ref index, null, genericArguments);
         }
 
-        internal ContextualType(Type type, IEnumerable<Attribute> contextAttributes, ContextualType? parent, 
-            byte[]? nullableFlags, ref int nullableFlagsIndex, IEnumerable<dynamic>? customAttributeProviders, 
+        internal ContextualType(Type type, IEnumerable<Attribute> contextAttributes, ContextualType? parent,
+            byte[]? nullableFlags, ref int nullableFlagsIndex, IEnumerable<dynamic>? customAttributeProviders,
             ContextualType[]? genericArguments = null)
             : base(type)
         {
@@ -235,7 +235,7 @@ namespace Namotion.Reflection
 
         public ContextualPropertyInfo? GetProperty(string propertyName)
         {
-            var property = this.Type.GetRuntimeProperty(propertyName);
+            var property = Type.GetRuntimeProperty(propertyName);
             if (property is null)
             {
                 return null;
@@ -294,7 +294,7 @@ namespace Namotion.Reflection
                         }
                         else
                         {// Default nullability (NullableContextAttribute) from the context
-                            _nullableFlags = GetFlagsFromCustomAttributeProviders( typeInfo.DeclaringType.IsNested ? new dynamic[] { typeInfo.DeclaringType, typeInfo.DeclaringType.DeclaringType} : new dynamic[] { typeInfo.DeclaringType });
+                            _nullableFlags = GetFlagsFromCustomAttributeProviders(typeInfo.DeclaringType.IsNested ? new dynamic[] { typeInfo.DeclaringType, typeInfo.DeclaringType.DeclaringType } : new dynamic[] { typeInfo.DeclaringType });
                         }
                     }
                     else if (customAttributeProviders is not null)
@@ -303,7 +303,7 @@ namespace Namotion.Reflection
                     }
                     else
                     {
-                        _nullableFlags = new byte[] {0}; // Unknown
+                        _nullableFlags = new byte[] { 0 }; // Unknown
                     }
                 }
             }

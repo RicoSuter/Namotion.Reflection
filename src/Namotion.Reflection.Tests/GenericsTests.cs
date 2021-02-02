@@ -109,8 +109,8 @@ namespace Namotion.Reflection.Tests
             var nullableField = typeof(GenericClassContainer).GetField(nameof(GenericClassContainer.Nullable))!.ToContextualField();
             var nonNullableField = typeof(GenericClassContainer).GetField(nameof(GenericClassContainer.NonNullable))!.ToContextualField();
 
-            Assert.Equal(Nullability.NotNullable, nonNullableField.Type.GetProperty("Prop")!.ToContextualProperty().Nullability);
-            Assert.Equal(Nullability.Nullable, nullableField.Type.GetProperty("Prop")!.ToContextualProperty().Nullability);
+            Assert.Equal(Nullability.NotNullable, nonNullableField.GetProperty("Prop")!.Nullability);
+            Assert.Equal(Nullability.Nullable, nullableField.GetProperty("Prop")!.Nullability);
         }
     }
 }

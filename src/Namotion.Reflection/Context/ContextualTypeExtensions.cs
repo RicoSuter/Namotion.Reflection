@@ -22,12 +22,14 @@ namespace Namotion.Reflection
         }
 
         /// <summary>
-        /// Gets an enumerable of <see cref="ContextualPropertyInfo"/> and <see cref="ContextualFieldInfo"/> for the given <see cref="Type"/> instance.
+        /// Gets an enumerable of <see cref="ContextualAccessorInfo"/>s (all properties and fields) for the given <see cref="Type"/> instance.
         /// </summary>
         /// <param name="type">The type.</param>
         /// <returns></returns>
-        public static IEnumerable<ContextualMemberInfo> GetContextualPropertiesAndFields(this Type type)
+        public static IEnumerable<ContextualAccessorInfo> GetContextualAccessors(this Type type)
         {
+            // TODO: Also offer this on the contextual type to not lose context! => all methods here probably
+
             var key = "PropertiesAndFields:" + type.FullName;
 
             if (!Cache.ContainsKey(key))
@@ -37,14 +39,14 @@ namespace Namotion.Reflection
                     if (!Cache.ContainsKey(key))
                     {
                         Cache[key] = type.GetContextualProperties()
-                            .OfType<ContextualMemberInfo>()
+                            .OfType<ContextualAccessorInfo>()
                             .Union(type.GetContextualFields())
                             .ToArray();
                     }
                 }
             }
 
-            return (IEnumerable<ContextualMemberInfo>)Cache[key];
+            return (IEnumerable<ContextualAccessorInfo>)Cache[key];
         }
 
         /// <summary>

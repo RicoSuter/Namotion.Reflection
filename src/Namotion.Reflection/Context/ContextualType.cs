@@ -14,6 +14,7 @@ namespace Namotion.Reflection
         private int _nullableFlagsIndex;
         private byte[]? _nullableFlags;
         private Nullability? nullability;
+        private bool? _isValueType;
 
         internal static ContextualType ForType(Type type, IEnumerable<Attribute> contextAttributes)
         {
@@ -192,6 +193,11 @@ namespace Namotion.Reflection
                 }
             }
         }
+
+        /// <summary>
+        /// Gets a value indicating whether the System.Type is a value type.
+        /// </summary>
+        public bool IsValueType => _isValueType ?? ((bool)(_isValueType = TypeInfo.IsValueType));
 
         /// <summary>
         /// Gets an attribute of the given type which is defined on the context (property, field, parameter or contextual generic argument type).

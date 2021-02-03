@@ -80,9 +80,9 @@ namespace Namotion.Reflection.Tests
             {
                 var property = typeof(ClosedGenericsClass).GetProperty(propertyName)!.ToContextualProperty();
 
-                Assert.Equal(expectedNullability, property.GenericArguments[0].Nullability);
-                Assert.Equal(expectedNullability, property.GetProperty("Prop")!.Nullability);
-                Assert.Equal(expectedNullability, property.GetField("Field")!.Nullability);
+                Assert.Equal(expectedNullability, property.PropertyType.GenericArguments[0].Nullability);
+                Assert.Equal(expectedNullability, property.PropertyType.GetProperty("Prop")!.Nullability);
+                Assert.Equal(expectedNullability, property.PropertyType.GetField("Field")!.Nullability);
             }
 
             DoTest(nameof(ClosedGenericsClass.NotNull1), Nullability.NotNullable);
@@ -122,11 +122,11 @@ namespace Namotion.Reflection.Tests
             var nullableField = typeof(GenericClassContainer).GetField(nameof(GenericClassContainer.Nullable))!.ToContextualField();
             var nonNullableField = typeof(GenericClassContainer).GetField(nameof(GenericClassContainer.NonNullable))!.ToContextualField();
 
-            Assert.Equal(Nullability.NotNullable, nonNullableField.GetProperty("Prop")!.Nullability);
-            Assert.Equal(Nullability.Nullable, nullableField.GetProperty("Prop")!.Nullability);
+            Assert.Equal(Nullability.NotNullable, nonNullableField.FieldType.GetProperty("Prop")!.Nullability);
+            Assert.Equal(Nullability.Nullable, nullableField.FieldType.GetProperty("Prop")!.Nullability);
 
-            Assert.Equal(Nullability.NotNullable, nonNullableField.GetField("Field")!.Nullability);
-            Assert.Equal(Nullability.Nullable, nullableField.GetField("Field")!.Nullability);
+            Assert.Equal(Nullability.NotNullable, nonNullableField.FieldType.GetField("Field")!.Nullability);
+            Assert.Equal(Nullability.Nullable, nullableField.FieldType.GetField("Field")!.Nullability);
         }
     }
 }

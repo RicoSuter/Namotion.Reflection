@@ -209,7 +209,7 @@ namespace Namotion.Reflection
         /// </summary>
         /// <param name="memberInfo">The member info.</param>
         /// <returns>The <see cref="ContextualMemberInfo"/>.</returns>
-        public static ContextualMemberInfo ToContextualMember(this MemberInfo memberInfo)
+        public static ContextualAccessorInfo ToContextualAccessor(this MemberInfo memberInfo)
         {
             if (memberInfo is PropertyInfo propertyInfo)
             {
@@ -220,7 +220,7 @@ namespace Namotion.Reflection
                 return fieldInfo.ToContextualField();
             }
 
-            throw new NotSupportedException();
+            throw new NotSupportedException("The member info must be a field or property.");
         }
 
         /// <summary>

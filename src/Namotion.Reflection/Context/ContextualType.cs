@@ -246,7 +246,7 @@ namespace Namotion.Reflection
         /// <returns>The contextual property or null.</returns>
         public ContextualPropertyInfo? GetProperty(string propertyName)
         {
-            // TODO: Cache this?
+            // TODO: Implement type level property cache
 
             var property = Type.GetRuntimeProperty(propertyName);
             if (property is null)
@@ -277,7 +277,7 @@ namespace Namotion.Reflection
         /// <returns>The contextual field or null.</returns>
         public ContextualFieldInfo? GetField(string fieldName)
         {
-            // TODO: Cache this?
+            // TODO: Implement type level field cache
 
 #if NET40
             var field = Type.GetField(fieldName);
@@ -348,12 +348,14 @@ namespace Namotion.Reflection
                             _nullableFlags = GetFlagsFromNullableAttribute(nullableAttribute);
                         }
                         else
-                        {// Default nullability (NullableContextAttribute) from the context
+                        {
+                            // Default nullability (NullableContextAttribute) from the context
                             _nullableFlags = GetFlagsFromCustomAttributeProviders(typeInfo.DeclaringType.IsNested ? new dynamic[] { typeInfo.DeclaringType, typeInfo.DeclaringType.DeclaringType } : new dynamic[] { typeInfo.DeclaringType });
                         }
                     }
                     else if (customAttributeProviders is not null)
-                    {// Default nullability (NullableContextAttribute) from the context
+                    {
+                        // Default nullability (NullableContextAttribute) from the context
                         _nullableFlags = GetFlagsFromCustomAttributeProviders(customAttributeProviders);
                     }
                     else

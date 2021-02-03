@@ -342,12 +342,14 @@ namespace Namotion.Reflection
                             _nullableFlags = GetFlagsFromNullableAttribute(nullableAttribute);
                         }
                         else
-                        {// Default nullability (NullableContextAttribute) from the context
+                        {
+                            // Default nullability (NullableContextAttribute) from the context
                             _nullableFlags = GetFlagsFromCustomAttributeProviders(typeInfo.DeclaringType.IsNested ? new dynamic[] { typeInfo.DeclaringType, typeInfo.DeclaringType.DeclaringType } : new dynamic[] { typeInfo.DeclaringType });
                         }
                     }
                     else if (customAttributeProviders is not null)
-                    {// Default nullability (NullableContextAttribute) from the context
+                    {
+                        // Default nullability (NullableContextAttribute) from the context
                         _nullableFlags = GetFlagsFromCustomAttributeProviders(customAttributeProviders);
                     }
                     else

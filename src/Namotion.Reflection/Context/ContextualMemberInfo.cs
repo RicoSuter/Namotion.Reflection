@@ -9,7 +9,6 @@ namespace Namotion.Reflection
     /// </summary>
     public abstract class ContextualMemberInfo : ContextualType
     {
-        // TODO: Align order of nullableFlags params as in other classes
         internal ContextualMemberInfo(MemberInfo memberInfo, Type memberType, ref int nullableFlagsIndex, byte[]? nullableFlags)
             : base(memberType,
                 memberInfo.GetCustomAttributes(true).OfType<Attribute>().ToArray(),

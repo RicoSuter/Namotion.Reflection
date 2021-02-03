@@ -240,7 +240,7 @@ namespace Namotion.Reflection
         /// <returns>The contextual property or null.</returns>
         public ContextualPropertyInfo? GetProperty(string propertyName)
         {
-            // TODO: Cache this?
+            // TODO: Implement type level property cache
 
             var property = Type.GetRuntimeProperty(propertyName);
             if (property is null)
@@ -271,7 +271,7 @@ namespace Namotion.Reflection
         /// <returns>The contextual field or null.</returns>
         public ContextualFieldInfo? GetField(string fieldName)
         {
-            // TODO: Cache this?
+            // TODO: Implement type level field cache
 
 #if NET40
             var field = Type.GetField(fieldName);

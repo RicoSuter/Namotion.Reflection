@@ -10,10 +10,10 @@ namespace Namotion.Reflection
     public abstract class ContextualMemberInfo : ContextualType
     {
         // TODO: Align order of nullableFlags params as in other classes
-        internal ContextualMemberInfo(MemberInfo memberInfo, Type memberType, ref int nullableFlagsIndex, byte[]? nullableFlags = null)
+        internal ContextualMemberInfo(MemberInfo memberInfo, Type memberType, ref int nullableFlagsIndex, byte[]? nullableFlags)
             : base(memberType,
                 memberInfo.GetCustomAttributes(true).OfType<Attribute>().ToArray(),
-                null, nullableFlags, ref nullableFlagsIndex,
+                null, ref nullableFlagsIndex, nullableFlags,
                 memberInfo.DeclaringType.IsNested ?
                     new dynamic[] { memberInfo.DeclaringType, memberInfo.DeclaringType.DeclaringType, memberInfo.DeclaringType.GetTypeInfo().Assembly } :
                     new dynamic[] { memberInfo.DeclaringType, memberInfo.DeclaringType.GetTypeInfo().Assembly })

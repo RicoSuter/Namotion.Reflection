@@ -15,15 +15,14 @@ namespace Namotion.Reflection
         private byte[]? _nullableFlags;
         private Nullability? nullability;
 
-        internal static ContextualType ForType(Type type, IEnumerable<Attribute> contextAttributes, ContextualType[]? genericArguments = null)
+        internal static ContextualType ForType(Type type, IEnumerable<Attribute> contextAttributes)
         {
             var index = 0;
-            return new ContextualType(type, contextAttributes, null, null, ref index, null, genericArguments);
+            return new ContextualType(type, contextAttributes, null, ref index, null, null);
         }
 
         internal ContextualType(Type type, IEnumerable<Attribute> contextAttributes, ContextualType? parent,
-            byte[]? nullableFlags, ref int nullableFlagsIndex, IEnumerable<dynamic>? customAttributeProviders,
-            ContextualType[]? genericArguments = null)
+            ref int nullableFlagsIndex, byte[]? nullableFlags, IEnumerable<dynamic>? customAttributeProviders)
             : base(type)
         {
             Parent = parent;
@@ -31,8 +30,9 @@ namespace Namotion.Reflection
                 attributesArray : contextAttributes?.ToArray() ??
                 new Attribute[0];
 
-            _nullableFlagsIndex = nullableFlagsIndex;
             _nullableFlags = nullableFlags;
+            _nullableFlagsIndex = nullableFlagsIndex;
+
             InitializeNullableFlagsAndOriginalNullability(ref nullableFlagsIndex, customAttributeProviders);
 
             if (_nullableFlags != null)
@@ -233,8 +233,15 @@ namespace Namotion.Reflection
             return ContextAttributes.OfType<T>().Concat(TypeAttributes.OfType<T>());
         }
 
+        /// <summary>
+        /// Gets a contextual property of the given contextual type (preserving the context).
+        /// </summary>
+        /// <param name="propertyName">The property name.</param>
+        /// <returns>The contextual property or null.</returns>
         public ContextualPropertyInfo? GetProperty(string propertyName)
         {
+            // TODO: Cache this?
+
             var property = Type.GetRuntimeProperty(propertyName);
             if (property is null)
             {
@@ -245,13 +252,55 @@ namespace Namotion.Reflection
             {
                 var genericType = property.DeclaringType.GetGenericTypeDefinition();
                 var genericProperty = genericType.GetRuntimeProperty(property.Name);
-                var actualType = GenericArguments[genericProperty.PropertyType.GenericParameterPosition];
-                var actualIndex = actualType._nullableFlagsIndex;
-                return new ContextualPropertyInfo(property, ref actualIndex, actualType._nullableFlags);
+                if (genericProperty != null)
+                {
+                    var actualType = GenericArguments[genericProperty.PropertyType.GenericParameterPosition];
+                    var actualIndex = actualType._nullableFlagsIndex;
+                    return new ContextualPropertyInfo(property, ref actualIndex, actualType._nullableFlags);
+                }
             }
 
             var index = 0;
-            return new ContextualPropertyInfo(property, ref index);
+            return new ContextualPropertyInfo(property, ref index, null);
+        }
+
+        /// <summary>
+        /// Gets a contextual field of the given contextual type (preserving the context).
+        /// </summary>
+        /// <param name="fieldName">The field name.</param>
+        /// <returns>The contextual field or null.</returns>
+        public ContextualFieldInfo? GetField(string fieldName)
+        {
+            // TODO: Cache this?
+
+#if NET40
+            var field = Type.GetField(fieldName);
+#else
+            var field = Type.GetRuntimeField(fieldName);
+#endif
+            if (field is null)
+            {
+                return null;
+            }
+
+            if (TypeInfo.IsGenericType && !TypeInfo.ContainsGenericParameters)
+            {
+                var genericType = field.DeclaringType.GetGenericTypeDefinition();
+#if NET40
+                var genericField = genericType.GetField(field.Name);
+#else
+                var genericField = genericType.GetRuntimeField(field.Name);
+#endif
+                if (genericField != null)
+                {
+                    var actualType = GenericArguments[genericField.FieldType.GenericParameterPosition];
+                    var actualIndex = actualType._nullableFlagsIndex;
+                    return new ContextualFieldInfo(field, ref actualIndex, actualType._nullableFlags);
+                }
+            }
+
+            var index = 0;
+            return new ContextualFieldInfo(field, ref index, null);
         }
 
         /// <inheritdocs />
@@ -269,7 +318,7 @@ namespace Namotion.Reflection
         /// <returns>The cached type.</returns>
         protected override CachedType GetCachedType(Type type, ref int nullableFlagsIndex)
         {
-            return new ContextualType(type, ContextAttributes, this, _nullableFlags, ref nullableFlagsIndex, null);
+            return new ContextualType(type, ContextAttributes, this, ref nullableFlagsIndex, _nullableFlags, null);
         }
 
         private void InitializeNullableFlagsAndOriginalNullability(ref int nullableFlagsIndex, IEnumerable<dynamic>? customAttributeProviders)

@@ -171,7 +171,7 @@ namespace Namotion.Reflection
                     if (!Cache.ContainsKey(key))
                     {
                         var index = 0;
-                        Cache[key] = new ContextualPropertyInfo(propertyInfo, ref index);
+                        Cache[key] = new ContextualPropertyInfo(propertyInfo, nullableFlagsIndex: ref index, nullableFlags: null);
                     }
 
                     return (ContextualPropertyInfo)Cache[key];
@@ -196,7 +196,7 @@ namespace Namotion.Reflection
                     if (!Cache.ContainsKey(key))
                     {
                         var index = 0;
-                        Cache[key] = new ContextualFieldInfo(fieldInfo, ref index);
+                        Cache[key] = new ContextualFieldInfo(fieldInfo, nullableFlagsIndex: ref index, nullableFlags: null);
                     }
                 }
             }

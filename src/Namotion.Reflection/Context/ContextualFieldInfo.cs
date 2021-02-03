@@ -9,9 +9,8 @@ namespace Namotion.Reflection
     {
         private string? _name;
 
-        // TODO: Also support this for fields => ie add GetField() same as GetProperty()
-        internal ContextualFieldInfo(FieldInfo fieldInfo, ref int nullableFlagsIndex)
-            : base(fieldInfo, fieldInfo.FieldType, ref nullableFlagsIndex)
+        internal ContextualFieldInfo(FieldInfo fieldInfo, ref int nullableFlagsIndex, byte[]? nullableFlags)
+            : base(fieldInfo, fieldInfo.FieldType, ref nullableFlagsIndex, nullableFlags)
         {
             FieldInfo = fieldInfo;
         }

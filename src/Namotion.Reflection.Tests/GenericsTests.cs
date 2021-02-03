@@ -11,11 +11,15 @@ namespace Namotion.Reflection.Tests
         {
             public T Prop { get; set; } = default!;
 
+            public T Field = default!;
+
             public T DoStuff(T original) => original;
         }
         public class NotNullGenericClass<T> where T : notnull
         {
             public T Prop { get; set; } = default!;
+
+            public T Field = default!;
 
             public T DoStuff(T original) => original;
         }
@@ -23,12 +27,16 @@ namespace Namotion.Reflection.Tests
         {
             public T Prop { get; set; } = default!;
 
+            public T Field = default!;
+
             public T DoStuff(T original) => original;
         }
 
         public class StructGenericClass<T> where T : struct
         {
             public T Prop { get; set; }
+
+            public T Field = default!;
 
             public T DoStuff(T original) => original;
         }
@@ -71,8 +79,10 @@ namespace Namotion.Reflection.Tests
             void DoTest(string propertyName, Nullability expectedNullability)
             {
                 var property = typeof(ClosedGenericsClass).GetProperty(propertyName)!.ToContextualProperty();
+
                 Assert.Equal(expectedNullability, property.GenericArguments[0].Nullability);
-                Assert.Equal(expectedNullability, property.GetProperty("Prop")!.Nullability);// TODO : fails...
+                Assert.Equal(expectedNullability, property.GetProperty("Prop")!.Nullability);
+                Assert.Equal(expectedNullability, property.GetField("Field")!.Nullability);
             }
 
             DoTest(nameof(ClosedGenericsClass.NotNull1), Nullability.NotNullable);
@@ -96,6 +106,8 @@ namespace Namotion.Reflection.Tests
             }
 
             public T Prop { get; set; } = default!;
+
+            public T Field = default!;
         }
 
         public class GenericClassContainer
@@ -112,6 +124,9 @@ namespace Namotion.Reflection.Tests
 
             Assert.Equal(Nullability.NotNullable, nonNullableField.GetProperty("Prop")!.Nullability);
             Assert.Equal(Nullability.Nullable, nullableField.GetProperty("Prop")!.Nullability);
+
+            Assert.Equal(Nullability.NotNullable, nonNullableField.GetField("Field")!.Nullability);
+            Assert.Equal(Nullability.Nullable, nullableField.GetField("Field")!.Nullability);
         }
     }
 }

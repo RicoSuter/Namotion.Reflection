@@ -13,7 +13,7 @@ namespace Namotion.Reflection
         private bool? _canWrite;
         private bool? _canRead;
 
-        internal ContextualPropertyInfo(PropertyInfo propertyInfo, ref int nullableFlagsIndex, byte[]? nullableFlags = null)
+        internal ContextualPropertyInfo(PropertyInfo propertyInfo, ref int nullableFlagsIndex, byte[]? nullableFlags)
             : base(propertyInfo, propertyInfo.PropertyType, ref nullableFlagsIndex, nullableFlags)
         {
             PropertyInfo = propertyInfo;

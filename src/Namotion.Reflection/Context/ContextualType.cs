@@ -11,25 +11,28 @@ namespace Namotion.Reflection
     /// </summary>
     public class ContextualType : CachedType
     {
+        private int _nullableFlagsIndex;
         private byte[]? _nullableFlags;
         private Nullability? nullability;
 
         internal static ContextualType ForType(Type type, IEnumerable<Attribute> contextAttributes)
         {
             var index = 0;
-            return new ContextualType(type, contextAttributes, null, null, ref index, null);
+            return new ContextualType(type, contextAttributes, null, ref index, null, null);
         }
 
-        internal ContextualType(Type type, IEnumerable<Attribute> contextAttributes, ContextualType? parent, byte[]? nullableFlags, ref int nullableFlagsIndex, IEnumerable<dynamic>? customAttributeProviders)
+        internal ContextualType(Type type, IEnumerable<Attribute> contextAttributes, ContextualType? parent,
+            ref int nullableFlagsIndex, byte[]? nullableFlags, IEnumerable<dynamic>? customAttributeProviders)
             : base(type)
         {
             Parent = parent;
-            ContextAttributes = contextAttributes is Attribute[]?
-                (Attribute[])contextAttributes :
-                contextAttributes?.ToArray() ??
+            ContextAttributes = contextAttributes is Attribute[] attributesArray ?
+                attributesArray : contextAttributes?.ToArray() ??
                 new Attribute[0];
 
             _nullableFlags = nullableFlags;
+            _nullableFlagsIndex = nullableFlagsIndex;
+
             InitializeNullableFlagsAndOriginalNullability(ref nullableFlagsIndex, customAttributeProviders);
 
             if (_nullableFlags != null)
@@ -119,6 +122,46 @@ namespace Namotion.Reflection
             }
         }
 
+        private ContextualType? _enumerableItemType;
+
+        /// <summary>
+        /// Gets the type's element type (i.e. array type).
+        /// </summary>
+        public ContextualType? EnumerableItemType
+        {
+            get
+            {
+                var elementType = ElementType;
+                if (elementType != null)
+                {
+                    return elementType;
+                }
+
+                var getEnumeratorMethod = Type.GetTypeInfo().GetDeclaredMethod("GetEnumerator");
+                if (getEnumeratorMethod != null)
+                {
+                    if (GenericArguments?.Length == 1)
+                    {
+                        return GenericArguments[0];
+                    }
+
+                    if (_enumerableItemType != null)
+                    {
+                        return _enumerableItemType;
+                    }
+
+                    var returnParam = getEnumeratorMethod.ReturnParameter?.ToContextualParameter();
+                    if (returnParam?.GenericArguments.Length == 1)
+                    {
+                        _enumerableItemType = returnParam.GenericArguments[0];
+                        return _enumerableItemType;
+                    }
+                }
+
+                return null;
+            }
+        }
+
         /// <summary>
         /// Gets the type's base type
         /// </summary>
@@ -175,7 +218,7 @@ namespace Namotion.Reflection
         /// </summary>
         /// <typeparam name="T">The attribute type.</typeparam>
         /// <returns>The attribute or null.</returns>
-        public T GetAttribute<T>()
+        public T? GetAttribute<T>()
         {
             return ContextAttributes.OfType<T>().Concat(TypeAttributes.OfType<T>()).FirstOrDefault();
         }
@@ -188,6 +231,76 @@ namespace Namotion.Reflection
         public IEnumerable<T> GetAttributes<T>()
         {
             return ContextAttributes.OfType<T>().Concat(TypeAttributes.OfType<T>());
+        }
+
+        /// <summary>
+        /// Gets a contextual property of the given contextual type (preserving the context).
+        /// </summary>
+        /// <param name="propertyName">The property name.</param>
+        /// <returns>The contextual property or null.</returns>
+        public ContextualPropertyInfo? GetProperty(string propertyName)
+        {
+            // TODO: Implement type level property cache
+
+            var property = Type.GetRuntimeProperty(propertyName);
+            if (property is null)
+            {
+                return null;
+            }
+
+            if (TypeInfo.IsGenericType && !TypeInfo.ContainsGenericParameters)
+            {
+                var genericType = property.DeclaringType.GetGenericTypeDefinition();
+                var genericProperty = genericType.GetRuntimeProperty(property.Name);
+                if (genericProperty != null)
+                {
+                    var actualType = GenericArguments[genericProperty.PropertyType.GenericParameterPosition];
+                    var actualIndex = actualType._nullableFlagsIndex;
+                    return new ContextualPropertyInfo(property, ref actualIndex, actualType._nullableFlags);
+                }
+            }
+
+            var index = 0;
+            return new ContextualPropertyInfo(property, ref index, null);
+        }
+
+        /// <summary>
+        /// Gets a contextual field of the given contextual type (preserving the context).
+        /// </summary>
+        /// <param name="fieldName">The field name.</param>
+        /// <returns>The contextual field or null.</returns>
+        public ContextualFieldInfo? GetField(string fieldName)
+        {
+            // TODO: Implement type level field cache
+
+#if NET40
+            var field = Type.GetField(fieldName);
+#else
+            var field = Type.GetRuntimeField(fieldName);
+#endif
+            if (field is null)
+            {
+                return null;
+            }
+
+            if (TypeInfo.IsGenericType && !TypeInfo.ContainsGenericParameters)
+            {
+                var genericType = field.DeclaringType.GetGenericTypeDefinition();
+#if NET40
+                var genericField = genericType.GetField(field.Name);
+#else
+                var genericField = genericType.GetRuntimeField(field.Name);
+#endif
+                if (genericField != null)
+                {
+                    var actualType = GenericArguments[genericField.FieldType.GenericParameterPosition];
+                    var actualIndex = actualType._nullableFlagsIndex;
+                    return new ContextualFieldInfo(field, ref actualIndex, actualType._nullableFlags);
+                }
+            }
+
+            var index = 0;
+            return new ContextualFieldInfo(field, ref index, null);
         }
 
         /// <inheritdocs />
@@ -205,27 +318,43 @@ namespace Namotion.Reflection
         /// <returns>The cached type.</returns>
         protected override CachedType GetCachedType(Type type, ref int nullableFlagsIndex)
         {
-            return new ContextualType(type, ContextAttributes, this, _nullableFlags, ref nullableFlagsIndex, null);
+            return new ContextualType(type, ContextAttributes, this, ref nullableFlagsIndex, _nullableFlags, null);
         }
 
         private void InitializeNullableFlagsAndOriginalNullability(ref int nullableFlagsIndex, IEnumerable<dynamic>? customAttributeProviders)
         {
+            var typeInfo = OriginalType.GetTypeInfo();
+
             try
             {
                 if (_nullableFlags == null)
                 {
                     var nullableAttribute = ContextAttributes.FirstOrDefault(a => a.GetType().FullName == "System.Runtime.CompilerServices.NullableAttribute");
-                    if (nullableAttribute != null)
+                    if (nullableAttribute is not null)
                     {
                         _nullableFlags = GetFlagsFromNullableAttribute(nullableAttribute);
                     }
-                    else if (customAttributeProviders != null)
+                    else if (typeInfo.IsGenericParameter)
                     {
+                        nullableAttribute = typeInfo.GetCustomAttributes().FirstOrDefault(a => a.GetType().FullName == "System.Runtime.CompilerServices.NullableAttribute");
+                        if (nullableAttribute is not null)
+                        {
+                            _nullableFlags = GetFlagsFromNullableAttribute(nullableAttribute);
+                        }
+                        else
+                        {
+                            // Default nullability (NullableContextAttribute) from the context
+                            _nullableFlags = GetFlagsFromCustomAttributeProviders(typeInfo.DeclaringType.IsNested ? new dynamic[] { typeInfo.DeclaringType, typeInfo.DeclaringType.DeclaringType } : new dynamic[] { typeInfo.DeclaringType });
+                        }
+                    }
+                    else if (customAttributeProviders is not null)
+                    {
+                        // Default nullability (NullableContextAttribute) from the context
                         _nullableFlags = GetFlagsFromCustomAttributeProviders(customAttributeProviders);
                     }
                     else
                     {
-                        _nullableFlags = new byte[] { 0 };
+                        _nullableFlags = new byte[] { 0 }; // Unknown
                     }
                 }
             }
@@ -237,11 +366,11 @@ namespace Namotion.Reflection
 #endif
             }
 
-            if (OriginalType.GetTypeInfo() is var typeInfo && typeInfo.IsValueType)
+            if (typeInfo.IsValueType)
             {
                 if (typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() != typeof(Nullable<>))
                 {
-                    nullableFlagsIndex++;                
+                    nullableFlagsIndex++;
                 }
 
                 OriginalNullability = Nullability.NotNullable;

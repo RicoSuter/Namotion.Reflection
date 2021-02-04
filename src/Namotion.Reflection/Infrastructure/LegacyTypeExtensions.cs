@@ -21,6 +21,11 @@ namespace Namotion.Reflection
             return type.GetMethod(name, types);
         }
 
+        public static MethodInfo? GetDeclaredMethod(this Type type, string name)
+        {
+            return type.GetMethod(name);
+        }
+
         public static PropertyInfo? GetRuntimeProperty(this Type type, string name)
         {
             return type.GetProperty(name);

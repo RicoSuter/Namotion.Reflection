@@ -11,7 +11,7 @@
     <PackageIconUrl>https://raw.githubusercontent.com/RicoSuter/Namotion.Reflection/master/assets/NuGetIcon.png</PackageIconUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Description>.NET library with advanced reflection APIs like XML documentation reading, Null Reference Types (C# 8) reflection and string based type checks.</Description>
-    <projectUrl>https://github.com/RicoSuter/Namotion.Reflection</projectUrl>
+    <PackageProjectUrl>https://github.com/RicoSuter/Namotion.Reflection</PackageProjectUrl>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.0'">
     <PackageReference Include="Microsoft.CSharp" Version="4.3.0" />

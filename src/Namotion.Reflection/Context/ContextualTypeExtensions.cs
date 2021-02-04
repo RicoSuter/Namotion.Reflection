@@ -118,7 +118,7 @@ namespace Namotion.Reflection
 
         /// <summary>
         /// Gets an array of <see cref="ContextualParameterInfo"/> for the given <see cref="MethodBase"/> instance.
-        /// Warning: Retrieving contextual information directly from <see cref="MethodBase"/> might lose original context data.
+        /// Warning: Retrieving contextual information directly from <see cref="MethodBase"/> might lose original context data (NRT on original generic type parameters).
         /// </summary>
         /// <param name="method">The method.</param>
         /// <returns>The runtime properties.</returns>
@@ -150,7 +150,7 @@ namespace Namotion.Reflection
 
         /// <summary>
         /// Gets a <see cref="ContextualParameterInfo"/> for the given <see cref="ParameterInfo"/> instance.
-        /// Warning: Retrieving contextual information directly from <see cref="ParameterInfo"/> might lose original context data.
+        /// Warning: Retrieving contextual information directly from <see cref="ParameterInfo"/> might lose original context data (NRT on original generic type parameters).
         /// </summary>
         /// <param name="parameterInfo">The parameter info.</param>
         /// <returns>The <see cref="ContextualParameterInfo"/>.</returns>
@@ -176,7 +176,7 @@ namespace Namotion.Reflection
 
         /// <summary>
         /// Gets a <see cref="ContextualPropertyInfo"/> for the given <see cref="PropertyInfo"/> instance.
-        /// Warning: Retrieving contextual information directly from <see cref="PropertyInfo"/> might lose original context data.
+        /// Warning: Retrieving contextual information directly from <see cref="PropertyInfo"/> might lose original context data (NRT on original generic type parameters).
         /// </summary>
         /// <param name="propertyInfo">The property info.</param>
         /// <returns>The <see cref="ContextualPropertyInfo"/>.</returns>
@@ -203,7 +203,7 @@ namespace Namotion.Reflection
 
         /// <summary>
         /// Gets a <see cref="ContextualFieldInfo"/> for the given <see cref="FieldInfo"/> instance.
-        /// Warning: Retrieving contextual information directly from <see cref="FieldInfo"/> might lose original context data.
+        /// Warning: Retrieving contextual information directly from <see cref="FieldInfo"/> might lose original context data (NRT on original generic type parameters).
         /// </summary>
         /// <param name="fieldInfo">The field info.</param>
         /// <returns>The <see cref="ContextualFieldInfo"/>.</returns>
@@ -228,7 +228,7 @@ namespace Namotion.Reflection
 
         /// <summary>
         /// Gets a <see cref="ContextualMemberInfo"/> for the given <see cref="MemberInfo"/> instance.
-        /// Warning: Retrieving contextual information directly from <see cref="MemberInfo"/> might lose original context data.
+        /// Warning: Retrieving contextual information directly from <see cref="MemberInfo"/> might lose original context data (NRT on original generic type parameters).
         /// </summary>
         /// <param name="memberInfo">The member info.</param>
         /// <returns>The <see cref="ContextualMemberInfo"/>.</returns>

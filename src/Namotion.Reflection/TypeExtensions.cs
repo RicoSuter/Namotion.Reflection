@@ -81,7 +81,14 @@ namespace Namotion.Reflection
                 return elementType;
             }
 
-            var getEnumeratorMethod = type.GetTypeInfo().GetDeclaredMethod("GetEnumerator");
+#if NETSTANDARD1_0
+            var getEnumeratorMethod = type.GetRuntimeMethod("GetEnumerator", new Type[0]) ?? type.GetTypeInfo().ImplementedInterfaces
+                .Select(i => i.GetTypeInfo().GetDeclaredMethod("GetEnumerator")).FirstOrDefault(m => m != null);
+#else
+            var getEnumeratorMethod = type.GetRuntimeMethod("GetEnumerator", new Type[0]) ?? type.GetTypeInfo().GetInterfaces()
+                .Select(i => i.GetTypeInfo().GetDeclaredMethod("GetEnumerator")).FirstOrDefault(m => m != null);
+#endif
+
             if (getEnumeratorMethod != null)
             {
                 var genericTypeArguments = type.GetGenericTypeArgumentsOfTypeOrBaseTypes();

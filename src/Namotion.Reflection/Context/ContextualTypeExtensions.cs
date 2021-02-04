@@ -171,7 +171,7 @@ namespace Namotion.Reflection
                     if (!Cache.ContainsKey(key))
                     {
                         var index = 0;
-                        Cache[key] = new ContextualPropertyInfo(propertyInfo, ref index);
+                        Cache[key] = new ContextualPropertyInfo(propertyInfo, nullableFlagsIndex: ref index, nullableFlags: null);
                     }
 
                     return (ContextualPropertyInfo)Cache[key];
@@ -196,7 +196,7 @@ namespace Namotion.Reflection
                     if (!Cache.ContainsKey(key))
                     {
                         var index = 0;
-                        Cache[key] = new ContextualFieldInfo(fieldInfo, ref index);
+                        Cache[key] = new ContextualFieldInfo(fieldInfo, nullableFlagsIndex: ref index, nullableFlags: null);
                     }
                 }
             }
@@ -242,6 +242,10 @@ namespace Namotion.Reflection
         /// <returns>The <see cref="CachedType"/>.</returns>
         public static ContextualType ToContextualType(this Type type)
         {
+            if (type.FullName == null)
+            {
+                return ContextualType.ForType(type, new Attribute[0]);
+            }
             var key = "Type:Context:" + type.FullName;
             lock (Lock)
             {
@@ -261,6 +265,11 @@ namespace Namotion.Reflection
         /// <returns>The <see cref="CachedType"/>.</returns>
         public static CachedType ToCachedType(this Type type)
         {
+            if (type.FullName == null)
+            {
+                // Returns an uncached version of the type since we can't build a cache key
+                return new CachedType(type);
+            }
             var key = "Type:" + type.FullName;
             if (!Cache.ContainsKey(key))
             {

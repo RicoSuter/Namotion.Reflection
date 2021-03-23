@@ -251,6 +251,52 @@ namespace Namotion.Reflection.Tests
             public int ID { get; }
             public string Name { get; }
         }
+        
+        private sealed class SimpleClass
+        {
+            public string? Name { get; set; } = string.Empty;
+            public SimpleClass()
+            {
+            }
+            public SimpleClass( string name )
+            {
+                Name = name;
+            }
+        }
+        
+        /// <summary>
+        /// related to issue 68
+        /// </summary>
+        [Fact]
+        public void When_object_is_dictionary_with_string_key_and_custom_class_value_should_throw()
+        {
+            // setup
+            var obj = new Dictionary<string, SimpleClass>()
+            {
+                {"a", new SimpleClass()},
+                {"b", new SimpleClass( "hello" )}
+            };
+
+            // verify
+            Assert.Throws<System.InvalidCastException>( () => obj.EnsureValidNullability() );
+        }
+
+        /// <summary>
+        /// related to issue 68
+        /// </summary>
+        [Fact]
+        public void When_object_is_dectionary_with_string_key_and_int_value_should_not_throw()
+        {
+            // setup
+            var obj = new Dictionary<string, int>()
+            {
+                {"a", 1},
+                {"b", 2}
+            };
+
+            // verify
+            Assert.True( obj.HasValidNullability() );
+        }
     }
 
     public sealed class PersonDetails_PublicNonNested

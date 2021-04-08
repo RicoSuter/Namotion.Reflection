@@ -254,7 +254,7 @@ namespace Namotion.Reflection.Tests
         
         private sealed class SimpleClass
         {
-            public string? Name { get; set; } = string.Empty;
+            public string Name { get; set; } = null!;
             public SimpleClass()
             {
             }
@@ -268,7 +268,7 @@ namespace Namotion.Reflection.Tests
         /// related to issue 68
         /// </summary>
         [Fact]
-        public void When_object_is_dictionary_with_string_key_and_custom_class_value_should_throw()
+        public void When_object_is_dictionary_with_string_key_and_custom_class_and_not_valid_nullability_extension_will_throw()
         {
             // setup
             var obj = new Dictionary<string, SimpleClass>()
@@ -278,7 +278,24 @@ namespace Namotion.Reflection.Tests
             };
 
             // verify
-            Assert.Throws<System.InvalidCastException>( () => obj.EnsureValidNullability() );
+            Assert.True( !obj.HasValidNullability() );
+        }
+        
+        /// <summary>
+        /// related to issue 68
+        /// </summary>
+        [Fact]
+        public void When_object_is_dictionary_with_string_key_and_custom_class_and_valid_nullability_extension_will_throw()
+        {
+            // setup
+            var obj = new Dictionary<string, SimpleClass>()
+            {
+                {"a", new SimpleClass("bye")},
+                {"b", new SimpleClass( "hello" )}
+            };
+
+            // verify
+            Assert.True( obj.HasValidNullability() );
         }
 
         /// <summary>

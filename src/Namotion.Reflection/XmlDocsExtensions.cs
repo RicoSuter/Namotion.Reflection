@@ -37,7 +37,7 @@ namespace Namotion.Reflection
     public static class XmlDocsExtensions
     {
         private static readonly object Lock = new object();
-        private static readonly Dictionary<string, XDocument?> Cache = new Dictionary<string, XDocument?>(StringComparer.OrdinalIgnoreCase);
+        private static readonly Dictionary<string, CachingXDocument?> Cache = new Dictionary<string, CachingXDocument?>(StringComparer.OrdinalIgnoreCase);
 
         internal static void ClearCache()
         {
@@ -166,7 +166,7 @@ namespace Namotion.Reflection
         {
             lock (Lock)
             {
-                return ((MemberInfo)type.GetTypeInfo()).GetXmlDocsWithoutLock(pathToXmlFile);
+                return type.GetTypeInfo().GetXmlDocsWithoutLock(pathToXmlFile);
             }
         }
 
@@ -258,7 +258,6 @@ namespace Namotion.Reflection
                     return null;
                 }
 
-                var assemblyName = parameter.Member.Module.Assembly.GetName();
                 lock (Lock)
                 {
                     return GetXmlDocumentationWithoutLock(parameter, pathToXmlFile);
@@ -403,65 +402,63 @@ namespace Namotion.Reflection
             }
         }
 
-        private static XDocument? TryGetXmlDocsDocument(AssemblyName assemblyName, string? pathToXmlFile)
+        private static CachingXDocument? TryGetXmlDocsDocument(AssemblyName assemblyName, string? pathToXmlFile)
         {
-            if (!Cache.ContainsKey(assemblyName.FullName))
+            if (Cache.TryGetValue(assemblyName.FullName, out var document))
             {
-                if (pathToXmlFile is null)
-                {
-                    return null;
-                }
-                if (DynamicApis.FileExists(pathToXmlFile) == false)
-                {
-                    Cache[assemblyName.FullName] = null;
-                    return null;
-                }
-
-                Cache[assemblyName.FullName] = XDocument.Load(pathToXmlFile, LoadOptions.PreserveWhitespace);
+                return document;
             }
 
-            return Cache[assemblyName.FullName];
+            if (pathToXmlFile is null)
+            {
+                return null;
+            }
+
+            if (DynamicApis.FileExists(pathToXmlFile) == false)
+            {
+                Cache[assemblyName.FullName] = null;
+                return null;
+            }
+
+            document = new CachingXDocument(pathToXmlFile);
+            Cache[assemblyName.FullName] = document;
+
+            return document;
         }
 
         private static bool IsAssemblyIgnored(AssemblyName assemblyName)
         {
-            if (Cache.ContainsKey(assemblyName.FullName) && Cache[assemblyName.FullName] == null)
-            {
-                return true;
-            }
-
-            return false;
+            return Cache.TryGetValue(assemblyName.FullName, out var document) && document == null;
         }
 
-        private static XElement? GetXmlDocsElement(this MemberInfo member, XDocument xml)
+        private static XElement? GetXmlDocsElement(this MemberInfo member, CachingXDocument xml)
         {
             var name = GetMemberElementName(member);
-            return GetXmlDocsElement(xml, name);
+            return xml.GetXmlDocsElement(name);
         }
 
         internal static XElement? GetXmlDocsElement(this XDocument xml, string name)
         {
             var result = (IEnumerable)DynamicApis.XPathEvaluate(xml, $"/doc/members/member[@name='{name}']");
-            return result.OfType<XElement>().FirstOrDefault();
+            return CachingXDocument.GetXmlDocsElement(xml, name);
         }
 
-        private static XElement? GetXmlDocsElement(this ParameterInfo parameter, XDocument xml)
+        private static XElement? GetXmlDocsElement(this ParameterInfo parameter, CachingXDocument xml)
         {
             var name = GetMemberElementName(parameter.Member);
-            var result = (IEnumerable)DynamicApis.XPathEvaluate(xml, $"/doc/members/member[@name='{name}']");
-
-            var element = result.OfType<XElement>().FirstOrDefault();
+            var element = xml.GetXmlDocsElement(name);
             if (element != null)
             {
                 ReplaceInheritdocElements(parameter.Member, element);
 
+                IEnumerable result;
                 if (parameter.IsRetval || string.IsNullOrEmpty(parameter.Name))
                 {
-                    result = (IEnumerable)DynamicApis.XPathEvaluate(xml, $"/doc/members/member[@name='{name}']/returns");
+                    result = element.Elements("returns");
                 }
                 else
                 {
-                    result = (IEnumerable)DynamicApis.XPathEvaluate(xml, $"/doc/members/member[@name='{name}']/param[@name='{parameter.Name}']");
+                    result = element.Elements("param").Where(x => x.Attribute("name")?.Value == parameter.Name);
                 }
 
                 return result.OfType<XElement>().FirstOrDefault();
@@ -668,7 +665,8 @@ namespace Namotion.Reflection
                     return null;
                 }
 
-                if (Cache.ContainsKey(assemblyName.FullName))
+                var assemblyFullName = assemblyName.FullName;
+                if (Cache.ContainsKey(assemblyFullName))
                 {
                     return null;
                 }
@@ -732,6 +730,8 @@ namespace Namotion.Reflection
                     return path;
                 }
 
+                // won't be found the next time either
+                Cache[assemblyFullName] = null;
                 return null;
             }
             catch

@@ -420,7 +420,7 @@ namespace Namotion.Reflection
                 return null;
             }
 
-            document = XDocument.Load(pathToXmlFile, LoadOptions.PreserveWhitespace);
+            document = new CachingXDocument(pathToXmlFile);
             Cache[assemblyName.FullName] = document;
 
             return document;

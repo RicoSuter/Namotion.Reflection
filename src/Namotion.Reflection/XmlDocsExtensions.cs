@@ -404,33 +404,31 @@ namespace Namotion.Reflection
 
         private static CachingXDocument? TryGetXmlDocsDocument(AssemblyName assemblyName, string? pathToXmlFile)
         {
-            if (!Cache.TryGetValue(assemblyName.FullName, out var document))
+            if (Cache.TryGetValue(assemblyName.FullName, out var document))
             {
-                if (pathToXmlFile is null)
-                {
-                    return null;
-                }
-                if (DynamicApis.FileExists(pathToXmlFile) == false)
-                {
-                    Cache[assemblyName.FullName] = null;
-                    return null;
-                }
-
-                document = new CachingXDocument(pathToXmlFile);
-                Cache[assemblyName.FullName] = document;
+                return document;
             }
+
+            if (pathToXmlFile is null)
+            {
+                return null;
+            }
+
+            if (DynamicApis.FileExists(pathToXmlFile) == false)
+            {
+                Cache[assemblyName.FullName] = null;
+                return null;
+            }
+
+            document = new CachingXDocument(pathToXmlFile);
+            Cache[assemblyName.FullName] = document;
 
             return document;
         }
 
         private static bool IsAssemblyIgnored(AssemblyName assemblyName)
         {
-            if (Cache.ContainsKey(assemblyName.FullName) && Cache[assemblyName.FullName] == null)
-            {
-                return true;
-            }
-
-            return false;
+            return Cache.TryGetValue(assemblyName.FullName, out var document) && document == null;
         }
 
         private static XElement? GetXmlDocsElement(this MemberInfo member, CachingXDocument xml)
@@ -667,7 +665,8 @@ namespace Namotion.Reflection
                     return null;
                 }
 
-                if (Cache.ContainsKey(assemblyName.FullName))
+                var assemblyFullName = assemblyName.FullName;
+                if (Cache.ContainsKey(assemblyFullName))
                 {
                     return null;
                 }
@@ -731,6 +730,8 @@ namespace Namotion.Reflection
                     return path;
                 }
 
+                // won't be found the next time either
+                Cache[assemblyFullName] = null;
                 return null;
             }
             catch

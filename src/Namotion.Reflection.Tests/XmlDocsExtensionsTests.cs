@@ -582,5 +582,27 @@ namespace Namotion.Reflection.Tests
             //// Assert
             Assert.Equal("A point.", summary);
         }
+
+        /// <summary>
+        /// Returns a list of items.
+        /// </summary>
+        /// <param name="PageNumber">The page number.</param>
+        /// <param name="PageSize">The page size.</param>
+        public record ListItems(int PageNumber, int PageSize);
+
+        [Fact]
+        public void When_record_has_param_properties_then_xml_docs_is_read()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            var listItemsSummary = typeof(ListItems).GetXmlDocsSummary();
+            var pageNumberSummary = typeof(ListItems).GetRuntimeProperty("PageNumber").GetXmlDocsSummary();
+
+            //// Assert
+            Assert.Equal("Returns a list of items.", listItemsSummary);
+            Assert.Equal("The page number.", pageNumberSummary);
+        }
     }
 }

@@ -147,7 +147,14 @@ namespace Namotion.Reflection
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static string GetXmlDocsSummary(this MemberInfo member)
         {
-            return GetXmlDocsTag(member, "summary");
+            var docs = GetXmlDocsTag(member, "summary");
+
+            if (string.IsNullOrEmpty(docs) && member is PropertyInfo propertyInfo)
+            {
+                return propertyInfo.GetXmlDocsRecordPropertySummary();
+            }
+
+            return docs;
         }
 
         /// <summary>Returns the contents of the "remarks" XML documentation tag for the specified member.</summary>
@@ -218,6 +225,33 @@ namespace Namotion.Reflection
                 var documentationPath = GetXmlDocsPath(member.Module.Assembly);
                 var element = GetXmlDocsWithoutLock(member, documentationPath);
                 return ToXmlDocsContent(element?.Element(tagName));
+            }
+        }
+
+        /// <summary>Returns the property summary of a Record type which is read from the param tag on the type.</summary>
+        /// <param name="member">The reflected member.</param>
+        /// <returns>The contents of the "param" tag of the Record property.</returns>
+        public static string GetXmlDocsRecordPropertySummary(this PropertyInfo member)
+        {
+            if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false || DynamicApis.SupportsPathApis == false)
+            {
+                return string.Empty;
+            }
+
+            _ = member ?? throw new ArgumentNullException(nameof(member));
+
+            var assemblyName = member.Module.Assembly.GetName();
+            lock (Lock)
+            {
+                if (IsAssemblyIgnored(assemblyName))
+                {
+                    return string.Empty;
+                }
+
+                var documentationPath = GetXmlDocsPath(member.Module.Assembly);
+                var parentElement = GetXmlDocsWithoutLock(member.DeclaringType.GetTypeInfo(), documentationPath);
+                var paramElement = parentElement?.Elements("param").First(x => x.Attribute("name")?.Value == member.Name);
+                return ToXmlDocsContent(paramElement);
             }
         }
 

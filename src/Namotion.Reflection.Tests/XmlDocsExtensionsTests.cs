@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using NJsonSchema;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -603,6 +605,32 @@ namespace Namotion.Reflection.Tests
             //// Assert
             Assert.Equal("Returns a list of items.", listItemsSummary);
             Assert.Equal("The page number.", pageNumberSummary);
+        }
+
+        [Fact]
+        public void When_type_is_in_NuGet_then_xml_docs_should_be_found()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            var summary = typeof(JsonSchema).GetXmlDocsSummary();
+
+            //// Assert
+            Assert.False(string.IsNullOrWhiteSpace(summary));
+        }
+
+        [Fact]
+        public void When_type_is_in_AspNetCore_then_docs_should_be_found()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            var summary = typeof(ProblemDetails).GetXmlDocsSummary();
+
+            //// Assert
+            Assert.False(string.IsNullOrWhiteSpace(summary));
         }
     }
 }

@@ -7,10 +7,10 @@ namespace Namotion.Reflection
     /// </summary>
     public class ContextualFieldInfo : ContextualMemberInfo
     {
-        private string _name;
+        private string? _name;
 
-        internal ContextualFieldInfo(FieldInfo fieldInfo, ref int nullableFlagsIndex)
-            : base(fieldInfo, fieldInfo.FieldType, ref nullableFlagsIndex)
+        internal ContextualFieldInfo(FieldInfo fieldInfo, ref int nullableFlagsIndex, byte[]? nullableFlags)
+            : base(fieldInfo, fieldInfo.FieldType, ref nullableFlagsIndex, nullableFlags)
         {
             FieldInfo = fieldInfo;
         }
@@ -35,7 +35,7 @@ namespace Namotion.Reflection
         /// </summary>
         /// <param name="obj">The object.</param>
         /// <returns>The value.</returns>
-        public override object GetValue(object obj)
+        public override object? GetValue(object? obj)
         {
             return FieldInfo.GetValue(obj);
         }
@@ -45,7 +45,7 @@ namespace Namotion.Reflection
         /// </summary>
         /// <param name="obj">The object.</param>
         /// <param name="value">The value.</param>
-        public override void SetValue(object obj, object value)
+        public override void SetValue(object? obj, object? value)
         {
             FieldInfo.SetValue(obj, value);
         }

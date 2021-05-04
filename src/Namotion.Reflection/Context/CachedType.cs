@@ -20,26 +20,26 @@ namespace Namotion.Reflection
             ContextualTypeExtensions.ClearCache();
         }
 
-        private Type _type;
+        private Type? _type;
         private bool _isNullableType;
-        private string _typeName;
+        private string? _typeName;
 
-        private Attribute[] _typeAttributes;
+        private Attribute[]? _typeAttributes;
 
         /// <summary>
         /// Internal generic arguments.
         /// </summary>
-        internal object _genericArguments;
+        internal object? _genericArguments;
 
         /// <summary>
         /// Internal original generic arguments.
         /// </summary>
-        internal object _originalGenericArguments;
+        internal object? _originalGenericArguments;
 
         /// <summary>
         /// Internal element type.
         /// </summary>
-        internal object _elementType;
+        internal object? _elementType;
 
         /// <summary>
         /// Unwraps the OriginalType as <see cref="Type"/> from the context type.
@@ -76,7 +76,7 @@ namespace Namotion.Reflection
 #if !NET40
         public TypeInfo TypeInfo => _typeInfo ?? (_typeInfo = Type.GetTypeInfo());
 
-        private TypeInfo _typeInfo;
+        private TypeInfo? _typeInfo;
 #else
         public Type TypeInfo => Type;
 #endif
@@ -98,7 +98,7 @@ namespace Namotion.Reflection
                     if (_typeAttributes == null)
                     {
                         // TODO: rename to inherited type attributes and add type attributes property
-                        _typeAttributes = _type.GetTypeInfo().GetCustomAttributes(true).OfType<Attribute>().ToArray();
+                        _typeAttributes = _type!.GetTypeInfo().GetCustomAttributes(true).OfType<Attribute>().ToArray();
                     }
 
                     return _typeAttributes;
@@ -114,7 +114,7 @@ namespace Namotion.Reflection
             get
             {
                 UpdateOriginalGenericArguments();
-                return _type;
+                return _type ?? throw new InvalidOperationException("_type is not initialized");
             }
         }
 
@@ -138,7 +138,7 @@ namespace Namotion.Reflection
             get
             {
                 UpdateOriginalGenericArguments();
-                return (CachedType[])_genericArguments;
+                return (CachedType[]?)_genericArguments ?? throw new InvalidOperationException("_genericArguments is not initialized");
             }
         }
 
@@ -150,14 +150,14 @@ namespace Namotion.Reflection
             get
             {
                 UpdateOriginalGenericArguments();
-                return (CachedType[])_originalGenericArguments;
+                return (CachedType[]?)_originalGenericArguments ?? throw new InvalidOperationException("_genericArguments is not initialized");
             }
         }
 
         /// <summary>
         /// Gets the type's element type (i.e. array type).
         /// </summary>
-        public CachedType ElementType
+        public CachedType? ElementType
         {
             get
             {
@@ -171,7 +171,7 @@ namespace Namotion.Reflection
         /// </summary>
         /// <typeparam name="T">The attribute type.</typeparam>
         /// <returns>The attribute or null.</returns>
-        public T GetTypeAttribute<T>()
+        public T? GetTypeAttribute<T>()
             where T : Attribute
         {
             return TypeAttributes.OfType<T>().SingleOrDefault();

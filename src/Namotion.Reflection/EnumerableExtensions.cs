@@ -25,7 +25,7 @@ namespace Namotion.Reflection
         /// <returns>The objects which are assignable.</returns>
         public static IEnumerable<T> GetAssignableToTypeName<T>(this IEnumerable<T> objects, string typeName, TypeNameStyle typeNameStyle = TypeNameStyle.FullName)
         {
-            return objects.Where(o => o.GetType().IsAssignableToTypeName(typeName, typeNameStyle));
+            return objects.Where(o => o!.GetType().IsAssignableToTypeName(typeName, typeNameStyle));
         }
 
         /// <summary>Tries to get the first object which is assignable to the given type name.</summary>
@@ -33,7 +33,7 @@ namespace Namotion.Reflection
         /// <param name="typeName">Type of the attribute.</param>
         /// <param name="typeNameStyle">The type name style.</param>
         /// <returns>May return null (not found).</returns>
-        public static T FirstAssignableToTypeNameOrDefault<T>(this IEnumerable<T> objects, string typeName, TypeNameStyle typeNameStyle = TypeNameStyle.FullName)
+        public static T? FirstAssignableToTypeNameOrDefault<T>(this IEnumerable<T>? objects, string typeName, TypeNameStyle typeNameStyle = TypeNameStyle.FullName)
         {
             return objects != null ?
                 objects.GetAssignableToTypeName(typeName, typeNameStyle).FirstOrDefault() :
@@ -45,6 +45,7 @@ namespace Namotion.Reflection
         /// <returns>The common base type.</returns>
         public static Type GetCommonBaseType(this IEnumerable<Type> types)
         {
+            types = types.ToList();
             var baseType = types.First();
             while (baseType != typeof(object) && baseType != null)
             {

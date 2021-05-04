@@ -16,17 +16,22 @@ namespace Namotion.Reflection
 
     public static class LegacyTypeExtensions
     {
-        public static MethodInfo GetRuntimeMethod(this Type type, string name, Type[] types)
+        public static MethodInfo? GetRuntimeMethod(this Type type, string name, Type[] types)
         {
             return type.GetMethod(name, types);
         }
 
-        public static PropertyInfo GetRuntimeProperty(this Type type, string name)
+        public static MethodInfo? GetDeclaredMethod(this Type type, string name)
+        {
+            return type.GetMethod(name);
+        }
+
+        public static PropertyInfo? GetRuntimeProperty(this Type type, string name)
         {
             return type.GetProperty(name);
         }
 
-        public static FieldInfo GetDeclaredField(this Type type, string name)
+        public static FieldInfo? GetDeclaredField(this Type type, string name)
         {
             return type.GetField(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
         }
@@ -68,24 +73,24 @@ namespace Namotion.Reflection
             return propertyInfo.GetCustomAttributes(inherit).OfType<T>().ToArray();
         }
 
-        public static T GetCustomAttribute<T>(this Type type)
+        public static T? GetCustomAttribute<T>(this Type type)
             where T : Attribute
         {
             return type.GetCustomAttributes().OfType<T>().FirstOrDefault();
         }
 
-        public static T GetCustomAttribute<T>(this PropertyInfo propertyInfo)
+        public static T? GetCustomAttribute<T>(this PropertyInfo propertyInfo)
             where T : Attribute
         {
             return propertyInfo.GetCustomAttributes().OfType<T>().FirstOrDefault();
         }
 
-        public static object GetValue(this PropertyInfo propertyInfo, object obj)
+        public static object? GetValue(this PropertyInfo propertyInfo, object? obj)
         {
             return propertyInfo.GetValue(obj, null);
         }
 
-        public static void SetValue(this PropertyInfo propertyInfo, object obj, object value)
+        public static void SetValue(this PropertyInfo propertyInfo, object? obj, object? value)
         {
             propertyInfo.SetValue(obj, value, null);
         }

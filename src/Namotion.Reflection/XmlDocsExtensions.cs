@@ -37,7 +37,7 @@ namespace Namotion.Reflection
     public static class XmlDocsExtensions
     {
         private static readonly object Lock = new object();
-        private static readonly Dictionary<string, XDocument> Cache = new Dictionary<string, XDocument>(StringComparer.OrdinalIgnoreCase);
+        private static readonly Dictionary<string, CachingXDocument?> Cache = new Dictionary<string, CachingXDocument?>(StringComparer.OrdinalIgnoreCase);
 
         internal static void ClearCache()
         {
@@ -110,7 +110,7 @@ namespace Namotion.Reflection
         /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static XElement GetXmlDocsElement(this ContextualMemberInfo member)
+        public static XElement? GetXmlDocsElement(this ContextualMemberInfo member)
         {
             return member.MemberInfo.GetXmlDocsElement();
         }
@@ -147,7 +147,14 @@ namespace Namotion.Reflection
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static string GetXmlDocsSummary(this MemberInfo member)
         {
-            return GetXmlDocsTag(member, "summary");
+            var docs = GetXmlDocsTag(member, "summary");
+
+            if (string.IsNullOrEmpty(docs) && member is PropertyInfo propertyInfo)
+            {
+                return propertyInfo.GetXmlDocsRecordPropertySummary();
+            }
+
+            return docs;
         }
 
         /// <summary>Returns the contents of the "remarks" XML documentation tag for the specified member.</summary>
@@ -162,18 +169,18 @@ namespace Namotion.Reflection
         /// <param name="type">The type.</param>
         /// <param name="pathToXmlFile">The path to the XML documentation file.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static XElement GetXmlDocsElement(this Type type, string pathToXmlFile)
+        public static XElement? GetXmlDocsElement(this Type type, string pathToXmlFile)
         {
             lock (Lock)
             {
-                return ((MemberInfo)type.GetTypeInfo()).GetXmlDocsWithoutLock(pathToXmlFile);
+                return type.GetTypeInfo().GetXmlDocsWithoutLock(pathToXmlFile);
             }
         }
 
         /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static XElement GetXmlDocsElement(this MemberInfo member)
+        public static XElement? GetXmlDocsElement(this MemberInfo member)
         {
             lock (Lock)
             {
@@ -185,7 +192,7 @@ namespace Namotion.Reflection
         /// <param name="member">The reflected member.</param>
         /// <param name="pathToXmlFile">The path to the XML documentation file.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static XElement GetXmlDocsElement(this MemberInfo member, string pathToXmlFile)
+        public static XElement? GetXmlDocsElement(this MemberInfo member, string pathToXmlFile)
         {
             lock (Lock)
             {
@@ -221,6 +228,33 @@ namespace Namotion.Reflection
             }
         }
 
+        /// <summary>Returns the property summary of a Record type which is read from the param tag on the type.</summary>
+        /// <param name="member">The reflected member.</param>
+        /// <returns>The contents of the "param" tag of the Record property.</returns>
+        public static string GetXmlDocsRecordPropertySummary(this PropertyInfo member)
+        {
+            if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false || DynamicApis.SupportsPathApis == false)
+            {
+                return string.Empty;
+            }
+
+            _ = member ?? throw new ArgumentNullException(nameof(member));
+
+            var assemblyName = member.Module.Assembly.GetName();
+            lock (Lock)
+            {
+                if (IsAssemblyIgnored(assemblyName))
+                {
+                    return string.Empty;
+                }
+
+                var documentationPath = GetXmlDocsPath(member.Module.Assembly);
+                var parentElement = GetXmlDocsWithoutLock(member.DeclaringType.GetTypeInfo(), documentationPath);
+                var paramElement = parentElement?.Elements("param").First(x => x.Attribute("name")?.Value == member.Name);
+                return ToXmlDocsContent(paramElement);
+            }
+        }
+
         /// <summary>Returns the contents of the "returns" or "param" XML documentation tag for the specified parameter.</summary>
         /// <param name="parameter">The reflected parameter or return info.</param>
         /// <returns>The contents of the "returns" or "param" tag.</returns>
@@ -249,7 +283,7 @@ namespace Namotion.Reflection
         /// <param name="parameter">The reflected parameter or return info.</param>
         /// <param name="pathToXmlFile">The path to the XML documentation file.</param>
         /// <returns>The contents of the "returns" or "param" tag.</returns>
-        public static XElement GetXmlDocsElement(this ParameterInfo parameter, string pathToXmlFile)
+        public static XElement? GetXmlDocsElement(this ParameterInfo parameter, string pathToXmlFile)
         {
             try
             {
@@ -258,7 +292,6 @@ namespace Namotion.Reflection
                     return null;
                 }
 
-                var assemblyName = parameter.Member.Module.Assembly.GetName();
                 lock (Lock)
                 {
                     return GetXmlDocumentationWithoutLock(parameter, pathToXmlFile);
@@ -273,7 +306,7 @@ namespace Namotion.Reflection
         /// <summary>Converts the given XML documentation <see cref="XElement"/> to text.</summary>
         /// <param name="element">The XML element.</param>
         /// <returns>The text</returns>
-        public static string ToXmlDocsContent(this XElement element)
+        public static string ToXmlDocsContent(this XElement? element)
         {
             if (element != null)
             {
@@ -336,7 +369,7 @@ namespace Namotion.Reflection
             return string.Empty;
         }
 
-        private static XElement GetXmlDocumentationWithoutLock(this ParameterInfo parameter, string pathToXmlFile)
+        private static XElement? GetXmlDocumentationWithoutLock(this ParameterInfo parameter, string? pathToXmlFile)
         {
             try
             {
@@ -360,7 +393,7 @@ namespace Namotion.Reflection
             }
         }
 
-        private static XElement GetXmlDocsWithoutLock(this MemberInfo member)
+        private static XElement? GetXmlDocsWithoutLock(this MemberInfo member)
         {
             if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false || DynamicApis.SupportsPathApis == false)
             {
@@ -377,7 +410,7 @@ namespace Namotion.Reflection
             return GetXmlDocsWithoutLock(member, documentationPath);
         }
 
-        private static XElement GetXmlDocsWithoutLock(this MemberInfo member, string pathToXmlFile)
+        private static XElement? GetXmlDocsWithoutLock(this MemberInfo member, string? pathToXmlFile)
         {
             try
             {
@@ -403,61 +436,63 @@ namespace Namotion.Reflection
             }
         }
 
-        private static XDocument TryGetXmlDocsDocument(AssemblyName assemblyName, string pathToXmlFile)
+        private static CachingXDocument? TryGetXmlDocsDocument(AssemblyName assemblyName, string? pathToXmlFile)
         {
-            if (!Cache.ContainsKey(assemblyName.FullName))
+            if (Cache.TryGetValue(assemblyName.FullName, out var document))
             {
-                if (DynamicApis.FileExists(pathToXmlFile) == false)
-                {
-                    Cache[assemblyName.FullName] = null;
-                    return null;
-                }
-
-                Cache[assemblyName.FullName] = XDocument.Load(pathToXmlFile, LoadOptions.PreserveWhitespace);
+                return document;
             }
 
-            return Cache[assemblyName.FullName];
+            if (pathToXmlFile is null)
+            {
+                return null;
+            }
+
+            if (DynamicApis.FileExists(pathToXmlFile) == false)
+            {
+                Cache[assemblyName.FullName] = null;
+                return null;
+            }
+
+            document = new CachingXDocument(pathToXmlFile);
+            Cache[assemblyName.FullName] = document;
+
+            return document;
         }
 
         private static bool IsAssemblyIgnored(AssemblyName assemblyName)
         {
-            if (Cache.ContainsKey(assemblyName.FullName) && Cache[assemblyName.FullName] == null)
-            {
-                return true;
-            }
-
-            return false;
+            return Cache.TryGetValue(assemblyName.FullName, out var document) && document == null;
         }
 
-        private static XElement GetXmlDocsElement(this MemberInfo member, XDocument xml)
+        private static XElement? GetXmlDocsElement(this MemberInfo member, CachingXDocument xml)
         {
             var name = GetMemberElementName(member);
-            return GetXmlDocsElement(xml, name);
+            return xml.GetXmlDocsElement(name);
         }
 
-        internal static XElement GetXmlDocsElement(this XDocument xml, string name)
+        internal static XElement? GetXmlDocsElement(this XDocument xml, string name)
         {
             var result = (IEnumerable)DynamicApis.XPathEvaluate(xml, $"/doc/members/member[@name='{name}']");
-            return result.OfType<XElement>().FirstOrDefault();
+            return CachingXDocument.GetXmlDocsElement(xml, name);
         }
 
-        private static XElement GetXmlDocsElement(this ParameterInfo parameter, XDocument xml)
+        private static XElement? GetXmlDocsElement(this ParameterInfo parameter, CachingXDocument xml)
         {
             var name = GetMemberElementName(parameter.Member);
-            var result = (IEnumerable)DynamicApis.XPathEvaluate(xml, $"/doc/members/member[@name='{name}']");
-
-            var element = result.OfType<XElement>().FirstOrDefault();
+            var element = xml.GetXmlDocsElement(name);
             if (element != null)
             {
                 ReplaceInheritdocElements(parameter.Member, element);
 
+                IEnumerable result;
                 if (parameter.IsRetval || string.IsNullOrEmpty(parameter.Name))
                 {
-                    result = (IEnumerable)DynamicApis.XPathEvaluate(xml, $"/doc/members/member[@name='{name}']/returns");
+                    result = element.Elements("returns");
                 }
                 else
                 {
-                    result = (IEnumerable)DynamicApis.XPathEvaluate(xml, $"/doc/members/member[@name='{name}']/param[@name='{parameter.Name}']");
+                    result = element.Elements("param").Where(x => x.Attribute("name")?.Value == parameter.Name);
                 }
 
                 return result.OfType<XElement>().FirstOrDefault();
@@ -466,7 +501,7 @@ namespace Namotion.Reflection
             return null;
         }
 
-        private static void ReplaceInheritdocElements(this MemberInfo member, XElement element)
+        private static void ReplaceInheritdocElements(this MemberInfo member, XElement? element)
         {
 #if !NET40
             if (element == null)
@@ -520,14 +555,14 @@ namespace Namotion.Reflection
 #endif
         }
 
-        private static string RemoveLineBreakWhiteSpaces(string documentation)
+        private static string RemoveLineBreakWhiteSpaces(string? documentation)
         {
             if (string.IsNullOrEmpty(documentation))
             {
                 return string.Empty;
             }
 
-            documentation = "\n" + documentation.Replace("\r", string.Empty).Trim('\n');
+            documentation = "\n" + documentation!.Replace("\r", string.Empty).Trim('\n');
 
             var whitespace = Regex.Match(documentation, "(\\n[ \\t]*)").Value;
             documentation = documentation.Replace(whitespace, "\n");
@@ -549,7 +584,7 @@ namespace Namotion.Reflection
                 // Resolve member with generic arguments (Ts instead of actual types)
                 if (member is PropertyInfo propertyInfo)
                 {
-                    member = propertyInfo.DeclaringType.GetRuntimeProperty(propertyInfo.Name);
+                    member = propertyInfo.DeclaringType!.GetRuntimeProperty(propertyInfo.Name)!;
                 }
                 else
                 {
@@ -558,7 +593,7 @@ namespace Namotion.Reflection
             }
 
             var memberType = ((object)member).GetType();
-            if (memberType.FullName.Contains(".Cecil."))
+            if (memberType.FullName!.Contains(".Cecil."))
             {
                 memberName = TypeExtensions.IsAssignableToTypeName(memberType, "TypeDefinition", TypeNameStyle.Name) ?
                     member.FullName : member.DeclaringType.FullName + "." + member.Name;
@@ -648,7 +683,7 @@ namespace Namotion.Reflection
             return string.Format("{0}:{1}", prefixCode, memberName.Replace("+", "."));
         }
 
-        private static string GetXmlDocsPath(dynamic assembly)
+        private static string? GetXmlDocsPath(dynamic? assembly)
         {
             string path;
             try
@@ -664,7 +699,8 @@ namespace Namotion.Reflection
                     return null;
                 }
 
-                if (Cache.ContainsKey(assemblyName.FullName))
+                var assemblyFullName = assemblyName.FullName;
+                if (Cache.ContainsKey(assemblyFullName))
                 {
                     return null;
                 }
@@ -695,7 +731,7 @@ namespace Namotion.Reflection
                     }
                 }
 
-                var currentDomain = Type.GetType("System.AppDomain")?.GetRuntimeProperty("CurrentDomain").GetValue(null);
+                var currentDomain = Type.GetType("System.AppDomain")?.GetRuntimeProperty("CurrentDomain")?.GetValue(null);
                 if (currentDomain?.HasProperty("BaseDirectory") == true)
                 {
                     var baseDirectory = currentDomain.TryGetPropertyValue("BaseDirectory", "");
@@ -707,7 +743,11 @@ namespace Namotion.Reflection
                             return path;
                         }
 
-                        return DynamicApis.PathCombine(baseDirectory, "bin\\" + assemblyName.Name + ".xml");
+                        path = DynamicApis.PathCombine(baseDirectory, "bin/" + assemblyName.Name + ".xml");
+                        if (DynamicApis.FileExists(path))
+                        {
+                            return path;
+                        }
                     }
                 }
 
@@ -718,12 +758,14 @@ namespace Namotion.Reflection
                     return path;
                 }
 
-                path = DynamicApis.PathCombine(currentDirectory, "bin\\" + assembly.GetName().Name + ".xml");
+                path = DynamicApis.PathCombine(currentDirectory, "bin/" + assembly.GetName().Name + ".xml");
                 if (DynamicApis.FileExists(path))
                 {
                     return path;
                 }
 
+                // won't be found the next time either
+                Cache[assemblyFullName] = null;
                 return null;
             }
             catch

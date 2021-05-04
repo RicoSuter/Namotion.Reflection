@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -553,6 +554,56 @@ namespace Namotion.Reflection.Tests
 
             //// Assert
             Assert.False(string.IsNullOrWhiteSpace(summary));
+        }
+
+        [Fact]
+        public void When_xml_doc_is_in_working_dir_then_it_is_found()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+            _ = Directory.CreateDirectory("./wd");
+            File.WriteAllText("./wd/System.Drawing.Primitives.xml", @"<?xml version=""1.0""?>
+                <doc>
+                    <assembly><name>System.Drawing.Primitives</name></assembly>
+                    <members>
+                        <member name=""T:System.Drawing.Point"">
+                            <summary>A point.</summary>
+                        </member>
+                    </members>
+                </doc>");
+            Directory.SetCurrentDirectory("./wd");
+
+            //// Act
+            var summary = typeof(Point).GetXmlDocsSummary();
+            
+            //// Clean up
+            Directory.SetCurrentDirectory("..");
+            Directory.Delete("./wd", recursive: true);
+
+            //// Assert
+            Assert.Equal("A point.", summary);
+        }
+
+        /// <summary>
+        /// Returns a list of items.
+        /// </summary>
+        /// <param name="PageNumber">The page number.</param>
+        /// <param name="PageSize">The page size.</param>
+        public record ListItems(int PageNumber, int PageSize);
+
+        [Fact]
+        public void When_record_has_param_properties_then_xml_docs_is_read()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            var listItemsSummary = typeof(ListItems).GetXmlDocsSummary();
+            var pageNumberSummary = typeof(ListItems).GetRuntimeProperty("PageNumber").GetXmlDocsSummary();
+
+            //// Assert
+            Assert.Equal("Returns a list of items.", listItemsSummary);
+            Assert.Equal("The page number.", pageNumberSummary);
         }
 
         [Fact]

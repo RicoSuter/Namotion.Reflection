@@ -48,13 +48,13 @@ namespace Namotion.Reflection
         }
 
         /// <summary>
-        /// Gets an array of <see cref="ContextualParameterInfo"/> for the given <see cref="MethodInfo"/> instance.
+        /// Gets an array of <see cref="ContextualParameterInfo"/> for the given <see cref="MethodBase"/> instance.
         /// </summary>
         /// <param name="method">The method.</param>
         /// <returns>The runtime properties.</returns>
-        public static ContextualParameterInfo[] GetContextualParameters(this MethodInfo method)
+        public static ContextualParameterInfo[] GetContextualParameters(this MethodBase method)
         {
-            var key = "Parameters:" + method.Name + ":" + method.DeclaringType.FullName;
+            var key = "Parameters:" + method.Name + ":" + method.DeclaringType.FullName + ":" + EnumeratedParameters(method.GetParameters());
 
             if (!Cache.ContainsKey(key))
             {
@@ -70,6 +70,11 @@ namespace Namotion.Reflection
             }
 
             return (ContextualParameterInfo[])Cache[key];
+        }
+
+        private static string EnumeratedParameters(ParameterInfo[] parameters)
+        {
+            return string.Join("-", parameters.Select(p => p.ParameterType.FullName));
         }
 
         /// <summary>
@@ -134,7 +139,7 @@ namespace Namotion.Reflection
         /// <returns>The <see cref="ContextualParameterInfo"/>.</returns>
         public static ContextualParameterInfo ToContextualParameter(this ParameterInfo parameterInfo)
         {
-            var key = "Parameter:" + parameterInfo.Name + ":" + parameterInfo.Member.Name + ":" + parameterInfo.Member.DeclaringType.FullName;
+            var key = "Parameter:" + parameterInfo.Name + ":" + parameterInfo.ParameterType.FullName + ":" + parameterInfo.Member.Name + ":" + parameterInfo.Member.DeclaringType.FullName;
             if (!Cache.ContainsKey(key))
             {
                 lock (Lock)
@@ -166,7 +171,7 @@ namespace Namotion.Reflection
                     if (!Cache.ContainsKey(key))
                     {
                         var index = 0;
-                        Cache[key] = new ContextualPropertyInfo(propertyInfo, ref index);
+                        Cache[key] = new ContextualPropertyInfo(propertyInfo, nullableFlagsIndex: ref index, nullableFlags: null);
                     }
 
                     return (ContextualPropertyInfo)Cache[key];
@@ -191,7 +196,7 @@ namespace Namotion.Reflection
                     if (!Cache.ContainsKey(key))
                     {
                         var index = 0;
-                        Cache[key] = new ContextualFieldInfo(fieldInfo, ref index);
+                        Cache[key] = new ContextualFieldInfo(fieldInfo, nullableFlagsIndex: ref index, nullableFlags: null);
                     }
                 }
             }
@@ -237,6 +242,10 @@ namespace Namotion.Reflection
         /// <returns>The <see cref="CachedType"/>.</returns>
         public static ContextualType ToContextualType(this Type type)
         {
+            if (type.FullName == null)
+            {
+                return ContextualType.ForType(type, new Attribute[0]);
+            }
             var key = "Type:Context:" + type.FullName;
             lock (Lock)
             {
@@ -256,6 +265,11 @@ namespace Namotion.Reflection
         /// <returns>The <see cref="CachedType"/>.</returns>
         public static CachedType ToCachedType(this Type type)
         {
+            if (type.FullName == null)
+            {
+                // Returns an uncached version of the type since we can't build a cache key
+                return new CachedType(type);
+            }
             var key = "Type:" + type.FullName;
             if (!Cache.ContainsKey(key))
             {

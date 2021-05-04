@@ -8,13 +8,13 @@ namespace Namotion.Reflection
     /// </summary>
     public class ContextualPropertyInfo : ContextualMemberInfo
     {
-        private string _name;
+        private string? _name;
         private bool? _isValueType;
         private bool? _canWrite;
         private bool? _canRead;
 
-        internal ContextualPropertyInfo(PropertyInfo propertyInfo, ref int nullableFlagsIndex)
-            : base(propertyInfo, propertyInfo.PropertyType, ref nullableFlagsIndex)
+        internal ContextualPropertyInfo(PropertyInfo propertyInfo, ref int nullableFlagsIndex, byte[]? nullableFlags)
+            : base(propertyInfo, propertyInfo.PropertyType, ref nullableFlagsIndex, nullableFlags)
         {
             PropertyInfo = propertyInfo;
         }
@@ -57,7 +57,7 @@ namespace Namotion.Reflection
 #if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
-        public override object GetValue(object obj)
+        public override object? GetValue(object? obj)
         {
             if (_propertyReader == null)
             {
@@ -73,7 +73,7 @@ namespace Namotion.Reflection
             return _propertyReader.GetValue(obj);
         }
 
-        private IPropertyReader _propertyReader;
+        private IPropertyReader? _propertyReader;
 
         /// <summary>
         /// Sets the value of the field supported by the given object.
@@ -83,13 +83,13 @@ namespace Namotion.Reflection
 #if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
-        public override void SetValue(object obj, object value)
+        public override void SetValue(object? obj, object? value)
         {
-            if (_propertyReader == null)
+            if (_propertyWriter == null)
             {
                 lock (this)
                 {
-                    if (_propertyReader == null)
+                    if (_propertyWriter == null)
                     {
                         _propertyWriter = PropertyWriter.Create(PropertyInfo.DeclaringType, OriginalType, PropertyInfo);
                     }
@@ -99,6 +99,6 @@ namespace Namotion.Reflection
             _propertyWriter.SetValue(obj, value);
         }
 
-        private IPropertyWriter _propertyWriter;
+        private IPropertyWriter? _propertyWriter;
     }
 }

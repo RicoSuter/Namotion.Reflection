@@ -7,7 +7,6 @@
 //-----------------------------------------------------------------------
 
 using System;
-using System.Collections;
 using System.Linq;
 using System.Reflection;
 
@@ -74,30 +73,38 @@ namespace Namotion.Reflection
         }
 
         /// <summary>Gets the type of the array item.</summary>
-        public static Type GetEnumerableItemType(this Type type)
+        public static Type? GetEnumerableItemType(this Type type)
         {
-            var genericTypeArguments = type.GetGenericTypeArgumentsOfTypeOrBaseTypes();
-
-            var itemType = genericTypeArguments.Length == 0 ? type.GetElementType() : genericTypeArguments[0];
-            if (itemType == null)
+            var elementType = type.GetElementType();
+            if (elementType != null)
             {
-#if !NET40
-                foreach (var iface in type.GetTypeInfo().ImplementedInterfaces)
+                return elementType;
+            }
+
+#if NETSTANDARD1_0
+            var getEnumeratorMethod = type.GetRuntimeMethod("GetEnumerator", new Type[0]) ?? type.GetTypeInfo().ImplementedInterfaces
+                .Select(i => i.GetTypeInfo().GetDeclaredMethod("GetEnumerator")).FirstOrDefault(m => m != null);
 #else
-                foreach (var iface in type.GetTypeInfo().GetInterfaces())
+            var getEnumeratorMethod = type.GetRuntimeMethod("GetEnumerator", new Type[0]) ?? type.GetTypeInfo().GetInterfaces()
+                .Select(i => i.GetTypeInfo().GetDeclaredMethod("GetEnumerator")).FirstOrDefault(m => m != null);
 #endif
+
+            if (getEnumeratorMethod != null)
+            {
+                var genericTypeArguments = type.GetGenericTypeArgumentsOfTypeOrBaseTypes();
+                if (genericTypeArguments?.Length == 1)
                 {
-                    if (typeof(IEnumerable).GetTypeInfo()
-                        .IsAssignableFrom(iface.GetTypeInfo()))
-                    {
-                        itemType = iface.GetEnumerableItemType();
-                        if (itemType != null)
-                            return itemType;
-                    }
+                    return genericTypeArguments[0];
+                }
+
+                var returnParam = getEnumeratorMethod.ReturnParameter?.ToContextualParameter();
+                if (returnParam?.GenericArguments.Length == 1)
+                {
+                    return returnParam.GenericArguments[0];
                 }
             }
 
-            return itemType;
+            return null;
         }
 
         /// <summary>Gets the generic type arguments of a type or its base type.</summary>

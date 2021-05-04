@@ -9,11 +9,11 @@ namespace Namotion.Reflection
     /// </summary>
     public class ContextualParameterInfo : ContextualType
     {
-        private string _name;
+        private string? _name;
 
         internal ContextualParameterInfo(ParameterInfo parameterInfo, ref int nullableFlagsIndex)
             : base(parameterInfo.ParameterType, GetContextualAttributes(parameterInfo),
-                null, null, ref nullableFlagsIndex,
+                null, ref nullableFlagsIndex, null,
                 parameterInfo.Member.DeclaringType.IsNested ?
                     new dynamic[] { parameterInfo.Member, parameterInfo.Member.DeclaringType, parameterInfo.Member.DeclaringType.DeclaringType, parameterInfo.Member.DeclaringType.GetTypeInfo().Assembly } :
                     new dynamic[] { parameterInfo.Member, parameterInfo.Member.DeclaringType, parameterInfo.Member.DeclaringType.GetTypeInfo().Assembly })

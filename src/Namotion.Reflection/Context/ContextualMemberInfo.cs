@@ -9,10 +9,10 @@ namespace Namotion.Reflection
     /// </summary>
     public abstract class ContextualMemberInfo : ContextualType
     {
-        internal ContextualMemberInfo(MemberInfo memberInfo, Type memberType, ref int nullableFlagsIndex)
+        internal ContextualMemberInfo(MemberInfo memberInfo, Type memberType, ref int nullableFlagsIndex, byte[]? nullableFlags)
             : base(memberType,
                 memberInfo.GetCustomAttributes(true).OfType<Attribute>().ToArray(),
-                null, null, ref nullableFlagsIndex,
+                null, ref nullableFlagsIndex, nullableFlags,
                 memberInfo.DeclaringType.IsNested ?
                     new dynamic[] { memberInfo.DeclaringType, memberInfo.DeclaringType.DeclaringType, memberInfo.DeclaringType.GetTypeInfo().Assembly } :
                     new dynamic[] { memberInfo.DeclaringType, memberInfo.DeclaringType.GetTypeInfo().Assembly })
@@ -34,14 +34,14 @@ namespace Namotion.Reflection
         /// </summary>
         /// <param name="obj">The object.</param>
         /// <returns>The value.</returns>
-        public abstract object GetValue(object obj);
+        public abstract object? GetValue(object? obj);
 
         /// <summary>
         /// Sets the value of the field supported by the given object.
         /// </summary>
         /// <param name="obj">The object.</param>
         /// <param name="value">The value.</param>
-        public abstract void SetValue(object obj, object value);
+        public abstract void SetValue(object? obj, object? value);
 
         /// <inheritdocs />
         public override string ToString()

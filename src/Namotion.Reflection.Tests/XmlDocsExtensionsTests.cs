@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using NJsonSchema;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -581,6 +583,54 @@ namespace Namotion.Reflection.Tests
 
             //// Assert
             Assert.Equal("A point.", summary);
+        }
+
+        /// <summary>
+        /// Returns a list of items.
+        /// </summary>
+        /// <param name="PageNumber">The page number.</param>
+        /// <param name="PageSize">The page size.</param>
+        public record ListItems(int PageNumber, int PageSize);
+
+        [Fact]
+        public void When_record_has_param_properties_then_xml_docs_is_read()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            var listItemsSummary = typeof(ListItems).GetXmlDocsSummary();
+            var pageNumberSummary = typeof(ListItems).GetRuntimeProperty("PageNumber").GetXmlDocsSummary();
+
+            //// Assert
+            Assert.Equal("Returns a list of items.", listItemsSummary);
+            Assert.Equal("The page number.", pageNumberSummary);
+        }
+
+        [Fact]
+        public void When_type_is_in_NuGet_then_xml_docs_should_be_found()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            var summary = typeof(JsonSchema).GetXmlDocsSummary();
+
+            //// Assert
+            Assert.False(string.IsNullOrWhiteSpace(summary));
+        }
+
+        [Fact]
+        public void When_type_is_in_AspNetCore_then_docs_should_be_found()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            var summary = typeof(ProblemDetails).GetXmlDocsSummary();
+
+            //// Assert
+            Assert.False(string.IsNullOrWhiteSpace(summary));
         }
     }
 }

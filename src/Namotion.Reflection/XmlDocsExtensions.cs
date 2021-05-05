@@ -251,8 +251,12 @@ namespace Namotion.Reflection
 
                 var documentationPath = GetXmlDocsPath(member.Module.Assembly);
                 var parentElement = GetXmlDocsWithoutLock(member.DeclaringType.GetTypeInfo(), documentationPath);
-                var paramElement = parentElement?.Elements("param").First(x => x.Attribute("name")?.Value == member.Name);
-                return ToXmlDocsContent(paramElement);
+                var paramElement = parentElement?
+                    .Elements("param")?
+                    .FirstOrDefault(x => x.Attribute("name")?
+                    .Value == member.Name);
+
+                return paramElement != null ? ToXmlDocsContent(paramElement) : string.Empty;
             }
         }
 

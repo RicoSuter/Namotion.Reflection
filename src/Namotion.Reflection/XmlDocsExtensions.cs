@@ -478,7 +478,6 @@ namespace Namotion.Reflection
 
         internal static XElement? GetXmlDocsElement(this XDocument xml, string name)
         {
-            var result = (IEnumerable)DynamicApis.XPathEvaluate(xml, $"/doc/members/member[@name='{name}']");
             return CachingXDocument.GetXmlDocsElement(xml, name);
         }
 
@@ -792,25 +791,29 @@ namespace Namotion.Reflection
             var configs = DynamicApis.DirectoryGetAllFiles(assemblyDirectory, "*.runtimeconfig.dev.json");
             if (configs.Any())
             {
-                // Retrieve NuGet package cache directories from *.runtimeconfig.dev.json
-                var json = DynamicApis.FileReadAllText(configs.First());
-                var matches = Regex.Matches(json, $"\"((.*?)((\\\\\\\\)|(////))(.*?))\"", RegexOptions.IgnoreCase);
-                if (matches.Count > 0)
+                try
                 {
-                    foreach (Match match in matches)
+                    // Retrieve NuGet package cache directories from *.runtimeconfig.dev.json
+                    var json = DynamicApis.FileReadAllText(configs.First());
+                    var matches = Regex.Matches(json, $"\"((.*?)((\\\\\\\\)|(////))(.*?))\"", RegexOptions.IgnoreCase);
+                    if (matches.Count > 0)
                     {
-                        var path = match.Groups[1].Value.Replace("\\\\", "\\").Replace("//", "/");
-                        if (DynamicApis.DirectoryExists(path))
+                        foreach (Match match in matches)
                         {
-                            var packagePath = DynamicApis.PathCombine(path, assemblyName.Name + "/" + assemblyName.Version.ToString(3));
-                            var files = DynamicApis.DirectoryGetAllFiles(packagePath, assemblyName.Name + ".xml");
-                            if (files.Any())
+                            var path = match.Groups[1].Value.Replace("\\\\", "\\").Replace("//", "/");
+                            if (DynamicApis.DirectoryExists(path))
                             {
-                                return files.Last();
+                                var packagePath = DynamicApis.PathCombine(path, assemblyName.Name + "/" + assemblyName.Version.ToString(3));
+                                var files = DynamicApis.DirectoryGetAllFiles(packagePath, assemblyName.Name + ".xml");
+                                if (files.Any())
+                                {
+                                    return files.Last();
+                                }
                             }
                         }
                     }
                 }
+                catch { }
             }
 
             // Retrieve NuGet packages from project.nuget.cache locations
@@ -831,18 +834,25 @@ namespace Namotion.Reflection
 
         private static string? GetXmlDocsPathFromNuGetCacheFile(string nuGetCacheFile, AssemblyName assemblyName)
         {
-            var json = DynamicApis.FileReadAllText(nuGetCacheFile);
-            var matches = Regex.Matches(json, $"\"((.*?){assemblyName.Name}((\\\\\\\\)|(////)){assemblyName.Version.ToString(3)})((\\\\\\\\)|(////))(.*?)\"", RegexOptions.IgnoreCase);
-            if (matches.Count > 0)
+            try
             {
-                var files = DynamicApis.DirectoryGetAllFiles(matches[0].Groups[1].Value.Replace("\\\\", "\\").Replace("//", "/"), assemblyName.Name + ".xml");
-                if (files.Any())
+                var json = DynamicApis.FileReadAllText(nuGetCacheFile);
+                var matches = Regex.Matches(json, $"\"((.*?){assemblyName.Name}((\\\\\\\\)|(////)){assemblyName.Version.ToString(3)})((\\\\\\\\)|(////))(.*?)\"", RegexOptions.IgnoreCase);
+                if (matches.Count > 0)
                 {
-                    return files.Last();
+                    var files = DynamicApis.DirectoryGetAllFiles(matches[0].Groups[1].Value.Replace("\\\\", "\\").Replace("//", "/"), assemblyName.Name + ".xml");
+                    if (files.Any())
+                    {
+                        return files.Last();
+                    }
                 }
-            }
 
-            return null;
+                return null;
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -10,15 +11,11 @@ namespace Namotion.Reflection
     /// </summary>
     public static class ContextualTypeExtensions
     {
-        private static readonly object Lock = new object();
-        private static readonly Dictionary<string, object> Cache = new Dictionary<string, object>();
+        private static readonly ConcurrentDictionary<string, object> Cache = new ConcurrentDictionary<string, object>();
 
         internal static void ClearCache()
         {
-            lock (Lock)
-            {
-                Cache.Clear();
-            }
+            Cache.Clear();
         }
 
         /// <summary>
@@ -34,15 +31,7 @@ namespace Namotion.Reflection
             }
 
             var key = "Type:Context:" + type.FullName;
-            lock (Lock)
-            {
-                if (!Cache.ContainsKey(key))
-                {
-                    Cache[key] = ContextualType.ForType(type, new Attribute[0]);
-                }
-
-                return (ContextualType)Cache[key];
-            }
+            return (ContextualType)Cache.GetOrAdd(key, k => ContextualType.ForType(type, new Attribute[0]));
         }
 
         /// <summary>
@@ -59,18 +48,7 @@ namespace Namotion.Reflection
             }
 
             var key = "Type:" + type.FullName;
-            if (!Cache.ContainsKey(key))
-            {
-                lock (Lock)
-                {
-                    if (!Cache.ContainsKey(key))
-                    {
-                        Cache[key] = new CachedType(type);
-                    }
-                }
-            }
-
-            return (CachedType)Cache[key];
+            return (CachedType)Cache.GetOrAdd(key, k => new CachedType(type));
         }
 
         /// <summary>
@@ -127,20 +105,9 @@ namespace Namotion.Reflection
         {
             // TODO: Remove usages of this method in code (might lose context)!!
             var key = "Parameters:" + method.Name + ":" + method.DeclaringType.FullName + ":" + EnumeratedParameters(method.GetParameters());
-            if (!Cache.ContainsKey(key))
-            {
-                lock (Lock)
-                {
-                    if (!Cache.ContainsKey(key))
-                    {
-                        Cache[key] = method.GetParameters()
-                            .Select(p => p.ToContextualParameter())
-                            .ToArray();
-                    }
-                }
-            }
-
-            return (ContextualParameterInfo[])Cache[key];
+            return (ContextualParameterInfo[])Cache.GetOrAdd(key, k => method.GetParameters()
+                .Select(p => p.ToContextualParameter())
+                .ToArray());
         }
 
         private static string EnumeratedParameters(ParameterInfo[] parameters)
@@ -158,20 +125,11 @@ namespace Namotion.Reflection
         {
             // TODO: Remove usages of this method in code (might lose context)!!
             var key = "Parameter:" + parameterInfo.Name + ":" + parameterInfo.ParameterType.FullName + ":" + parameterInfo.Member.Name + ":" + parameterInfo.Member.DeclaringType.FullName;
-            if (!Cache.ContainsKey(key))
+            return (ContextualParameterInfo)Cache.GetOrAdd(key, k =>
             {
-                lock (Lock)
-                {
-                    if (!Cache.ContainsKey(key))
-                    {
-                        var index = 0;
-                        Cache[key] = new ContextualParameterInfo(parameterInfo, ref index);
-                    }
-
-                }
-            }
-
-            return (ContextualParameterInfo)Cache[key];
+                var index = 0;
+                return new ContextualParameterInfo(parameterInfo, ref index);
+            });
         }
 
         /// <summary>
@@ -184,21 +142,11 @@ namespace Namotion.Reflection
         {
             // TODO: Remove usages of this method in code (might lose context)!!
             var key = "Property:" + propertyInfo.Name + ":" + propertyInfo.DeclaringType.FullName;
-            if (!Cache.ContainsKey(key))
+            return (ContextualPropertyInfo)Cache.GetOrAdd(key, k =>
             {
-                lock (Lock)
-                {
-                    if (!Cache.ContainsKey(key))
-                    {
-                        var index = 0;
-                        Cache[key] = new ContextualPropertyInfo(propertyInfo, nullableFlagsIndex: ref index, nullableFlags: null);
-                    }
-
-                    return (ContextualPropertyInfo)Cache[key];
-                }
-            }
-
-            return (ContextualPropertyInfo)Cache[key];
+                var index = 0;
+                return new ContextualPropertyInfo(propertyInfo, nullableFlagsIndex: ref index, nullableFlags: null);
+            });
         }
 
         /// <summary>
@@ -211,19 +159,11 @@ namespace Namotion.Reflection
         {
             // TODO: Remove usages of this method in code (might lose context)!!
             var key = "Field:" + fieldInfo.Name + ":" + fieldInfo.DeclaringType.FullName;
-            if (!Cache.ContainsKey(key))
+            return (ContextualFieldInfo)Cache.GetOrAdd(key, k =>
             {
-                lock (Lock)
-                {
-                    if (!Cache.ContainsKey(key))
-                    {
-                        var index = 0;
-                        Cache[key] = new ContextualFieldInfo(fieldInfo, nullableFlagsIndex: ref index, nullableFlags: null);
-                    }
-                }
-            }
-
-            return (ContextualFieldInfo)Cache[key];
+                var index = 0;
+                return new ContextualFieldInfo(fieldInfo, nullableFlagsIndex: ref index, nullableFlags: null);
+            });
         }
 
         /// <summary>

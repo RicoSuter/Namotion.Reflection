@@ -18,7 +18,7 @@ namespace Namotion.Reflection
     internal class PropertyWriter<TObject, TValue> : IPropertyWriter
     {
         private readonly PropertyInfo _propertyInfo;
-#if !NET40 && !NETSTANDARD1_0
+#if !NET40 && !NETSTANDARD1_1
         private Action<TObject?, TValue?>? _setter;
 #endif
 
@@ -26,7 +26,7 @@ namespace Namotion.Reflection
         {
             _propertyInfo = propertyInfo;
 
-#if !NET40 && !NETSTANDARD1_0
+#if !NET40 && !NETSTANDARD1_1
             var method = propertyInfo.SetMethod;
             _setter = method != null ? (Action<TObject?, TValue?>)Delegate.CreateDelegate(typeof(Action<TObject?, TValue?>), null, method) : null;
 #endif
@@ -37,7 +37,7 @@ namespace Namotion.Reflection
 #endif
         public void SetValue(TObject? obj, TValue? value)
         {
-#if !NET40 && !NETSTANDARD1_0
+#if !NET40 && !NETSTANDARD1_1
             if (_setter != null)
             {
                 _setter(obj, value);

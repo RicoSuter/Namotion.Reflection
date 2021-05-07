@@ -141,7 +141,7 @@ namespace Namotion.Reflection
                     return elementType;
                 }
 
-#if NETSTANDARD1_0
+#if NETSTANDARD1_1
                 var getEnumeratorMethod = Type.GetRuntimeMethod("GetEnumerator", new Type[0]) ?? Type.GetTypeInfo().ImplementedInterfaces
                     .Select(i => i.GetTypeInfo().GetDeclaredMethod("GetEnumerator")).FirstOrDefault(m => m != null);
 #else

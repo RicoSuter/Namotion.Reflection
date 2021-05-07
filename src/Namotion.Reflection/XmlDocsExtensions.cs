@@ -689,7 +689,6 @@ namespace Namotion.Reflection
 
         private static string? GetXmlDocsPath(dynamic? assembly)
         {
-            string? path;
             try
             {
                 if (assembly == null)
@@ -709,76 +708,89 @@ namespace Namotion.Reflection
                     return null;
                 }
 
-                if (!string.IsNullOrEmpty(assembly.Location))
+                try
                 {
-                    var assemblyDirectory = DynamicApis.PathGetDirectoryName((string)assembly.Location);
-                    path = DynamicApis.PathCombine(assemblyDirectory, assemblyName.Name + ".xml");
+                    string? path;
+                    if (!string.IsNullOrEmpty(assembly.Location))
+                    {
+                        var assemblyDirectory = DynamicApis.PathGetDirectoryName((string)assembly.Location);
+                        path = DynamicApis.PathCombine(assemblyDirectory, assemblyName.Name + ".xml");
+                        if (DynamicApis.FileExists(path))
+                        {
+                            return path;
+                        }
+                    }
+
+                    if (ObjectExtensions.HasProperty(assembly, "CodeBase"))
+                    {
+                        var codeBase = (string)assembly.CodeBase;
+                        if (!string.IsNullOrEmpty(codeBase))
+                        {
+                            path = DynamicApis.PathCombine(DynamicApis.PathGetDirectoryName(codeBase
+                                .Replace("file:///", string.Empty)), assemblyName.Name + ".xml")
+                                .Replace("file:\\", string.Empty);
+
+                            if (DynamicApis.FileExists(path))
+                            {
+                                return path;
+                            }
+                        }
+                    }
+
+                    var currentDomain = Type.GetType("System.AppDomain")?.GetRuntimeProperty("CurrentDomain")?.GetValue(null);
+                    if (currentDomain?.HasProperty("BaseDirectory") == true)
+                    {
+                        var baseDirectory = currentDomain.TryGetPropertyValue("BaseDirectory", "");
+                        if (!string.IsNullOrEmpty(baseDirectory))
+                        {
+                            path = DynamicApis.PathCombine(baseDirectory, assemblyName.Name + ".xml");
+                            if (DynamicApis.FileExists(path))
+                            {
+                                return path;
+                            }
+
+                            path = DynamicApis.PathCombine(baseDirectory, "bin/" + assemblyName.Name + ".xml");
+                            if (DynamicApis.FileExists(path))
+                            {
+                                return path;
+                            }
+                        }
+                    }
+
+                    var currentDirectory = DynamicApis.DirectoryGetCurrentDirectory();
+                    path = DynamicApis.PathCombine(currentDirectory, assembly.GetName().Name + ".xml");
                     if (DynamicApis.FileExists(path))
                     {
                         return path;
                     }
-                    else
+
+                    path = DynamicApis.PathCombine(currentDirectory, "bin/" + assembly.GetName().Name + ".xml");
+                    if (DynamicApis.FileExists(path))
                     {
-                        path = GetXmlDocsPathFromNuGetCache(assemblyDirectory, assemblyName);
+                        return path;
+                    }
+
+                    dynamic? executingAssembly = typeof(Assembly)
+                        .GetRuntimeMethod("GetExecutingAssembly", new Type[0])?
+                        .Invoke(null, new object[0]);
+                    if (!string.IsNullOrEmpty(executingAssembly?.Location))
+                    {
+                        var assemblyDirectory = DynamicApis.PathGetDirectoryName((string)executingAssembly!.Location);
+                        path = GetXmlDocsPathFromNuGetCacheOrDotNetSdk(assemblyDirectory, assemblyName);
                         if (path != null && DynamicApis.FileExists(path))
                         {
                             return path;
                         }
                     }
-                }
 
-                if (ObjectExtensions.HasProperty(assembly, "CodeBase"))
+                    Cache[assemblyFullName] = null;
+                    return null;
+                }
+                catch
                 {
-                    var codeBase = (string)assembly.CodeBase;
-                    if (!string.IsNullOrEmpty(codeBase))
-                    {
-                        path = DynamicApis.PathCombine(DynamicApis.PathGetDirectoryName(codeBase
-                            .Replace("file:///", string.Empty)), assemblyName.Name + ".xml")
-                            .Replace("file:\\", string.Empty);
-
-                        if (DynamicApis.FileExists(path))
-                        {
-                            return path;
-                        }
-                    }
+                    Cache[assemblyFullName] = null;
+                    return null;
                 }
-
-                var currentDomain = Type.GetType("System.AppDomain")?.GetRuntimeProperty("CurrentDomain")?.GetValue(null);
-                if (currentDomain?.HasProperty("BaseDirectory") == true)
-                {
-                    var baseDirectory = currentDomain.TryGetPropertyValue("BaseDirectory", "");
-                    if (!string.IsNullOrEmpty(baseDirectory))
-                    {
-                        path = DynamicApis.PathCombine(baseDirectory, assemblyName.Name + ".xml");
-                        if (DynamicApis.FileExists(path))
-                        {
-                            return path;
-                        }
-
-                        path = DynamicApis.PathCombine(baseDirectory, "bin/" + assemblyName.Name + ".xml");
-                        if (DynamicApis.FileExists(path))
-                        {
-                            return path;
-                        }
-                    }
-                }
-
-                var currentDirectory = DynamicApis.DirectoryGetCurrentDirectory();
-                path = DynamicApis.PathCombine(currentDirectory, assembly.GetName().Name + ".xml");
-                if (DynamicApis.FileExists(path))
-                {
-                    return path;
-                }
-
-                path = DynamicApis.PathCombine(currentDirectory, "bin/" + assembly.GetName().Name + ".xml");
-                if (DynamicApis.FileExists(path))
-                {
-                    return path;
-                }
-
-                // won't be found the next time either
-                Cache[assemblyFullName] = null;
-                return null;
             }
             catch
             {
@@ -786,7 +798,7 @@ namespace Namotion.Reflection
             }
         }
 
-        private static string? GetXmlDocsPathFromNuGetCache(string assemblyDirectory, AssemblyName assemblyName)
+        private static string? GetXmlDocsPathFromNuGetCacheOrDotNetSdk(string assemblyDirectory, AssemblyName assemblyName)
         {
             var configs = DynamicApis.DirectoryGetAllFiles(assemblyDirectory, "*.runtimeconfig.dev.json");
             if (configs.Any())
@@ -800,20 +812,71 @@ namespace Namotion.Reflection
                     {
                         foreach (Match match in matches)
                         {
-                            var path = match.Groups[1].Value.Replace("\\\\", "\\").Replace("//", "/");
+                            var path = match.Groups[1].Value
+                                .Replace("\\\\", "/")
+                                .Replace("//", "/")
+                                .Replace("\\|arch|", "")
+                                .Replace("\\|tfm|", "")
+                                .Replace("/|arch|", "")
+                                .Replace("/|tfm|", "");
+
+                            // From NuGet cache
                             if (DynamicApis.DirectoryExists(path))
                             {
-                                var packagePath = DynamicApis.PathCombine(path, assemblyName.Name + "/" + assemblyName.Version.ToString(3));
-                                var files = DynamicApis.DirectoryGetAllFiles(packagePath, assemblyName.Name + ".xml");
-                                if (files.Any())
+                                try
                                 {
-                                    return files.Last();
+                                    var packagePath = DynamicApis.PathCombine(path, assemblyName.Name + "/" + assemblyName.Version.ToString(3));
+                                    if (DynamicApis.DirectoryExists(packagePath))
+                                    {
+                                        var files = DynamicApis.DirectoryGetAllFiles(packagePath, assemblyName.Name + ".xml")
+                                            .OrderBy(f => f)
+                                            .ToArray();
+
+                                        if (files.Any())
+                                        {
+                                            return files.Last();
+                                        }
+                                    }
+                                }
+                                catch
+                                {
+                                }
+                            }
+
+                            // From .NET SDK, e.g. C:\Program Files\dotnet\packs\Microsoft.AspNetCore.App.Ref\3.1.3\ref\netcoreapp3.1
+                            if (path.Contains("/dotnet/sdk"))
+                            {
+                                while ((path = DynamicApis.PathGetDirectoryName(path).Replace('\\', '/')) != null)
+                                {
+                                    if (path.EndsWith("/dotnet"))
+                                    {
+                                        try
+                                        {
+                                            path = DynamicApis.PathCombine(path, "packs");
+                                            var files = DynamicApis.DirectoryGetAllFiles(path, assemblyName.Name + ".xml")
+                                               .OrderBy(f => f)
+                                               .Where(f => f.Replace('\\', '/').Contains("/" + assemblyName.Version.ToString(2)))
+                                               .ToArray();
+
+                                            if (files.Any())
+                                            {
+                                                return files.Last();
+                                            }
+                                        }
+                                        catch
+                                        {
+                                        }
+
+                                        break;
+                                    }
                                 }
                             }
                         }
                     }
                 }
-                catch { }
+                catch
+                {
+                }
             }
 
             // Retrieve NuGet packages from project.nuget.cache locations

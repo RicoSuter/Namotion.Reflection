@@ -130,20 +130,6 @@ namespace Namotion.Reflection.Tests
             Assert.Equal("This are some tags.", summary);
         }
 
-        [Fact]
-        public void When_xml_doc_is_missing_then_summary_is_missing()
-        {
-            //// Arrange
-            XmlDocs.ClearCache();
-
-            //// Act
-            var summary = typeof(Point).GetXmlDocsSummary();
-            var summary2 = typeof(Point).GetXmlDocsSummary();
-
-            //// Assert
-            Assert.Empty(summary);
-        }
-
         public abstract class BaseBaseClass
         {
             /// <summary>Foo.</summary>
@@ -562,6 +548,7 @@ namespace Namotion.Reflection.Tests
         {
             //// Arrange
             XmlDocs.ClearCache();
+
             _ = Directory.CreateDirectory("./wd");
             File.WriteAllText("./wd/System.Drawing.Primitives.xml", @"<?xml version=""1.0""?>
                 <doc>

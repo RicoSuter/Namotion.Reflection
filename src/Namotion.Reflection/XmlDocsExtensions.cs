@@ -16,6 +16,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using System.Runtime.CompilerServices;
+using System.IO;
 
 [assembly: InternalsVisibleTo("Namotion.Reflection.Cecil, PublicKey=0024000004800000940000000602000000240000525341310004000001000100337d8a0b73ac39048dc55d8e48dd86dcebd0af16aa514c73fbf5f283a8e94d7075b4152e5621e18d234bf7a5aafcb6683091f79d87b80c3be3e806f688e6f940adf92b28cedf1f8f69aa443699c235fa049204b56b83d94f599dd9800171f28e45ab74351acab17d889cd65961354d2f6405bddb9e896956e69e60033c2574f1")]
 
@@ -37,7 +38,7 @@ namespace Namotion.Reflection
     public static class XmlDocsExtensions
     {
         private static readonly object Lock = new object();
-        private static readonly Dictionary<string, XDocument?> Cache = new Dictionary<string, XDocument?>(StringComparer.OrdinalIgnoreCase);
+        private static readonly Dictionary<string, CachingXDocument?> Cache = new Dictionary<string, CachingXDocument?>(StringComparer.OrdinalIgnoreCase);
 
         internal static void ClearCache()
         {
@@ -147,7 +148,14 @@ namespace Namotion.Reflection
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static string GetXmlDocsSummary(this MemberInfo member)
         {
-            return GetXmlDocsTag(member, "summary");
+            var docs = GetXmlDocsTag(member, "summary");
+
+            if (string.IsNullOrEmpty(docs) && member is PropertyInfo propertyInfo)
+            {
+                return propertyInfo.GetXmlDocsRecordPropertySummary();
+            }
+
+            return docs;
         }
 
         /// <summary>Returns the contents of the "remarks" XML documentation tag for the specified member.</summary>
@@ -166,7 +174,7 @@ namespace Namotion.Reflection
         {
             lock (Lock)
             {
-                return ((MemberInfo)type.GetTypeInfo()).GetXmlDocsWithoutLock(pathToXmlFile);
+                return type.GetTypeInfo().GetXmlDocsWithoutLock(pathToXmlFile);
             }
         }
 
@@ -221,6 +229,37 @@ namespace Namotion.Reflection
             }
         }
 
+        /// <summary>Returns the property summary of a Record type which is read from the param tag on the type.</summary>
+        /// <param name="member">The reflected member.</param>
+        /// <returns>The contents of the "param" tag of the Record property.</returns>
+        public static string GetXmlDocsRecordPropertySummary(this PropertyInfo member)
+        {
+            if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false || DynamicApis.SupportsPathApis == false)
+            {
+                return string.Empty;
+            }
+
+            _ = member ?? throw new ArgumentNullException(nameof(member));
+
+            var assemblyName = member.Module.Assembly.GetName();
+            lock (Lock)
+            {
+                if (IsAssemblyIgnored(assemblyName))
+                {
+                    return string.Empty;
+                }
+
+                var documentationPath = GetXmlDocsPath(member.Module.Assembly);
+                var parentElement = GetXmlDocsWithoutLock(member.DeclaringType.GetTypeInfo(), documentationPath);
+                var paramElement = parentElement?
+                    .Elements("param")?
+                    .FirstOrDefault(x => x.Attribute("name")?
+                    .Value == member.Name);
+
+                return paramElement != null ? ToXmlDocsContent(paramElement) : string.Empty;
+            }
+        }
+
         /// <summary>Returns the contents of the "returns" or "param" XML documentation tag for the specified parameter.</summary>
         /// <param name="parameter">The reflected parameter or return info.</param>
         /// <returns>The contents of the "returns" or "param" tag.</returns>
@@ -258,7 +297,6 @@ namespace Namotion.Reflection
                     return null;
                 }
 
-                var assemblyName = parameter.Member.Module.Assembly.GetName();
                 lock (Lock)
                 {
                     return GetXmlDocumentationWithoutLock(parameter, pathToXmlFile);
@@ -403,65 +441,62 @@ namespace Namotion.Reflection
             }
         }
 
-        private static XDocument? TryGetXmlDocsDocument(AssemblyName assemblyName, string? pathToXmlFile)
+        private static CachingXDocument? TryGetXmlDocsDocument(AssemblyName assemblyName, string? pathToXmlFile)
         {
-            if (!Cache.ContainsKey(assemblyName.FullName))
+            if (Cache.TryGetValue(assemblyName.FullName, out var document))
             {
-                if (pathToXmlFile is null)
-                {
-                    return null;
-                }
-                if (DynamicApis.FileExists(pathToXmlFile) == false)
-                {
-                    Cache[assemblyName.FullName] = null;
-                    return null;
-                }
-
-                Cache[assemblyName.FullName] = XDocument.Load(pathToXmlFile, LoadOptions.PreserveWhitespace);
+                return document;
             }
 
-            return Cache[assemblyName.FullName];
+            if (pathToXmlFile is null)
+            {
+                return null;
+            }
+
+            if (DynamicApis.FileExists(pathToXmlFile) == false)
+            {
+                Cache[assemblyName.FullName] = null;
+                return null;
+            }
+
+            document = new CachingXDocument(pathToXmlFile);
+            Cache[assemblyName.FullName] = document;
+
+            return document;
         }
 
         private static bool IsAssemblyIgnored(AssemblyName assemblyName)
         {
-            if (Cache.ContainsKey(assemblyName.FullName) && Cache[assemblyName.FullName] == null)
-            {
-                return true;
-            }
-
-            return false;
+            return Cache.TryGetValue(assemblyName.FullName, out var document) && document == null;
         }
 
-        private static XElement? GetXmlDocsElement(this MemberInfo member, XDocument xml)
+        private static XElement? GetXmlDocsElement(this MemberInfo member, CachingXDocument xml)
         {
             var name = GetMemberElementName(member);
-            return GetXmlDocsElement(xml, name);
+            return xml.GetXmlDocsElement(name);
         }
 
         internal static XElement? GetXmlDocsElement(this XDocument xml, string name)
         {
-            var result = (IEnumerable)DynamicApis.XPathEvaluate(xml, $"/doc/members/member[@name='{name}']");
-            return result.OfType<XElement>().FirstOrDefault();
+            return CachingXDocument.GetXmlDocsElement(xml, name);
         }
 
-        private static XElement? GetXmlDocsElement(this ParameterInfo parameter, XDocument xml)
+        private static XElement? GetXmlDocsElement(this ParameterInfo parameter, CachingXDocument xml)
         {
             var name = GetMemberElementName(parameter.Member);
-            var result = (IEnumerable)DynamicApis.XPathEvaluate(xml, $"/doc/members/member[@name='{name}']");
-
-            var element = result.OfType<XElement>().FirstOrDefault();
+            var element = xml.GetXmlDocsElement(name);
             if (element != null)
             {
                 ReplaceInheritdocElements(parameter.Member, element);
 
+                IEnumerable result;
                 if (parameter.IsRetval || string.IsNullOrEmpty(parameter.Name))
                 {
-                    result = (IEnumerable)DynamicApis.XPathEvaluate(xml, $"/doc/members/member[@name='{name}']/returns");
+                    result = element.Elements("returns");
                 }
                 else
                 {
-                    result = (IEnumerable)DynamicApis.XPathEvaluate(xml, $"/doc/members/member[@name='{name}']/param[@name='{parameter.Name}']");
+                    result = element.Elements("param").Where(x => x.Attribute("name")?.Value == parameter.Name);
                 }
 
                 return result.OfType<XElement>().FirstOrDefault();
@@ -654,7 +689,6 @@ namespace Namotion.Reflection
 
         private static string? GetXmlDocsPath(dynamic? assembly)
         {
-            string path;
             try
             {
                 if (assembly == null)
@@ -662,74 +696,218 @@ namespace Namotion.Reflection
                     return null;
                 }
 
-                var assemblyName = assembly.GetName();
+                AssemblyName assemblyName = assembly.GetName();
                 if (string.IsNullOrEmpty(assemblyName.Name))
                 {
                     return null;
                 }
 
-                if (Cache.ContainsKey(assemblyName.FullName))
+                var assemblyFullName = assemblyName.FullName;
+                if (Cache.ContainsKey(assemblyFullName))
                 {
                     return null;
                 }
 
-                if (!string.IsNullOrEmpty(assembly.Location))
+                try
                 {
-                    var assemblyDirectory = DynamicApis.PathGetDirectoryName((string)assembly.Location);
-                    path = DynamicApis.PathCombine(assemblyDirectory, (string)assemblyName.Name + ".xml");
+                    string? path;
+                    if (!string.IsNullOrEmpty(assembly.Location))
+                    {
+                        var assemblyDirectory = DynamicApis.PathGetDirectoryName((string)assembly.Location);
+                        path = DynamicApis.PathCombine(assemblyDirectory, assemblyName.Name + ".xml");
+                        if (DynamicApis.FileExists(path))
+                        {
+                            return path;
+                        }
+                    }
+
+                    if (ObjectExtensions.HasProperty(assembly, "CodeBase"))
+                    {
+                        var codeBase = (string)assembly.CodeBase;
+                        if (!string.IsNullOrEmpty(codeBase))
+                        {
+                            path = DynamicApis.PathCombine(DynamicApis.PathGetDirectoryName(codeBase
+                                .Replace("file:///", string.Empty)), assemblyName.Name + ".xml")
+                                .Replace("file:\\", string.Empty);
+
+                            if (DynamicApis.FileExists(path))
+                            {
+                                return path;
+                            }
+                        }
+                    }
+
+                    var currentDomain = Type.GetType("System.AppDomain")?.GetRuntimeProperty("CurrentDomain")?.GetValue(null);
+                    if (currentDomain?.HasProperty("BaseDirectory") == true)
+                    {
+                        var baseDirectory = currentDomain.TryGetPropertyValue("BaseDirectory", "");
+                        if (!string.IsNullOrEmpty(baseDirectory))
+                        {
+                            path = DynamicApis.PathCombine(baseDirectory, assemblyName.Name + ".xml");
+                            if (DynamicApis.FileExists(path))
+                            {
+                                return path;
+                            }
+
+                            path = DynamicApis.PathCombine(baseDirectory, "bin/" + assemblyName.Name + ".xml");
+                            if (DynamicApis.FileExists(path))
+                            {
+                                return path;
+                            }
+                        }
+                    }
+
+                    var currentDirectory = DynamicApis.DirectoryGetCurrentDirectory();
+                    path = DynamicApis.PathCombine(currentDirectory, assembly.GetName().Name + ".xml");
                     if (DynamicApis.FileExists(path))
                     {
                         return path;
                     }
-                }
 
-                if (ObjectExtensions.HasProperty(assembly, "CodeBase"))
-                {
-                    var codeBase = (string)assembly.CodeBase;
-                    if (!string.IsNullOrEmpty(codeBase))
+                    path = DynamicApis.PathCombine(currentDirectory, "bin/" + assembly.GetName().Name + ".xml");
+                    if (DynamicApis.FileExists(path))
                     {
-                        path = DynamicApis.PathCombine(DynamicApis.PathGetDirectoryName(codeBase
-                            .Replace("file:///", string.Empty)), assemblyName.Name + ".xml")
-                            .Replace("file:\\", string.Empty);
+                        return path;
+                    }
 
-                        if (DynamicApis.FileExists(path))
+                    dynamic? executingAssembly = typeof(Assembly)
+                        .GetRuntimeMethod("GetExecutingAssembly", new Type[0])?
+                        .Invoke(null, new object[0]);
+                    if (!string.IsNullOrEmpty(executingAssembly?.Location))
+                    {
+                        var assemblyDirectory = DynamicApis.PathGetDirectoryName((string)executingAssembly!.Location);
+                        path = GetXmlDocsPathFromNuGetCacheOrDotNetSdk(assemblyDirectory, assemblyName);
+                        if (path != null && DynamicApis.FileExists(path))
                         {
                             return path;
                         }
                     }
+
+                    Cache[assemblyFullName] = null;
+                    return null;
                 }
-
-                var currentDomain = Type.GetType("System.AppDomain")?.GetRuntimeProperty("CurrentDomain")?.GetValue(null);
-                if (currentDomain?.HasProperty("BaseDirectory") == true)
+                catch
                 {
-                    var baseDirectory = currentDomain.TryGetPropertyValue("BaseDirectory", "");
-                    if (!string.IsNullOrEmpty(baseDirectory))
-                    {
-                        path = DynamicApis.PathCombine(baseDirectory, assemblyName.Name + ".xml");
-                        if (DynamicApis.FileExists(path))
-                        {
-                            return path;
-                        }
+                    Cache[assemblyFullName] = null;
+                    return null;
+                }
+            }
+            catch
+            {
+                return null;
+            }
+        }
 
-                        path = DynamicApis.PathCombine(baseDirectory, "bin/" + assemblyName.Name + ".xml");
-                        if (DynamicApis.FileExists(path))
+        private static string? GetXmlDocsPathFromNuGetCacheOrDotNetSdk(string assemblyDirectory, AssemblyName assemblyName)
+        {
+            var configs = DynamicApis.DirectoryGetAllFiles(assemblyDirectory, "*.runtimeconfig.dev.json");
+            if (configs.Any())
+            {
+                try
+                {
+                    // Retrieve NuGet package cache directories from *.runtimeconfig.dev.json
+                    var json = DynamicApis.FileReadAllText(configs.First());
+                    var matches = Regex.Matches(json, $"\"((.*?)((\\\\\\\\)|(////))(.*?))\"", RegexOptions.IgnoreCase);
+                    if (matches.Count > 0)
+                    {
+                        foreach (Match match in matches)
                         {
-                            return path;
+                            var path = match.Groups[1].Value
+                                .Replace("\\\\", "/")
+                                .Replace("//", "/")
+                                .Replace("\\|arch|", "")
+                                .Replace("\\|tfm|", "")
+                                .Replace("/|arch|", "")
+                                .Replace("/|tfm|", "");
+
+                            // From NuGet cache
+                            if (DynamicApis.DirectoryExists(path))
+                            {
+                                try
+                                {
+                                    var packagePath = DynamicApis.PathCombine(path, assemblyName.Name + "/" + assemblyName.Version.ToString(3));
+                                    if (DynamicApis.DirectoryExists(packagePath))
+                                    {
+                                        var files = DynamicApis.DirectoryGetAllFiles(packagePath, assemblyName.Name + ".xml")
+                                            .OrderBy(f => f)
+                                            .ToArray();
+
+                                        if (files.Any())
+                                        {
+                                            return files.Last();
+                                        }
+                                    }
+                                }
+                                catch
+                                {
+                                }
+                            }
+
+                            // From .NET SDK, e.g. C:\Program Files\dotnet\packs\Microsoft.AspNetCore.App.Ref\3.1.3\ref\netcoreapp3.1
+                            if (path.Contains("/dotnet/sdk"))
+                            {
+                                while ((path = DynamicApis.PathGetDirectoryName(path).Replace('\\', '/')) != null)
+                                {
+                                    if (path.EndsWith("/dotnet"))
+                                    {
+                                        try
+                                        {
+                                            path = DynamicApis.PathCombine(path, "packs");
+                                            var files = DynamicApis.DirectoryGetAllFiles(path, assemblyName.Name + ".xml")
+                                               .OrderBy(f => f)
+                                               .Where(f => f.Replace('\\', '/').Contains("/" + assemblyName.Version.ToString(2)))
+                                               .ToArray();
+
+                                            if (files.Any())
+                                            {
+                                                return files.Last();
+                                            }
+                                        }
+                                        catch
+                                        {
+                                        }
+
+                                        break;
+                                    }
+                                }
+                            }
                         }
                     }
                 }
-
-                var currentDirectory = DynamicApis.DirectoryGetCurrentDirectory();
-                path = DynamicApis.PathCombine(currentDirectory, assembly.GetName().Name + ".xml");
-                if (DynamicApis.FileExists(path))
+                catch
                 {
-                    return path;
                 }
+            }
 
-                path = DynamicApis.PathCombine(currentDirectory, "bin/" + assembly.GetName().Name + ".xml");
-                if (DynamicApis.FileExists(path))
+            // Retrieve NuGet packages from project.nuget.cache locations
+            var nuGetCacheFile = DynamicApis.PathCombine(assemblyDirectory, "../../obj/project.nuget.cache");
+            if (DynamicApis.FileExists(nuGetCacheFile))
+            {
+                return GetXmlDocsPathFromNuGetCacheFile(nuGetCacheFile, assemblyName);
+            }
+
+            nuGetCacheFile = DynamicApis.PathCombine(assemblyDirectory, "../../../obj/project.nuget.cache");
+            if (DynamicApis.FileExists(nuGetCacheFile))
+            {
+                return GetXmlDocsPathFromNuGetCacheFile(nuGetCacheFile, assemblyName);
+            }
+
+            return null;
+        }
+
+        private static string? GetXmlDocsPathFromNuGetCacheFile(string nuGetCacheFile, AssemblyName assemblyName)
+        {
+            try
+            {
+                var json = DynamicApis.FileReadAllText(nuGetCacheFile);
+                var matches = Regex.Matches(json, $"\"((.*?){assemblyName.Name}((\\\\\\\\)|(////)){assemblyName.Version.ToString(3)})((\\\\\\\\)|(////))(.*?)\"", RegexOptions.IgnoreCase);
+                if (matches.Count > 0)
                 {
-                    return path;
+                    var files = DynamicApis.DirectoryGetAllFiles(matches[0].Groups[1].Value.Replace("\\\\", "\\").Replace("//", "/"), assemblyName.Name + ".xml");
+                    if (files.Any())
+                    {
+                        return files.Last();
+                    }
                 }
 
                 return null;

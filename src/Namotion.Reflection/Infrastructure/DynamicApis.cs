@@ -8,6 +8,7 @@
 
 using System;
 #if NETSTANDARD1_0
+using System.Linq;
 using System.Reflection;
 #else
 using System.IO;
@@ -71,7 +72,7 @@ namespace Namotion.Reflection.Infrastructure
             if (!SupportsDirectoryApis)
                 throw new NotSupportedException("The System.IO.Directory API is not available on this platform.");
 
-            return (string)DirectoryType.GetRuntimeMethod("GetCurrentDirectory", new Type[] { }).Invoke(null, new object[] { });
+            return (string)DirectoryType.GetRuntimeMethod("GetCurrentDirectory", new Type[] { })!.Invoke(null, new object[] { });
 #else
             return Directory.GetCurrentDirectory();
 #endif
@@ -90,12 +91,69 @@ namespace Namotion.Reflection.Infrastructure
             if (string.IsNullOrEmpty(filePath))
                 return false;
 
-            return (bool)FileType.GetRuntimeMethod("Exists", new[] { typeof(string) }).Invoke(null, new object[] { filePath });
+            return (bool)FileType.GetRuntimeMethod("Exists", new[] { typeof(string) })!.Invoke(null, new object[] { filePath });
 #else
             if (string.IsNullOrEmpty(filePath))
                 return false;
 
             return File.Exists(filePath);
+#endif
+        }
+
+        /// <summary>Read a file.</summary>
+        /// <param name="filePath">The file path.</param>
+        /// <returns>The file content.</returns>
+        /// <exception cref="NotSupportedException">The System.IO.File API is not available on this platform.</exception>
+        public static string FileReadAllText(string filePath)
+        {
+#if NETSTANDARD1_0
+            if (!SupportsFileApis)
+                throw new NotSupportedException("The System.IO.File API is not available on this platform.");
+
+            return (string)FileType!.GetRuntimeMethod("ReadAllText", new[] { typeof(string) })!.Invoke(null, new object[] { filePath });
+#else
+            return File.ReadAllText(filePath);
+#endif
+        }
+
+        /// <summary>Checks whether a directory exists.</summary>
+        /// <param name="directoryPath">The directory path.</param>
+        /// <returns>true or false</returns>
+        /// <exception cref="NotSupportedException">The System.IO.File API is not available on this platform.</exception>
+        public static bool DirectoryExists(string directoryPath)
+        {
+#if NETSTANDARD1_0
+            if (!SupportsDirectoryApis)
+                throw new NotSupportedException("The System.IO.Directory API is not available on this platform.");
+
+            if (string.IsNullOrEmpty(directoryPath))
+                return false;
+
+            return (bool)DirectoryType!.GetRuntimeMethod("Exists", new[] { typeof(string) })!.Invoke(null, new object[] { directoryPath });
+#else
+            if (string.IsNullOrEmpty(directoryPath))
+                return false;
+
+            return Directory.Exists(directoryPath);
+#endif
+        }
+
+        /// <summary>Gets all files of directory.</summary>
+        /// <param name="path">The directory path.</param>
+        /// <param name="searchPattern">The search pattern.</param>
+        /// <returns>true or false</returns>
+        /// <exception cref="NotSupportedException">The System.IO.Directory API is not available on this platform.</exception>
+        public static string[] DirectoryGetAllFiles(string path, string searchPattern)
+        {
+#if NETSTANDARD1_0
+            if (!SupportsDirectoryApis)
+                throw new NotSupportedException("The System.IO.Directory API is not available on this platform.");
+
+            return (string[])DirectoryType!.GetRuntimeMethods()
+                .First(m => m.Name == "GetFiles" && m.GetParameters().Length == 3)
+                .Invoke(null, new object[] { path, searchPattern, 1 });
+#else
+            return Directory.GetFiles(path, searchPattern, SearchOption.AllDirectories);
 #endif
         }
 
@@ -110,7 +168,7 @@ namespace Namotion.Reflection.Infrastructure
             if (!SupportsPathApis)
                 throw new NotSupportedException("The System.IO.Path API is not available on this platform.");
 
-            return (string)PathType.GetRuntimeMethod("Combine", new[] { typeof(string), typeof(string) }).Invoke(null, new object[] { path1, path2 });
+            return (string)PathType!.GetRuntimeMethod("Combine", new[] { typeof(string), typeof(string) })!.Invoke(null, new object[] { path1, path2 });
 #else
             return Path.Combine(path1, path2);
 #endif
@@ -126,7 +184,7 @@ namespace Namotion.Reflection.Infrastructure
             if (!SupportsPathApis)
                 throw new NotSupportedException("The System.IO.Path API is not available on this platform.");
 
-            return (string)PathType.GetRuntimeMethod("GetDirectoryName", new[] { typeof(string) }).Invoke(null, new object[] { filePath });
+            return (string)PathType!.GetRuntimeMethod("GetDirectoryName", new[] { typeof(string) })!.Invoke(null, new object[] { filePath });
 #else
             return Path.GetDirectoryName(filePath);
 #endif
@@ -137,13 +195,13 @@ namespace Namotion.Reflection.Infrastructure
         /// <param name="path">The path.</param>
         /// <returns>The value.</returns>
         /// <exception cref="NotSupportedException">The System.Xml.XPath.Extensions API is not available on this platform.</exception>
-        public static object XPathEvaluate(XDocument document, string path)
+        public static object? XPathEvaluate(XDocument document, string path)
         {
 #if NETSTANDARD1_0
             if (!SupportsXPathApis)
                 throw new NotSupportedException("The System.Xml.XPath.Extensions API is not available on this platform.");
 
-            return XPathExtensionsType.GetRuntimeMethod("XPathEvaluate", new[] { typeof(XDocument), typeof(string) }).Invoke(null, new object[] { document, path });
+            return XPathExtensionsType!.GetRuntimeMethod("XPathEvaluate", new[] { typeof(XDocument), typeof(string) })?.Invoke(null, new object[] { document, path });
 #else
             return document.XPathEvaluate(path);
 #endif

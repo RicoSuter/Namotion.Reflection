@@ -97,6 +97,7 @@ namespace Namotion.Reflection
                     return genericTypeArguments[0];
                 }
 
+                // TODO: Load method from contextual type
                 var returnParam = getEnumeratorMethod.ReturnParameter?.ToContextualParameter();
                 if (returnParam?.GenericArguments.Length == 1)
                 {

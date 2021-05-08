@@ -15,6 +15,7 @@ namespace Namotion.Reflection
         private byte[]? _nullableFlags;
         private Nullability? nullability;
 
+        private ContextualMethodInfo[]? _methods;
         private ContextualPropertyInfo[]? _properties;
         private ContextualFieldInfo[]? _fields;
         private bool? _isValueType;
@@ -161,6 +162,7 @@ namespace Namotion.Reflection
                         return _enumerableItemType;
                     }
 
+                    // TODO: Load method from contextual type
                     var returnParam = getEnumeratorMethod.ReturnParameter?.ToContextualParameter();
                     if (returnParam?.GenericArguments.Length == 1)
                     {
@@ -284,6 +286,67 @@ namespace Namotion.Reflection
                 }
 
                 return _properties;
+            }
+        }
+
+        /// <summary>
+        /// Gets the contextual methods of this type.
+        /// </summary>
+        public ContextualMethodInfo[] Methods
+        {
+            get
+            {
+                if (_methods == null)
+                {
+                    lock (this)
+                    {
+                        if (_methods == null)
+                        {
+#if !NET40
+                            _methods = Type.GetRuntimeMethods().Select(method =>
+#else
+                            _methods = Type.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).Select(method =>
+#endif
+                            {
+                                // TODO: Correctly implement generics here
+
+                                //if (TypeInfo.IsGenericType && !TypeInfo.ContainsGenericParameters)
+                                //{
+                                //    var genericType = method.DeclaringType.GetGenericTypeDefinition();
+                                //    var genericProperty = genericType.GetRuntimeProperty(method.Name);
+                                //    if (genericProperty != null)
+                                //    {
+                                //        var actualType = GenericArguments[genericProperty.PropertyType.GenericParameterPosition];
+                                //        var actualIndex = actualType._nullableFlagsIndex;
+                                //        return new ContextualMethodInfo
+                                //        {
+                                //            Parameters = method
+                                //                .GetParameters()
+                                //                .Select(p => new ContextualParameterInfo(p, ref actualIndex, actualType?._nullableFlags))
+                                //                .ToArray()
+                                //        };
+                                //    }
+                                //}
+
+                                var index = 0;
+                                return new ContextualMethodInfo
+                                {
+                                    ReturnParameter = new ContextualParameterInfo(method.ReturnParameter, ref index, null),
+                                    Parameters = method
+                                        .GetParameters()
+                                        .Select(p =>
+                                        {
+                                            var index = 0;
+                                            return new ContextualParameterInfo(p, ref index, null);
+                                        })
+                                        .ToArray()
+                                };
+                            }).ToArray();
+                        }
+                    }
+                }
+
+                return _methods;
             }
         }
 

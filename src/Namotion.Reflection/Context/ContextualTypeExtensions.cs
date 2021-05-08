@@ -95,27 +95,6 @@ namespace Namotion.Reflection
         }
 
         /// <summary>
-        /// Gets an array of <see cref="ContextualParameterInfo"/> for the given <see cref="MethodBase"/> instance.
-        /// Warning: Retrieving contextual information directly from <see cref="MethodBase"/> might lose original context data (NRT on original generic type parameters).
-        /// </summary>
-        /// <param name="method">The method.</param>
-        /// <returns>The runtime properties.</returns>
-        [Obsolete("Remove usages in code and then obsolete attribute when PR is ready.")]
-        public static ContextualParameterInfo[] GetContextualParameters(this MethodBase method)
-        {
-            // TODO: Remove usages of this method in code (might lose context)!!
-            var key = "Parameters:" + method.Name + ":" + method.DeclaringType.FullName + ":" + EnumeratedParameters(method.GetParameters());
-            return (ContextualParameterInfo[])Cache.GetOrAdd(key, k => method.GetParameters()
-                .Select(p => p.ToContextualParameter())
-                .ToArray());
-        }
-
-        private static string EnumeratedParameters(ParameterInfo[] parameters)
-        {
-            return string.Join("-", parameters.Select(p => p.ParameterType.FullName));
-        }
-
-        /// <summary>
         /// Gets a <see cref="ContextualParameterInfo"/> for the given <see cref="ParameterInfo"/> instance.
         /// Warning: Retrieving contextual information directly from <see cref="ParameterInfo"/> might lose original context data (NRT on original generic type parameters).
         /// </summary>
@@ -128,7 +107,7 @@ namespace Namotion.Reflection
             return (ContextualParameterInfo)Cache.GetOrAdd(key, k =>
             {
                 var index = 0;
-                return new ContextualParameterInfo(parameterInfo, ref index);
+                return new ContextualParameterInfo(parameterInfo, ref index, null);
             });
         }
 

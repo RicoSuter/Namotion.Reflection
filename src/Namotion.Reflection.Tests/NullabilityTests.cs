@@ -361,10 +361,10 @@ namespace Namotion.Reflection.Tests
             Assert.Equal(Nullability.Nullable, methodTest2a!.ReturnParameter.ToContextualParameter().Nullability);
             Assert.Equal(Nullability.NotNullable, methodTest2b!.ReturnParameter.ToContextualParameter().Nullability);
 
-            Assert.Equal(Nullability.NotNullable, methodTest1a.GetContextualParameters()[0].Nullability);
-            Assert.Equal(Nullability.Nullable, methodTest1b.GetContextualParameters()[0].Nullability);
-            Assert.Equal(Nullability.NotNullable, methodTest1a.GetContextualParameters()[0].Nullability);
-            Assert.Equal(Nullability.Nullable, methodTest1b.GetContextualParameters()[0].Nullability);
+            Assert.Equal(Nullability.NotNullable, methodTest1a.GetParameters()[0].ToContextualParameter().Nullability);
+            Assert.Equal(Nullability.Nullable, methodTest1b.GetParameters()[0].ToContextualParameter().Nullability);
+            Assert.Equal(Nullability.NotNullable, methodTest1a.GetParameters()[0].ToContextualParameter().Nullability);
+            Assert.Equal(Nullability.Nullable, methodTest1b.GetParameters()[0].ToContextualParameter().Nullability);
 
         }
         

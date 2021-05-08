@@ -10,7 +10,7 @@
 
         // TODO: Should we implement this?
         /// <summary>
-        /// Gets the nullability information of this accessor's type in the given context by unwrapping Nullable{T} into account.
+        /// Gets the nullability information of this accessor's type in the given context by unwrapping Nullable{T}.
         /// </summary>
         public Nullability Nullability => AccessorType.Nullability;
 

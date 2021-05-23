@@ -687,7 +687,10 @@ namespace Namotion.Reflection
             return string.Format("{0}:{1}", prefixCode, memberName.Replace("+", "."));
         }
 
-        private static string? GetXmlDocsPath(dynamic? assembly)
+        /// <summary>
+        /// Retrieve path to XML documentation for <paramref name="assembly"/>
+        /// </summary>
+        public static string? GetXmlDocsPath(Assembly? assembly)
         {
             try
             {

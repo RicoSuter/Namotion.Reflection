@@ -136,7 +136,7 @@ Methods:
 **Object extensions**
 
 - **HasProperty():** Determines whether the specified property name exists.
-- **TryGetPropertyValue():** Determines whether the specified property name exists.
+- **TryGetPropertyValue():** Returns the value of the given property or null if the property does not exist.
 
 **Type extensions**
 

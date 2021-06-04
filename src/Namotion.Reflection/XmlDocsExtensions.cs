@@ -172,15 +172,6 @@ namespace Namotion.Reflection
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static XElement? GetXmlDocsElement(this Type type, string pathToXmlFile) {
             
-            _shouldLog = false;
-            if ( type.Name == "AverageDirectionalMovementIndicatorParameters" ) {
-                _shouldLog = true;
-            }
-            if ( type.Name == "ModelTestController" ) {
-                _shouldLog = true;
-            }
-            log( $"GetXmlDocsElement TYPE > {type}" );
-            
             lock (Lock)
             {
                 return type.GetTypeInfo().GetXmlDocsWithoutLock(pathToXmlFile);
@@ -192,31 +183,11 @@ namespace Namotion.Reflection
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static XElement? GetXmlDocsElement(this MemberInfo member) {
 
-            _shouldLog = false;
-            if ( member.Name == "AverageDirectionalMovementIndicatorParameters" ) {
-                _shouldLog = true;
-            }
-            if ( member.Name == "ModelTestController" ) {
-                _shouldLog = true;
-            }
-            log( $"GetXmlDocsElement MEMBER > {member}" );
 
             lock (Lock)
             {
                 return GetXmlDocsWithoutLock(member);
             }
-        }
-
-        private static bool _shouldLog = false;
-
-        private static void log( string msg ) {
-#if  !NETSTANDARD1_0
-            
-            if ( _shouldLog ) {
-                System.Console.WriteLine( $"\t>> XmlDocsExtensions.cs >> {msg}" );
-            }
-
-#endif        
         }
 
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
@@ -430,10 +401,8 @@ namespace Namotion.Reflection
 
         private static XElement? GetXmlDocsWithoutLock(this MemberInfo? member)
         {
-            log($"GetXmlDocsWithoutLock > {member}");
             if (member is null)
             {
-                log("GetXmlDocsWithoutLock -> member is null!");
                 return null;
             }
 
@@ -455,15 +424,11 @@ namespace Namotion.Reflection
 
             var documentationPath = GetXmlDocsPath(member.Module?.Assembly);
 
-            log($"GetXmlDocsWithoutLock > documentation path: {documentationPath ?? "null"}");
-
             return GetXmlDocsWithoutLock(member, documentationPath);
         }
 
         private static XElement? GetXmlDocsWithoutLock(this MemberInfo member, string? pathToXmlFile)
         {
-
-                log( $"GetXmlDocsWithoutLock > {member}" );
 
             try
             {
@@ -480,18 +445,14 @@ namespace Namotion.Reflection
                 }
 
                 var element = GetXmlDocsElement(member, document);
-                log( $"GetXmlDocsWithoutLock > xelement: {element}" );
                 ReplaceInheritdocElements(member, element);
 
-                log( $"GetXmlDocsWithoutLock > xelement inheritdoc replace: {element}" );
 
                 return element;
             }
             catch ( Exception e )
             {
-                log($"EXCEPTION! -> {e.Message}");
                 throw;
-                return null; //URGENT : error here
             }
         }
 
@@ -572,13 +533,10 @@ namespace Namotion.Reflection
             {
                 if (child.Name.LocalName.ToLowerInvariant() == "inheritdoc")
                 {
-                    log($"ReplaceInheritdocElements -> member: {member} ; DeclaringType: {member.DeclaringType} ; GetTypeInfo(): {member.DeclaringType?.GetTypeInfo()}");
 
 #if  !NETSTANDARD1_0
-                    // if ( member.DeclaringType is null ) {
                     // if this is not a member of a class/type // is a Type itself
                     if ( member.MemberType == MemberTypes.TypeInfo ) {
-                        log("ReplaceInheritdocElements -> member.MemberType == TypeInfo");
                         ProcessInheritdocTypeElements( member, element, child );
                         continue;
                     }
@@ -602,7 +560,6 @@ namespace Namotion.Reflection
                     }
                     else
                     {
-                        log( "ReplaceInheritdocElements -> else"  );
                         ProcessInheritdocInterfaceElements(member, child);
                     }
                 }
@@ -632,8 +589,6 @@ namespace Namotion.Reflection
                                   ?? referencingType.DeclaringType?.Namespace
                                   ?? (referencingType as Type)?.Namespace
                                   ?? throw new Exception($"failed to lookup namespace on type {referencingType}");
-            log(
-                $"looking up broken type reference for {matches.Groups["FullName"]} in namespace {lookupNamespace} from {referencingType}");
             Type referencedType = referencingType.Module.Assembly.GetType(lookupNamespace + "." + referencedTypeName);
             if (referencedType is not null)
             {
@@ -649,7 +604,6 @@ namespace Namotion.Reflection
         {
             var referencedTypeXmlId = child.Attribute("cref")?.Value;
 
-            log($"cref: {child.Attribute("cref")?.Value}");
             if (referencedTypeXmlId is not null)
             {
                 Match?      matches;
@@ -666,7 +620,6 @@ namespace Namotion.Reflection
                         break;
                     case '!':
                         referencedType = resolveBrokenTypeReference(member, referencedTypeXmlId);
-                        log($"resolvedBrokenTypeReference to type ({referencedType?.MemberType}: {referencedType}");
                         referencedTypeName = referencedType?.Name;
                         docAssembly        = referencedType?.Module.Assembly;
                         if (referencedType is not null)
@@ -681,10 +634,6 @@ namespace Namotion.Reflection
                         referencedTypeName = matches.Groups["FullName"].Value;
                         break;
                 }
-                // string referencedTypeName = 
-                log($"referencedTypeName: {referencedTypeName} from {referencedTypeXmlId}");
-                // var xml = GetXmlDocsPath( Assembly.Load( matches.Groups[ "AssemblyName" ].Value ) );
-                // xml.GetXmlDocsElement(name);
 
 
                 if (docAssembly is null && referencedTypeName is not null)
@@ -692,34 +641,16 @@ namespace Namotion.Reflection
                     docAssembly    = member.Module.Assembly;
                     referencedType = docAssembly.GetType(referencedTypeName);
                     // check member's assembly first
-                    if (referencedType != null)
-                    {
-                        log("found type in member's assembly!");
-                        // docAssembly = 
-                        // GetXmlDocsElement( referencedType );
-                        // XDocument xdoc = TryGetXmlDocsDocument(
-                        //     member.Module.Assembly.GetName(),
-                        //     GetXmlDocsPath( member.Module.Assembly )
-                        // ).GetXmlDocsElement;
-                        // referencedDocs = TryGetXmlDocsDocument(
-                        //         member.Module.Assembly.GetName(),
-                        //         GetXmlDocsPath( member.Module.Assembly )
-                        //     )?.GetXmlDocsElement( referencedTypeXmlId );
-                        // GetXmlDocsElement( )
-                        // GetXmlDocsPath(  )
-                    } else
+                    if (referencedType is null )
                     {
                         foreach ( var assembly in AppDomain.CurrentDomain.GetAssemblies() )
                         {
-                            // log($"Assembly: {assembly.FullName} \n\t\t >> {assembly.GetName().Name}"  );
-                            log($"Assembly: {assembly.GetName().Name}");
                             referencedType = assembly.GetType(referencedTypeName);
                             // limit the Assemblies that are searched by doing a basic name check.
                             if (referencedTypeXmlId.Contains(assembly.GetName().Name))
                             {
                                 if (referencedType != null)
                                 {
-                                    log($"referencedType: {referencedType}");
                                     docAssembly = assembly;
                                     break;
                                 }
@@ -756,51 +687,13 @@ namespace Namotion.Reflection
                     // for records, replace node with the entirety of the found docs. So the whole <param> tag.
                     child.ReplaceWith(referencedDocs);
                     return;
-                    // referencedDocs = GetXmlDocsRecordPropertySummary( referencedType )
                 }
-
-
-                // var referencedDocs = referencedType.GetXmlDocsWithoutLock();
-                // var referencedDocs = Assembly.Load( matches.Groups[ "AssemblyName" ].Value )
-                //         .GetType(
-                //             matches.Groups["TypeName"].Value
-                //         ).GetXmlDocsWithoutLock();
-                // var referencedType = member.Module.Assembly.GetType( referencedTypeName );
-                // log( $"referencedType: {referencedType}" );
-                // var baseDoc = referencedType.GetXmlDocsWithoutLock();
                 if (referencedDocs != null)
                 {
-                    log($"replacing nodes for {member.Name} inheritdoc from {referencedType?.Name}");
                     var nodes = referencedDocs.Nodes().OfType<object>().ToArray();
-                    log($"{referencedType?.Name} docs has # Nodes: {nodes.Count()} of {referencedDocs.Nodes().Count()}");
-                    // child.ReplaceWith(nodes);
-                    log($"Nodes ({nodes.Count()}): " + String.Join(",", referencedDocs.Nodes().Select(e => $"|{e.NodeType}")));
-                    log($"Child '{child.Name.ToString()}' Nodes ({child.Nodes().Count()}): " +
-                        String.Join(",", child.Nodes().Select(e => $"|{e.NodeType}")));
-                    log($"Element '{element.Name.ToString()}' Nodes ({element.Nodes().Count()}): " +
-                        String.Join(",", element.Nodes().Select(e => $"|{e.NodeType}")));
-                    // child.Remove();
                     child.ReplaceWith(nodes);
-                    // element.repl
-                    // child.Nodes().Add( nodes );
-                    // log(  String.Join( ",", child.Nodes().Select( e => e.ToString() ))  );
-                    // child = nodes.replace
                 }
             }
-            // log($"MemberType = {member.MemberType}"  );
-            // foreach (var baseInterface in member.MemberType ?? Array.Empty<Type>())
-            // {
-            //     var baseMember = baseInterface?.GetTypeInfo().DeclaredMembers.SingleOrDefault(m => m.Name == member.Name);
-            //     if (baseMember != null)
-            //     {
-            //         var baseDoc = baseMember.GetXmlDocsWithoutLock();
-            //         if (baseDoc != null)
-            //         {
-            //             var nodes = baseDoc.Nodes().OfType<object>().ToArray();
-            //             child.ReplaceWith(nodes);
-            //         }
-            //     }
-            // }
         }
 
             

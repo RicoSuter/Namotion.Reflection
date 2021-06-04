@@ -170,8 +170,17 @@ namespace Namotion.Reflection
         /// <param name="type">The type.</param>
         /// <param name="pathToXmlFile">The path to the XML documentation file.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static XElement? GetXmlDocsElement(this Type type, string pathToXmlFile)
-        {
+        public static XElement? GetXmlDocsElement(this Type type, string pathToXmlFile) {
+            
+            _shouldLog = false;
+            if ( type.Name == "AverageDirectionalMovementIndicatorParameters" ) {
+                _shouldLog = true;
+            }
+            if ( type.Name == "ModelTestController" ) {
+                _shouldLog = true;
+            }
+            log( $"GetXmlDocsElement TYPE > {type}" );
+            
             lock (Lock)
             {
                 return type.GetTypeInfo().GetXmlDocsWithoutLock(pathToXmlFile);
@@ -181,12 +190,33 @@ namespace Namotion.Reflection
         /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static XElement? GetXmlDocsElement(this MemberInfo member)
-        {
+        public static XElement? GetXmlDocsElement(this MemberInfo member) {
+
+            _shouldLog = false;
+            if ( member.Name == "AverageDirectionalMovementIndicatorParameters" ) {
+                _shouldLog = true;
+            }
+            if ( member.Name == "ModelTestController" ) {
+                _shouldLog = true;
+            }
+            log( $"GetXmlDocsElement MEMBER > {member}" );
+
             lock (Lock)
             {
                 return GetXmlDocsWithoutLock(member);
             }
+        }
+
+        private static bool _shouldLog = false;
+
+        private static void log( string msg ) {
+#if  !NETSTANDARD1_0
+            
+            if ( _shouldLog ) {
+                System.Console.WriteLine( $"\t>> XmlDocsExtensions.cs >> {msg}" );
+            }
+
+#endif        
         }
 
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
@@ -398,25 +428,43 @@ namespace Namotion.Reflection
             }
         }
 
-        private static XElement? GetXmlDocsWithoutLock(this MemberInfo member)
+        private static XElement? GetXmlDocsWithoutLock(this MemberInfo? member)
         {
-            if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false || DynamicApis.SupportsPathApis == false)
+            log($"GetXmlDocsWithoutLock > {member}");
+            if (member is null)
+            {
+                log("GetXmlDocsWithoutLock -> member is null!");
+                return null;
+            }
+
+            if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false ||
+                DynamicApis.SupportsPathApis == false)
             {
                 return null;
             }
 
-            var assemblyName = member.Module.Assembly.GetName();
+            var assemblyName = member.Module?.Assembly?.GetName();
+            if (assemblyName is null)
+            {
+                return null;
+            }
             if (IsAssemblyIgnored(assemblyName))
             {
                 return null;
             }
 
-            var documentationPath = GetXmlDocsPath(member.Module.Assembly);
+            var documentationPath = GetXmlDocsPath(member.Module?.Assembly);
+
+            log($"GetXmlDocsWithoutLock > documentation path: {documentationPath ?? "null"}");
+
             return GetXmlDocsWithoutLock(member, documentationPath);
         }
 
         private static XElement? GetXmlDocsWithoutLock(this MemberInfo member, string? pathToXmlFile)
         {
+
+                log( $"GetXmlDocsWithoutLock > {member}" );
+
             try
             {
                 if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false || DynamicApis.SupportsPathApis == false)
@@ -432,12 +480,18 @@ namespace Namotion.Reflection
                 }
 
                 var element = GetXmlDocsElement(member, document);
+                log( $"GetXmlDocsWithoutLock > xelement: {element}" );
                 ReplaceInheritdocElements(member, element);
+
+                log( $"GetXmlDocsWithoutLock > xelement inheritdoc replace: {element}" );
+
                 return element;
             }
-            catch
+            catch ( Exception e )
             {
-                return null;
+                log($"EXCEPTION! -> {e.Message}");
+                throw;
+                return null; //URGENT : error here
             }
         }
 
@@ -490,7 +544,7 @@ namespace Namotion.Reflection
                 ReplaceInheritdocElements(parameter.Member, element);
 
                 IEnumerable result;
-                if (parameter.IsRetval || string.IsNullOrEmpty(parameter.Name))
+                if (parameter.IsRetval || String.IsNullOrEmpty(parameter.Name))
                 {
                     result = element.Elements("returns");
                 }
@@ -518,7 +572,20 @@ namespace Namotion.Reflection
             {
                 if (child.Name.LocalName.ToLowerInvariant() == "inheritdoc")
                 {
-                    var baseType = member.DeclaringType.GetTypeInfo().BaseType;
+                    log($"ReplaceInheritdocElements -> member: {member} ; DeclaringType: {member.DeclaringType} ; GetTypeInfo(): {member.DeclaringType?.GetTypeInfo()}");
+
+#if  !NETSTANDARD1_0
+                    // if ( member.DeclaringType is null ) {
+                    // if this is not a member of a class/type // is a Type itself
+                    if ( member.MemberType == MemberTypes.TypeInfo ) {
+                        log("ReplaceInheritdocElements -> member.MemberType == TypeInfo");
+                        ProcessInheritdocTypeElements( member, element, child );
+                        continue;
+                    }
+
+            
+#endif                    
+                    var baseType = member.DeclaringType?.GetTypeInfo().BaseType;
                     var baseMember = baseType?.GetTypeInfo().DeclaredMembers.SingleOrDefault(m => m.Name == member.Name);
                     if (baseMember != null)
                     {
@@ -535,15 +602,212 @@ namespace Namotion.Reflection
                     }
                     else
                     {
+                        log( "ReplaceInheritdocElements -> else"  );
                         ProcessInheritdocInterfaceElements(member, child);
                     }
                 }
             }
         }
 
+#if !NETSTANDARD1_0
+
+        /// <summary>
+        /// Get Type from a referencing string such as <c>!:MyType</c> or <c>!:MyType.MyProperty</c>
+        /// </summary>
+        /// <param name="referencingType">
+        ///     The type whose documentation contains the reference to <paramref name="referencedTypeXmlId"/>
+        /// </param>
+        /// <param name="referencedTypeXmlId">
+        ///     String within <c>inheritdoc cref=</c> referencing an unknown type (prefaced with <c>!:</c>
+        /// </param>
+        /// <returns></returns>
+        private static MemberInfo? resolveBrokenTypeReference(MemberInfo referencingType, string referencedTypeXmlId)
+        {
+            var matches = Regex.Match(
+                referencedTypeXmlId,
+                @"[A-Z!]:(?<FullName>(?<TypeName>[a-zA-Z]*)\.?(?<MemberName>[a-zA-Z]*)?)");
+            var referencedTypeName   = matches.Groups["TypeName"].Value;
+            var referencedMemberName = matches.Groups["MemberName"].Value;
+            var lookupNamespace = referencingType.ReflectedType?.Namespace
+                                  ?? referencingType.DeclaringType?.Namespace
+                                  ?? (referencingType as Type)?.Namespace
+                                  ?? throw new Exception($"failed to lookup namespace on type {referencingType}");
+            log(
+                $"looking up broken type reference for {matches.Groups["FullName"]} in namespace {lookupNamespace} from {referencingType}");
+            Type referencedType = referencingType.Module.Assembly.GetType(lookupNamespace + "." + referencedTypeName);
+            if (referencedType is not null)
+            {
+                return !String.IsNullOrEmpty(referencedMemberName)
+                    ? referencedType.GetMember(referencedMemberName).Single()
+                    : referencedType;
+            }
+
+            return null;
+        }
+
+        private static void ProcessInheritdocTypeElements(this MemberInfo member, XElement element, XElement child)
+        {
+            var referencedTypeXmlId = child.Attribute("cref")?.Value;
+
+            log($"cref: {child.Attribute("cref")?.Value}");
+            if (referencedTypeXmlId is not null)
+            {
+                Match?      matches;
+                string?     referencedTypeName;
+                MemberInfo? referencedType = null;
+                Assembly?   docAssembly    = null;
+                switch ( referencedTypeXmlId[0] )
+                {
+                    case 'P':
+                        matches = Regex.Match(
+                            referencedTypeXmlId,
+                            @"(?<FullName>(?<FullTypeName>(?<AssemblyName>[a-zA-Z.]*)\.(?<TypeName>[a-zA-Z]*))\.(?<MemberName>[a-zA-Z]*))");
+                        referencedTypeName = matches.Groups["FullTypeName"].Value;
+                        break;
+                    case '!':
+                        referencedType = resolveBrokenTypeReference(member, referencedTypeXmlId);
+                        log($"resolvedBrokenTypeReference to type ({referencedType?.MemberType}: {referencedType}");
+                        referencedTypeName = referencedType?.Name;
+                        docAssembly        = referencedType?.Module.Assembly;
+                        if (referencedType is not null)
+                        {
+                            referencedTypeXmlId = GetMemberElementName(referencedType);
+                        }
+                        break;
+                    default:
+                        matches = Regex.Match(
+                            referencedTypeXmlId,
+                            @"[A-Z]:(?<FullName>(?<Namespace>[a-zA-Z.]*)\.(?<TypeName>[a-zA-Z]*))");
+                        referencedTypeName = matches.Groups["FullName"].Value;
+                        break;
+                }
+                // string referencedTypeName = 
+                log($"referencedTypeName: {referencedTypeName} from {referencedTypeXmlId}");
+                // var xml = GetXmlDocsPath( Assembly.Load( matches.Groups[ "AssemblyName" ].Value ) );
+                // xml.GetXmlDocsElement(name);
+
+
+                if (docAssembly is null && referencedTypeName is not null)
+                {
+                    docAssembly    = member.Module.Assembly;
+                    referencedType = docAssembly.GetType(referencedTypeName);
+                    // check member's assembly first
+                    if (referencedType != null)
+                    {
+                        log("found type in member's assembly!");
+                        // docAssembly = 
+                        // GetXmlDocsElement( referencedType );
+                        // XDocument xdoc = TryGetXmlDocsDocument(
+                        //     member.Module.Assembly.GetName(),
+                        //     GetXmlDocsPath( member.Module.Assembly )
+                        // ).GetXmlDocsElement;
+                        // referencedDocs = TryGetXmlDocsDocument(
+                        //         member.Module.Assembly.GetName(),
+                        //         GetXmlDocsPath( member.Module.Assembly )
+                        //     )?.GetXmlDocsElement( referencedTypeXmlId );
+                        // GetXmlDocsElement( )
+                        // GetXmlDocsPath(  )
+                    } else
+                    {
+                        foreach ( var assembly in AppDomain.CurrentDomain.GetAssemblies() )
+                        {
+                            // log($"Assembly: {assembly.FullName} \n\t\t >> {assembly.GetName().Name}"  );
+                            log($"Assembly: {assembly.GetName().Name}");
+                            referencedType = assembly.GetType(referencedTypeName);
+                            // limit the Assemblies that are searched by doing a basic name check.
+                            if (referencedTypeXmlId.Contains(assembly.GetName().Name))
+                            {
+                                if (referencedType != null)
+                                {
+                                    log($"referencedType: {referencedType}");
+                                    docAssembly = assembly;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (referencedType is null) { return; }
+                if (docAssembly is null) { return; }
+
+
+                XElement? referencedDocs = TryGetXmlDocsDocument(
+                    docAssembly.GetName(),
+                    GetXmlDocsPath(docAssembly)
+                )?.GetXmlDocsElement(referencedTypeXmlId);
+
+                /* for Record types ( as opposed to Class types ) the above lookup will fail for parameters defined in
+                 * shorthand form on the Constructor. Constructor-defined Properties will show up on the constructor
+                 * as <param name="PropertyName">...</param> rather than have the xml doc member element as a typical
+                 * property would.
+                */
+                if (referencedDocs is null && referencedType.MemberType == MemberTypes.Property)
+                {
+                    var documentationPath = GetXmlDocsPath(member.Module.Assembly);
+                    var parentElement = GetXmlDocsWithoutLock(
+                        referencedType.DeclaringType.GetTypeInfo(),
+                        documentationPath
+                    );
+                    referencedDocs = parentElement?
+                        .Elements("param")?
+                        .FirstOrDefault(x => x.Attribute("name")?
+                                            .Value == referencedType.Name);
+                    // for records, replace node with the entirety of the found docs. So the whole <param> tag.
+                    child.ReplaceWith(referencedDocs);
+                    return;
+                    // referencedDocs = GetXmlDocsRecordPropertySummary( referencedType )
+                }
+
+
+                // var referencedDocs = referencedType.GetXmlDocsWithoutLock();
+                // var referencedDocs = Assembly.Load( matches.Groups[ "AssemblyName" ].Value )
+                //         .GetType(
+                //             matches.Groups["TypeName"].Value
+                //         ).GetXmlDocsWithoutLock();
+                // var referencedType = member.Module.Assembly.GetType( referencedTypeName );
+                // log( $"referencedType: {referencedType}" );
+                // var baseDoc = referencedType.GetXmlDocsWithoutLock();
+                if (referencedDocs != null)
+                {
+                    log($"replacing nodes for {member.Name} inheritdoc from {referencedType?.Name}");
+                    var nodes = referencedDocs.Nodes().OfType<object>().ToArray();
+                    log($"{referencedType?.Name} docs has # Nodes: {nodes.Count()} of {referencedDocs.Nodes().Count()}");
+                    // child.ReplaceWith(nodes);
+                    log($"Nodes ({nodes.Count()}): " + String.Join(",", referencedDocs.Nodes().Select(e => $"|{e.NodeType}")));
+                    log($"Child '{child.Name.ToString()}' Nodes ({child.Nodes().Count()}): " +
+                        String.Join(",", child.Nodes().Select(e => $"|{e.NodeType}")));
+                    log($"Element '{element.Name.ToString()}' Nodes ({element.Nodes().Count()}): " +
+                        String.Join(",", element.Nodes().Select(e => $"|{e.NodeType}")));
+                    // child.Remove();
+                    child.ReplaceWith(nodes);
+                    // element.repl
+                    // child.Nodes().Add( nodes );
+                    // log(  String.Join( ",", child.Nodes().Select( e => e.ToString() ))  );
+                    // child = nodes.replace
+                }
+            }
+            // log($"MemberType = {member.MemberType}"  );
+            // foreach (var baseInterface in member.MemberType ?? Array.Empty<Type>())
+            // {
+            //     var baseMember = baseInterface?.GetTypeInfo().DeclaredMembers.SingleOrDefault(m => m.Name == member.Name);
+            //     if (baseMember != null)
+            //     {
+            //         var baseDoc = baseMember.GetXmlDocsWithoutLock();
+            //         if (baseDoc != null)
+            //         {
+            //             var nodes = baseDoc.Nodes().OfType<object>().ToArray();
+            //             child.ReplaceWith(nodes);
+            //         }
+            //     }
+            // }
+        }
+
+            
+#endif
         private static void ProcessInheritdocInterfaceElements(this MemberInfo member, XElement child)
         {
-            foreach (var baseInterface in member.DeclaringType.GetTypeInfo().ImplementedInterfaces)
+            foreach (var baseInterface in member.DeclaringType?.GetTypeInfo().ImplementedInterfaces ?? new Type[]{})
             {
                 var baseMember = baseInterface?.GetTypeInfo().DeclaredMembers.SingleOrDefault(m => m.Name == member.Name);
                 if (baseMember != null)
@@ -577,6 +841,9 @@ namespace Namotion.Reflection
         /// <exception cref="ArgumentException">Unknown member type.</exception>
         internal static string GetMemberElementName(dynamic member)
         {
+            if ( member is null ) {
+                throw new ArgumentNullException( nameof(member) );
+            }
             char prefixCode;
             string memberName;
             string memberTypeName;
@@ -613,8 +880,9 @@ namespace Namotion.Reflection
             }
             else
             {
-                memberName = member is Type type && !string.IsNullOrEmpty(memberType.FullName) ?
-                    type.FullName.Split('[')[0] : ((string)member.DeclaringType.FullName).Split('[')[0] + "." + member.Name;
+                memberName = member is Type type && !String.IsNullOrEmpty(memberType.FullName) ?
+                    type.FullName?.Split('[')[0] ?? ""
+                    : ((string)member.DeclaringType.FullName).Split('[')[0] + "." + member.Name;
 
                 memberTypeName = (string)member.MemberType.ToString();
             }
@@ -690,97 +958,119 @@ namespace Namotion.Reflection
         /// <summary>
         /// Retrieve path to XML documentation for <paramref name="assembly"/>
         /// </summary>
-
-#if NETSTANDARD1_0
-        public static string? GetXmlDocsPath( dynamic? assembly ) {
+            
+#if  NETSTANDARD1_0
+        public static string? GetXmlDocsPath(dynamic? assembly)
+        {
 #else
             
         public static string? GetXmlDocsPath(Assembly? assembly)
         {
 #endif
-            try {
-                if ( assembly == null ) {
+            try
+            {
+                if (assembly == null)
+                {
                     return null;
                 }
 
                 AssemblyName assemblyName = assembly.GetName();
-                if ( string.IsNullOrEmpty( assemblyName.Name ) ) {
+                if (string.IsNullOrEmpty(assemblyName.Name))
+                {
                     return null;
                 }
 
                 var assemblyFullName = assemblyName.FullName;
-                if ( Cache.ContainsKey( assemblyFullName ) ) {
+                if (Cache.ContainsKey(assemblyFullName))
+                {
                     return null;
                 }
 
                 try {
                     string? path = assembly?.Location;
-                    if ( path is not null && !String.IsNullOrEmpty( path ) ) {
+                    if (path is not null && !String.IsNullOrEmpty(path))
+                    {
                         var assemblyDirectory = DynamicApis.PathGetDirectoryName(path);
-                        path = DynamicApis.PathCombine( assemblyDirectory, assemblyName.Name + ".xml" );
-                        if ( DynamicApis.FileExists( path ) ) {
+                        path = DynamicApis.PathCombine(assemblyDirectory, assemblyName.Name + ".xml");
+                        if (DynamicApis.FileExists(path))
+                        {
                             return path;
                         }
                     }
 
-                    if ( ObjectExtensions.HasProperty( assembly, "CodeBase" ) ) {
+                    if (ObjectExtensions.HasProperty(assembly, "CodeBase"))
+                    {
                         var codeBase = (string)assembly?.CodeBase;
-                        if ( !string.IsNullOrEmpty( codeBase ) ) {
-                            path = DynamicApis.PathCombine( DynamicApis.PathGetDirectoryName( codeBase
-                                .Replace( "file:///", string.Empty ) ), assemblyName.Name + ".xml" )
-                                .Replace( "file:\\", string.Empty );
+                        if (!string.IsNullOrEmpty(codeBase))
+                        {
+                            path = DynamicApis.PathCombine(DynamicApis.PathGetDirectoryName(codeBase
+                                .Replace("file:///", string.Empty)), assemblyName.Name + ".xml")
+                                .Replace("file:\\", string.Empty);
 
-                            if ( DynamicApis.FileExists( path ) ) {
+                            if (DynamicApis.FileExists(path))
+                            {
                                 return path;
                             }
                         }
                     }
 
                     var currentDomain = Type.GetType("System.AppDomain")?.GetRuntimeProperty("CurrentDomain")?.GetValue(null);
-                    if ( currentDomain?.HasProperty( "BaseDirectory" ) == true ) {
+                    if (currentDomain?.HasProperty("BaseDirectory") == true)
+                    {
                         var baseDirectory = currentDomain.TryGetPropertyValue("BaseDirectory", "");
-                        if ( !string.IsNullOrEmpty( baseDirectory ) ) {
-                            path = DynamicApis.PathCombine( baseDirectory, assemblyName.Name + ".xml" );
-                            if ( DynamicApis.FileExists( path ) ) {
+                        if (!string.IsNullOrEmpty(baseDirectory))
+                        {
+                            path = DynamicApis.PathCombine(baseDirectory, assemblyName.Name + ".xml");
+                            if (DynamicApis.FileExists(path))
+                            {
                                 return path;
                             }
 
-                            path = DynamicApis.PathCombine( baseDirectory, "bin/" + assemblyName.Name + ".xml" );
-                            if ( DynamicApis.FileExists( path ) ) {
+                            path = DynamicApis.PathCombine(baseDirectory, "bin/" + assemblyName.Name + ".xml");
+                            if (DynamicApis.FileExists(path))
+                            {
                                 return path;
                             }
                         }
                     }
 
                     var currentDirectory = DynamicApis.DirectoryGetCurrentDirectory();
-                    path = DynamicApis.PathCombine( currentDirectory, assembly.GetName().Name + ".xml" );
-                    if ( DynamicApis.FileExists( path ) ) {
+                    path = DynamicApis.PathCombine(currentDirectory, assembly.GetName().Name + ".xml");
+                    if (DynamicApis.FileExists(path))
+                    {
                         return path;
                     }
 
-                    path = DynamicApis.PathCombine( currentDirectory, "bin/" + assembly.GetName().Name + ".xml" );
-                    if ( DynamicApis.FileExists( path ) ) {
+                    path = DynamicApis.PathCombine(currentDirectory, "bin/" + assembly.GetName().Name + ".xml");
+                    if (DynamicApis.FileExists(path))
+                    {
                         return path;
                     }
 
                     dynamic? executingAssembly = typeof(Assembly)
                         .GetRuntimeMethod("GetExecutingAssembly", new Type[0])?
                         .Invoke(null, new object[0]);
-                    if ( !string.IsNullOrEmpty( executingAssembly?.Location ) ) {
+                    if (!string.IsNullOrEmpty(executingAssembly?.Location))
+                    {
                         var assemblyDirectory = DynamicApis.PathGetDirectoryName((string)executingAssembly!.Location);
-                        path = GetXmlDocsPathFromNuGetCacheOrDotNetSdk( assemblyDirectory, assemblyName );
-                        if ( path != null && DynamicApis.FileExists( path ) ) {
+                        path = GetXmlDocsPathFromNuGetCacheOrDotNetSdk(assemblyDirectory, assemblyName);
+                        if (path != null && DynamicApis.FileExists(path))
+                        {
                             return path;
                         }
                     }
 
-                    Cache[ assemblyFullName ] = null;
-                    return null;
-                } catch {
-                    Cache[ assemblyFullName ] = null;
+                    Cache[assemblyFullName] = null;
                     return null;
                 }
-            } catch {
+                catch
+                {
+                    Cache[assemblyFullName] = null;
+                    return null;
+                }
+            }
+            catch
+            {
                 return null;
             }
         }

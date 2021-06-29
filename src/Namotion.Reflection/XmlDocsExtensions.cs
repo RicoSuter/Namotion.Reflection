@@ -289,7 +289,7 @@ namespace Namotion.Reflection
         /// <param name="parameter">The reflected parameter or return info.</param>
         /// <param name="pathToXmlFile">The path to the XML documentation file.</param>
         /// <returns>The contents of the "returns" or "param" tag.</returns>
-        public static XElement? GetXmlDocsElement(this ParameterInfo parameter, string pathToXmlFile)
+        public static XElement? GetXmlDocsElement(this ParameterInfo parameter, string? pathToXmlFile)
         {
             try
             {
@@ -412,7 +412,7 @@ namespace Namotion.Reflection
                 return null;
             }
 
-            var assemblyName = member.Module?.Assembly?.GetName();
+            var assemblyName = member.Module.Assembly?.GetName();
             if (assemblyName is null)
             {
                 return null;
@@ -422,38 +422,30 @@ namespace Namotion.Reflection
                 return null;
             }
 
-            var documentationPath = GetXmlDocsPath(member.Module?.Assembly);
+            var documentationPath = GetXmlDocsPath(member.Module.Assembly);
 
             return GetXmlDocsWithoutLock(member, documentationPath);
         }
 
         private static XElement? GetXmlDocsWithoutLock(this MemberInfo member, string? pathToXmlFile)
         {
-
-            try
+            if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false || DynamicApis.SupportsPathApis == false)
             {
-                if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false || DynamicApis.SupportsPathApis == false)
-                {
-                    return null;
-                }
-
-                var assemblyName = member.Module.Assembly.GetName();
-                var document = TryGetXmlDocsDocument(assemblyName, pathToXmlFile);
-                if (document == null)
-                {
-                    return null;
-                }
-
-                var element = GetXmlDocsElement(member, document);
-                ReplaceInheritdocElements(member, element);
-
-
-                return element;
+                return null;
             }
-            catch ( Exception e )
+
+            var assemblyName = member.Module.Assembly.GetName();
+            var document     = TryGetXmlDocsDocument(assemblyName, pathToXmlFile);
+            if (document == null)
             {
-                throw;
+                return null;
             }
+
+            var element = GetXmlDocsElement(member, document);
+            ReplaceInheritdocElements(member, element);
+
+
+            return element;
         }
 
         private static CachingXDocument? TryGetXmlDocsDocument(AssemblyName assemblyName, string? pathToXmlFile)
@@ -893,7 +885,7 @@ namespace Namotion.Reflection
 
                     if (ObjectExtensions.HasProperty(assembly, "CodeBase"))
                     {
-                        var codeBase = (string)assembly?.CodeBase;
+                        var codeBase = (string)assembly?.CodeBase!;
                         if (!string.IsNullOrEmpty(codeBase))
                         {
                             path = DynamicApis.PathCombine(DynamicApis.PathGetDirectoryName(codeBase
@@ -911,15 +903,15 @@ namespace Namotion.Reflection
                     if (currentDomain?.HasProperty("BaseDirectory") == true)
                     {
                         var baseDirectory = currentDomain.TryGetPropertyValue("BaseDirectory", "");
-                        if (!string.IsNullOrEmpty(baseDirectory))
+                        if (!String.IsNullOrEmpty(baseDirectory))
                         {
-                            path = DynamicApis.PathCombine(baseDirectory, assemblyName.Name + ".xml");
+                            path = DynamicApis.PathCombine(baseDirectory!, assemblyName.Name + ".xml");
                             if (DynamicApis.FileExists(path))
                             {
                                 return path;
                             }
 
-                            path = DynamicApis.PathCombine(baseDirectory, "bin/" + assemblyName.Name + ".xml");
+                            path = DynamicApis.PathCombine(baseDirectory!, "bin/" + assemblyName.Name + ".xml");
                             if (DynamicApis.FileExists(path))
                             {
                                 return path;
@@ -928,13 +920,13 @@ namespace Namotion.Reflection
                     }
 
                     var currentDirectory = DynamicApis.DirectoryGetCurrentDirectory();
-                    path = DynamicApis.PathCombine(currentDirectory, assembly.GetName().Name + ".xml");
+                    path = DynamicApis.PathCombine(currentDirectory, assembly?.GetName().Name + ".xml");
                     if (DynamicApis.FileExists(path))
                     {
                         return path;
                     }
 
-                    path = DynamicApis.PathCombine(currentDirectory, "bin/" + assembly.GetName().Name + ".xml");
+                    path = DynamicApis.PathCombine(currentDirectory, "bin/" + assembly?.GetName().Name + ".xml");
                     if (DynamicApis.FileExists(path))
                     {
                         return path;

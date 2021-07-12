@@ -1,24 +1,12 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace Namotion.Reflection
 {
     /// <summary>
     /// A member info with contextual information.
     /// </summary>
-    public abstract class ContextualMemberInfo : ContextualType
+    public abstract class ContextualMemberInfo
     {
-        internal ContextualMemberInfo(MemberInfo memberInfo, Type memberType, ref int nullableFlagsIndex, byte[]? nullableFlags)
-            : base(memberType,
-                memberInfo.GetCustomAttributes(true).OfType<Attribute>().ToArray(),
-                null, ref nullableFlagsIndex, nullableFlags,
-                memberInfo.DeclaringType.IsNested ?
-                    new dynamic[] { memberInfo.DeclaringType, memberInfo.DeclaringType.DeclaringType, memberInfo.DeclaringType.GetTypeInfo().Assembly } :
-                    new dynamic[] { memberInfo.DeclaringType, memberInfo.DeclaringType.GetTypeInfo().Assembly })
-        {
-        }
-
         /// <summary>
         /// Gets the type context's member info.
         /// </summary>
@@ -28,20 +16,6 @@ namespace Namotion.Reflection
         /// Gets the name of the cached member name (property or parameter name).
         /// </summary>
         public abstract string Name { get; }
-
-        /// <summary>
-        /// Returns the value of a field supported by a given object.
-        /// </summary>
-        /// <param name="obj">The object.</param>
-        /// <returns>The value.</returns>
-        public abstract object? GetValue(object? obj);
-
-        /// <summary>
-        /// Sets the value of the field supported by the given object.
-        /// </summary>
-        /// <param name="obj">The object.</param>
-        /// <param name="value">The value.</param>
-        public abstract void SetValue(object? obj, object? value);
 
         /// <inheritdocs />
         public override string ToString()

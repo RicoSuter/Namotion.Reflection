@@ -31,14 +31,19 @@ namespace Namotion.Reflection
             return type.GetProperty(name);
         }
 
-        public static FieldInfo? GetDeclaredField(this Type type, string name)
+        public static FieldInfo? GetRuntimeField(this Type type, string name)
         {
-            return type.GetField(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
+            return type.GetField(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
         }
 
         public static PropertyInfo[] GetRuntimeProperties(this Type type)
         {
-            return type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            return type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+        }
+
+        public static FieldInfo[] GetRuntimeFields(this Type type)
+        {
+            return type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
         }
 
         public static Type GetTypeInfo(this Type type)

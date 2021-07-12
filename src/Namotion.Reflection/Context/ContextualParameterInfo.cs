@@ -11,9 +11,9 @@ namespace Namotion.Reflection
     {
         private string? _name;
 
-        internal ContextualParameterInfo(ParameterInfo parameterInfo, ref int nullableFlagsIndex)
+        internal ContextualParameterInfo(ParameterInfo parameterInfo, ref int nullableFlagsIndex, byte[]? nullableFlags)
             : base(parameterInfo.ParameterType, GetContextualAttributes(parameterInfo),
-                null, ref nullableFlagsIndex, null,
+                null, ref nullableFlagsIndex, nullableFlags,
                 parameterInfo.Member.DeclaringType.IsNested ?
                     new dynamic[] { parameterInfo.Member, parameterInfo.Member.DeclaringType, parameterInfo.Member.DeclaringType.DeclaringType, parameterInfo.Member.DeclaringType.GetTypeInfo().Assembly } :
                     new dynamic[] { parameterInfo.Member, parameterInfo.Member.DeclaringType, parameterInfo.Member.DeclaringType.GetTypeInfo().Assembly })

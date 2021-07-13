@@ -4,7 +4,7 @@ using System.Xml.Linq;
 namespace Namotion.Reflection
 {
     /// <summary>
-    /// Caching layer hiding the details of of accessing DLL documentation.
+    /// Caching layer hiding the details of accessing DLL documentation.
     /// </summary>
     internal class CachingXDocument
     {

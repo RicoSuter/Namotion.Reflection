@@ -1,0 +1,23 @@
+﻿
+[*.cs]
+
+# Microsoft .NET properties
+csharp_indent_braces = false
+csharp_new_line_before_open_brace = control_blocks,local_functions,methods,types
+csharp_space_between_method_call_parameter_list_parentheses = false
+csharp_space_between_method_declaration_parameter_list_parentheses = false
+
+# ReSharper properties
+resharper_blank_lines_after_block_statements = 0
+resharper_blank_lines_after_control_transfer_statements = 1
+resharper_case_block_braces = end_of_line
+resharper_csharp_max_line_length = 135
+resharper_csharp_space_within_parentheses = false
+resharper_int_align_binary_expressions = false
+resharper_int_align_nested_ternary = false
+resharper_nested_ternary_style = compact
+resharper_place_simple_embedded_statement_on_same_line = false
+resharper_space_within_array_access_brackets = false
+resharper_space_within_array_rank_brackets = false
+resharper_space_within_if_parentheses = false
+resharper_space_within_while_parentheses = false

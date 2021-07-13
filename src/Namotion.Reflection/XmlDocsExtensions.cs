@@ -170,8 +170,8 @@ namespace Namotion.Reflection
         /// <param name="type">The type.</param>
         /// <param name="pathToXmlFile">The path to the XML documentation file.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static XElement? GetXmlDocsElement(this Type type, string pathToXmlFile) {
-            
+        public static XElement? GetXmlDocsElement(this Type type, string pathToXmlFile)
+        {
             lock (Lock)
             {
                 return type.GetTypeInfo().GetXmlDocsWithoutLock(pathToXmlFile);
@@ -181,9 +181,8 @@ namespace Namotion.Reflection
         /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static XElement? GetXmlDocsElement(this MemberInfo member) {
-
-
+        public static XElement? GetXmlDocsElement(this MemberInfo member)
+        {
             lock (Lock)
             {
                 return GetXmlDocsWithoutLock(member);

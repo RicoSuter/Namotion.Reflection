@@ -651,9 +651,11 @@ namespace Namotion.Reflection
                     }
                 }
 
-                if (referencedType is null) { return; }
-                if (docAssembly is null) { return; }
-
+                if (referencedType is null || 
+                    docAssembly is null) 
+                { 
+                    return; 
+                }
 
                 XElement? referencedDocs = TryGetXmlDocsDocument(
                     docAssembly.GetName(),
@@ -726,9 +728,11 @@ namespace Namotion.Reflection
         /// <exception cref="ArgumentException">Unknown member type.</exception>
         internal static string GetMemberElementName(dynamic member)
         {
-            if ( member is null ) {
+            if (member is null)
+            {
                 throw new ArgumentNullException( nameof(member) );
             }
+            
             char prefixCode;
             string memberName;
             string memberTypeName;

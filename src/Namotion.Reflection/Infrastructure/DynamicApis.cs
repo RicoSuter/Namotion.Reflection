@@ -7,7 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System;
-#if NETSTANDARD1_1
+#if NETSTANDARD1_0
 using System.Linq;
 using System.Reflection;
 #else
@@ -21,7 +21,7 @@ namespace Namotion.Reflection.Infrastructure
     /// <summary>Provides dynamic access to framework APIs.</summary>
     internal static class DynamicApis
     {
-#if NETSTANDARD1_1
+#if NETSTANDARD1_0
         private static readonly Type? XPathExtensionsType;
         private static readonly Type? FileType;
         private static readonly Type? DirectoryType;
@@ -68,7 +68,7 @@ namespace Namotion.Reflection.Infrastructure
         /// <exception cref="NotSupportedException">The System.IO.Directory API is not available on this platform.</exception>
         public static string DirectoryGetCurrentDirectory()
         {
-#if NETSTANDARD1_1
+#if NETSTANDARD1_0
             if (!SupportsDirectoryApis)
                 throw new NotSupportedException("The System.IO.Directory API is not available on this platform.");
 
@@ -84,7 +84,7 @@ namespace Namotion.Reflection.Infrastructure
         /// <exception cref="NotSupportedException">The System.IO.File API is not available on this platform.</exception>
         public static bool FileExists(string filePath)
         {
-#if NETSTANDARD1_1
+#if NETSTANDARD1_0
             if (!SupportsFileApis)
                 throw new NotSupportedException("The System.IO.File API is not available on this platform.");
 
@@ -106,7 +106,7 @@ namespace Namotion.Reflection.Infrastructure
         /// <exception cref="NotSupportedException">The System.IO.File API is not available on this platform.</exception>
         public static string FileReadAllText(string filePath)
         {
-#if NETSTANDARD1_1
+#if NETSTANDARD1_0
             if (!SupportsFileApis)
                 throw new NotSupportedException("The System.IO.File API is not available on this platform.");
 
@@ -122,7 +122,7 @@ namespace Namotion.Reflection.Infrastructure
         /// <exception cref="NotSupportedException">The System.IO.File API is not available on this platform.</exception>
         public static bool DirectoryExists(string directoryPath)
         {
-#if NETSTANDARD1_1
+#if NETSTANDARD1_0
             if (!SupportsDirectoryApis)
                 throw new NotSupportedException("The System.IO.Directory API is not available on this platform.");
 
@@ -145,7 +145,7 @@ namespace Namotion.Reflection.Infrastructure
         /// <exception cref="NotSupportedException">The System.IO.Directory API is not available on this platform.</exception>
         public static string[] DirectoryGetAllFiles(string path, string searchPattern)
         {
-#if NETSTANDARD1_1
+#if NETSTANDARD1_0
             if (!SupportsDirectoryApis)
                 throw new NotSupportedException("The System.IO.Directory API is not available on this platform.");
 
@@ -164,7 +164,7 @@ namespace Namotion.Reflection.Infrastructure
         /// <exception cref="NotSupportedException">The System.IO.Path API is not available on this platform.</exception>
         public static string PathCombine(string path1, string path2)
         {
-#if NETSTANDARD1_1
+#if NETSTANDARD1_0
             if (!SupportsPathApis)
                 throw new NotSupportedException("The System.IO.Path API is not available on this platform.");
 
@@ -180,7 +180,7 @@ namespace Namotion.Reflection.Infrastructure
         /// <exception cref="NotSupportedException">The System.IO.Path API is not available on this platform.</exception>
         public static string PathGetDirectoryName(string filePath)
         {
-#if NETSTANDARD1_1
+#if NETSTANDARD1_0
             if (!SupportsPathApis)
                 throw new NotSupportedException("The System.IO.Path API is not available on this platform.");
 
@@ -197,7 +197,7 @@ namespace Namotion.Reflection.Infrastructure
         /// <exception cref="NotSupportedException">The System.Xml.XPath.Extensions API is not available on this platform.</exception>
         public static object? XPathEvaluate(XDocument document, string path)
         {
-#if NETSTANDARD1_1
+#if NETSTANDARD1_0
             if (!SupportsXPathApis)
                 throw new NotSupportedException("The System.Xml.XPath.Extensions API is not available on this platform.");
 
@@ -207,7 +207,7 @@ namespace Namotion.Reflection.Infrastructure
 #endif
         }
 
-#if NETSTANDARD1_1
+#if NETSTANDARD1_0
         private static Type? TryLoadType(params string[] typeNames)
         {
             foreach (var typeName in typeNames)

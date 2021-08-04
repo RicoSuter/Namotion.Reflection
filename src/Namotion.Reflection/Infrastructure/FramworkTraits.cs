@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 
 #if NETSTANDARD1_0
 
@@ -9,21 +8,19 @@ namespace FrameworkTraits
     {
         public static T Read<T>(ref T location) where T : class
         {
-            // 
-            // The VM will replace this with a more efficient implementation.
-            //
-            var value = location;
-            //Thread.MemoryBarrier();
-            return value;
+            lock (typeof(Volatile))
+            {
+                var value = location;
+                return value;
+            }
         }
 
         public static void Write<T>(ref T location, T value) where T : class
         {
-            // 
-            // The VM will replace this with a more efficient implementation.
-            //
-            //Thread.MemoryBarrier();
-            location = value;
+            lock (typeof(Volatile))
+            {
+                location = value;
+            }
         }
     }
 

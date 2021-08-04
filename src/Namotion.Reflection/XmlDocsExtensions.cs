@@ -32,6 +32,11 @@ namespace Namotion.Reflection
         {
             XmlDocsExtensions.ClearCache();
         }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether XML Docs files should be tried to be resolved from the NuGet or SDK directory (default: true).
+        /// </summary>
+        public static bool ResolveFromNuGetCacheOrDotNetSdk { get; set; }
     }
 
     /// <summary>Provides extension methods for reading XML comments from reflected members.</summary>
@@ -744,16 +749,20 @@ namespace Namotion.Reflection
                         return path;
                     }
 
-                    dynamic? executingAssembly = typeof(Assembly)
-                        .GetRuntimeMethod("GetExecutingAssembly", new Type[0])?
-                        .Invoke(null, new object[0]);
-                    if (!string.IsNullOrEmpty(executingAssembly?.Location))
+                    if (XmlDocs.ResolveFromNuGetCacheOrDotNetSdk)
                     {
-                        var assemblyDirectory = DynamicApis.PathGetDirectoryName((string)executingAssembly!.Location);
-                        path = GetXmlDocsPathFromNuGetCacheOrDotNetSdk(assemblyDirectory, assemblyName);
-                        if (path != null && DynamicApis.FileExists(path))
+                        dynamic? executingAssembly = typeof(Assembly)
+                            .GetRuntimeMethod("GetExecutingAssembly", new Type[0])?
+                            .Invoke(null, new object[0]);
+
+                        if (!string.IsNullOrEmpty(executingAssembly?.Location))
                         {
-                            return path;
+                            var assemblyDirectory = DynamicApis.PathGetDirectoryName((string)executingAssembly!.Location);
+                            path = GetXmlDocsPathFromNuGetCacheOrDotNetSdk(assemblyDirectory, assemblyName);
+                            if (path != null && DynamicApis.FileExists(path))
+                            {
+                                return path;
+                            }
                         }
                     }
 

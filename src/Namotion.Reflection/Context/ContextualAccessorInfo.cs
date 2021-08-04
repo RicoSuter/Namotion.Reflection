@@ -8,7 +8,6 @@
         /// </summary>
         public abstract ContextualType AccessorType { get; }
 
-        // TODO: Should we implement this?
         /// <summary>
         /// Gets the nullability information of this accessor's type in the given context by unwrapping Nullable{T}.
         /// </summary>

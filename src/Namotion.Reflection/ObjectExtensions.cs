@@ -134,7 +134,7 @@ namespace Namotion.Reflection
                 for (int i = 0; i < properties.Length; i++)
                 {
                     var property = properties[i];
-                    if (!property.IsValueType && property.CanRead)
+                    if (!property.PropertyType.IsValueType && property.CanRead)
                     {
                         var value = property.GetValue(obj);
                         if (value == null)
@@ -152,13 +152,13 @@ namespace Namotion.Reflection
                                 else
                                 {
                                     throw new InvalidOperationException(
-                                        "The object's nullability is invalid, property: " + property.Type.FullName + "." + property.Name);
+                                        "The object's nullability is invalid, property: " + property.PropertyType.Type.FullName + "." + property.Name);
                                 }
                             }
                         }
                         else if (checkedObjects != null)
                         {
-                            ValidateNullability(value, property.MemberInfo.ToContextualMember(), checkedObjects, errors, stopFirstFail);
+                            ValidateNullability(value, property.PropertyType, checkedObjects, errors, stopFirstFail);
                         }
                     }
                 }

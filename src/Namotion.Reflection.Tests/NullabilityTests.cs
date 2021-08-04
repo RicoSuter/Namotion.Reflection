@@ -210,7 +210,7 @@ namespace Namotion.Reflection.Tests
 
             // Assert
             Assert.Equal(Nullability.NotNullable, typeWithContext.Nullability);
-            Assert.Equal(Nullability.Nullable, typeWithContext.GenericArguments[0].Nullability);
+            Assert.Equal(Nullability.Nullable, typeWithContext.PropertyType.GenericArguments[0].Nullability);
         }
 
         [Fact]
@@ -297,7 +297,7 @@ namespace Namotion.Reflection.Tests
         public void AssemblyNotNullableStringProperty()
         {
             // Arrange
-            var property = typeof(FullAssemblyTestAction).GetProperty(nameof(FullAssemblyTestAction.Property1))!.ToContextualMember();
+            var property = typeof(FullAssemblyTestAction).GetProperty(nameof(FullAssemblyTestAction.Property1))!.ToContextualAccessor();
 
             // Act & Assert
             Assert.Equal(Nullability.NotNullable, property.Nullability);
@@ -307,7 +307,7 @@ namespace Namotion.Reflection.Tests
         public void AssemblyNullableStringProperty()
         {
             // Arrange
-            var property = typeof(FullAssemblyTestAction).GetProperty(nameof(FullAssemblyTestAction.Property2))!.ToContextualMember();
+            var property = typeof(FullAssemblyTestAction).GetProperty(nameof(FullAssemblyTestAction.Property2))!.ToContextualAccessor();
 
             // Act & Assert
             Assert.Equal(Nullability.Nullable, property.Nullability);
@@ -361,10 +361,10 @@ namespace Namotion.Reflection.Tests
             Assert.Equal(Nullability.Nullable, methodTest2a!.ReturnParameter.ToContextualParameter().Nullability);
             Assert.Equal(Nullability.NotNullable, methodTest2b!.ReturnParameter.ToContextualParameter().Nullability);
 
-            Assert.Equal(Nullability.NotNullable, methodTest1a.GetContextualParameters()[0].Nullability);
-            Assert.Equal(Nullability.Nullable, methodTest1b.GetContextualParameters()[0].Nullability);
-            Assert.Equal(Nullability.NotNullable, methodTest1a.GetContextualParameters()[0].Nullability);
-            Assert.Equal(Nullability.Nullable, methodTest1b.GetContextualParameters()[0].Nullability);
+            Assert.Equal(Nullability.NotNullable, methodTest1a.GetParameters()[0].ToContextualParameter().Nullability);
+            Assert.Equal(Nullability.Nullable, methodTest1b.GetParameters()[0].ToContextualParameter().Nullability);
+            Assert.Equal(Nullability.NotNullable, methodTest1a.GetParameters()[0].ToContextualParameter().Nullability);
+            Assert.Equal(Nullability.Nullable, methodTest1b.GetParameters()[0].ToContextualParameter().Nullability);
 
         }
         
@@ -421,7 +421,7 @@ namespace Namotion.Reflection.Tests
             var properties = typeof(NullableStringCollectionTestClass).GetProperties();
             foreach (var prop in properties)
             {
-                var itemType = prop.ToContextualProperty().EnumerableItemType;
+                var itemType = prop.ToContextualProperty().PropertyType.EnumerableItemType;
                 Assert.Equal("String", itemType!.TypeName);
                 Assert.Equal(Nullability.Nullable, itemType!.Nullability);
             }

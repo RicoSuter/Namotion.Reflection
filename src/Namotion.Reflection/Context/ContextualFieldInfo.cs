@@ -1,18 +1,28 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Linq;
+using System.Reflection;
 
 namespace Namotion.Reflection
 {
     /// <summary>
     /// A field info with contextual information.
     /// </summary>
-    public class ContextualFieldInfo : ContextualMemberInfo
+    public class ContextualFieldInfo : ContextualAccessorInfo
     {
         private string? _name;
 
         internal ContextualFieldInfo(FieldInfo fieldInfo, ref int nullableFlagsIndex, byte[]? nullableFlags)
-            : base(fieldInfo, fieldInfo.FieldType, ref nullableFlagsIndex, nullableFlags)
         {
             FieldInfo = fieldInfo;
+            FieldType = new ContextualType(
+               fieldInfo.FieldType,
+               fieldInfo.GetCustomAttributes(true).OfType<Attribute>().ToArray(),
+               null,
+               ref nullableFlagsIndex,
+               nullableFlags,
+               fieldInfo.DeclaringType.IsNested ?
+                   new dynamic[] { fieldInfo.DeclaringType, fieldInfo.DeclaringType.DeclaringType, fieldInfo.DeclaringType.GetTypeInfo().Assembly } :
+                   new dynamic[] { fieldInfo.DeclaringType, fieldInfo.DeclaringType.GetTypeInfo().Assembly });
         }
 
         /// <summary>
@@ -24,6 +34,14 @@ namespace Namotion.Reflection
         /// Gets the type context's member info.
         /// </summary>
         public override MemberInfo MemberInfo => FieldInfo;
+
+        /// <inheritdoc />
+        public override ContextualType AccessorType => FieldType;
+
+        /// <summary>
+        /// Gets the field's contextual type.
+        /// </summary>
+        public ContextualType FieldType { get; private set; }
 
         /// <summary>
         /// Gets the cached field name.

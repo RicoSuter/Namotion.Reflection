@@ -22,8 +22,10 @@ Inheritance hierarchy:
     - **ContextualType:** A cached `Type` with contextual attributes (e.g. property attributes)
 	    - **ContextualParameterInfo**
 	    - **ContextualMemberInfo**
-		    - **ContextualPropertyInfo**
-			- **ContextualFieldInfo**
+            - **ContextualMethodInfo**
+            - **ContextualAccessorInfo**
+		        - **ContextualPropertyInfo**
+			    - **ContextualFieldInfo**
 
 Behavior: 
 

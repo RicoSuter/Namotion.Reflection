@@ -8,7 +8,7 @@ using Xunit.Abstractions;
 
 namespace Namotion.Reflection.Benchmark
 {
-    public class ObjectExtensionsBenchmarks
+    public class GeneralBenchmarks
     {
         private Foo _object = default!;
 
@@ -32,7 +32,7 @@ namespace Namotion.Reflection.Benchmark
 
         private Counter _counter = default!;
 
-        public ObjectExtensionsBenchmarks(ITestOutputHelper output)
+        public GeneralBenchmarks(ITestOutputHelper output)
         {
             Trace.Listeners.Clear();
             Trace.Listeners.Add(new XunitTraceListener(output));
@@ -75,10 +75,10 @@ namespace Namotion.Reflection.Benchmark
 
         [NBenchFact]
         [PerfBenchmark(
-          NumberOfIterations = 3,
-          RunTimeMilliseconds = 1000,
-          RunMode = RunMode.Throughput,
-          TestMode = TestMode.Test)]
+            NumberOfIterations = 3,
+            RunTimeMilliseconds = 1000,
+            RunMode = RunMode.Throughput,
+            TestMode = TestMode.Test)]
         [CounterThroughputAssertion("Iterations", MustBe.GreaterThan, 100)]
         public void ReadXmlDocs()
         {

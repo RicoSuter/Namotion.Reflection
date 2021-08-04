@@ -619,5 +619,29 @@ namespace Namotion.Reflection.Tests
             //// Assert
             Assert.False(string.IsNullOrWhiteSpace(summary));
         }
+
+        public abstract class WithSeeTagForMethodInParamXmlDoc
+        {
+            /// <summary>Foo.</summary>
+            string Foo { get; }
+
+            /// <summary>Bar.</summary>
+            /// <param name="baz">Boolean returned from method <see cref="int.TryParse(string?, out int)"/>.</param>
+            public abstract void Bar(bool baz);
+        }
+
+        [Fact]
+        public void When_param_has_see_tag_for_method_XML_docs_gets_method_name()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            var parameterXml = typeof(WithSeeTagForMethodInParamXmlDoc).GetMethod("Bar").GetParameters()
+                .Single(p => p.Name == "baz").GetXmlDocs();
+
+            //// Assert
+            Assert.Equal("Boolean returned from method TryParse.", parameterXml);
+        }
     }
 }

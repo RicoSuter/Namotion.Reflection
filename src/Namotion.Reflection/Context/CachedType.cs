@@ -98,7 +98,11 @@ namespace Namotion.Reflection
                     if (_typeAttributes == null)
                     {
                         // TODO: rename to inherited type attributes and add type attributes property
-                        _typeAttributes = _type!.GetTypeInfo().GetCustomAttributes(true).OfType<Attribute>().ToArray();
+                        _typeAttributes = _type!
+                            .GetTypeInfo()
+                            .GetCustomAttributes(true)
+                            .OfType<Attribute>()
+                            .ToArray();
                     }
 
                     return _typeAttributes;

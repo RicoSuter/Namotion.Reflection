@@ -142,14 +142,7 @@ namespace Namotion.Reflection
                     return elementType;
                 }
 
-#if NETSTANDARD1_0
-                var getEnumeratorMethod = Type.GetRuntimeMethod("GetEnumerator", new Type[0]) ?? Type.GetTypeInfo().ImplementedInterfaces
-                    .Select(i => i.GetTypeInfo().GetDeclaredMethod("GetEnumerator")).FirstOrDefault(m => m != null);
-#else
-                var getEnumeratorMethod = Type.GetRuntimeMethod("GetEnumerator", new Type[0]) ?? Type.GetTypeInfo().GetInterfaces()
-                    .Select(i => i.GetTypeInfo().GetDeclaredMethod("GetEnumerator")).FirstOrDefault(m => m != null);
-#endif
-
+                var getEnumeratorMethod = Methods.SingleOrDefault(m => m.Name == "GetEnumerator");
                 if (getEnumeratorMethod != null)
                 {
                     if (GenericArguments?.Length == 1)
@@ -162,8 +155,7 @@ namespace Namotion.Reflection
                         return _enumerableItemType;
                     }
 
-                    // TODO: Load method from contextual type
-                    var returnParam = getEnumeratorMethod.ReturnParameter?.ToContextualParameter();
+                    var returnParam = getEnumeratorMethod.ReturnParameter;
                     if (returnParam?.GenericArguments.Length == 1)
                     {
                         _enumerableItemType = returnParam.GenericArguments[0];
@@ -238,7 +230,7 @@ namespace Namotion.Reflection
         /// <returns>The attribute or null.</returns>
         public T? GetAttribute<T>()
         {
-            return ContextAttributes.OfType<T>().Concat(TypeAttributes.OfType<T>()).FirstOrDefault();
+            return ContextAttributes.OfType<T>().Concat(InheritedTypeAttributes.OfType<T>()).FirstOrDefault();
         }
 
         /// <summary>
@@ -248,7 +240,7 @@ namespace Namotion.Reflection
         /// <returns>The attributes.</returns>
         public IEnumerable<T> GetAttributes<T>()
         {
-            return ContextAttributes.OfType<T>().Concat(TypeAttributes.OfType<T>());
+            return ContextAttributes.OfType<T>().Concat(InheritedTypeAttributes.OfType<T>());
         }
 
         /// <summary>
@@ -290,7 +282,7 @@ namespace Namotion.Reflection
         }
 
         /// <summary>
-        /// Gets the contextual methods of this type.
+        /// Gets the contextual methods of this type (runtime).
         /// </summary>
         public ContextualMethodInfo[] Methods
         {

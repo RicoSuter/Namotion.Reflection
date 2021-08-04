@@ -81,14 +81,7 @@ namespace Namotion.Reflection
                 return elementType;
             }
 
-#if NETSTANDARD1_0
-            var getEnumeratorMethod = type.GetRuntimeMethod("GetEnumerator", new Type[0]) ?? type.GetTypeInfo().ImplementedInterfaces
-                .Select(i => i.GetTypeInfo().GetDeclaredMethod("GetEnumerator")).FirstOrDefault(m => m != null);
-#else
-            var getEnumeratorMethod = type.GetRuntimeMethod("GetEnumerator", new Type[0]) ?? type.GetTypeInfo().GetInterfaces()
-                .Select(i => i.GetTypeInfo().GetDeclaredMethod("GetEnumerator")).FirstOrDefault(m => m != null);
-#endif
-
+            var getEnumeratorMethod = type.ToContextualType().Methods.SingleOrDefault(m => m.Name == "GetEnumerator");
             if (getEnumeratorMethod != null)
             {
                 var genericTypeArguments = type.GetGenericTypeArgumentsOfTypeOrBaseTypes();
@@ -97,8 +90,7 @@ namespace Namotion.Reflection
                     return genericTypeArguments[0];
                 }
 
-                // TODO: Load method from contextual type
-                var returnParam = getEnumeratorMethod.ReturnParameter?.ToContextualParameter();
+                var returnParam = getEnumeratorMethod.ReturnParameter;
                 if (returnParam?.GenericArguments.Length == 1)
                 {
                     return returnParam.GenericArguments[0];

@@ -22,8 +22,10 @@ Inheritance hierarchy:
     - **ContextualType:** A cached `Type` with contextual attributes (e.g. property attributes)
 	    - **ContextualParameterInfo**
 	    - **ContextualMemberInfo**
-		    - **ContextualPropertyInfo**
-			- **ContextualFieldInfo**
+            - **ContextualMethodInfo**
+            - **ContextualAccessorInfo**
+		        - **ContextualPropertyInfo**
+			    - **ContextualFieldInfo**
 
 Behavior: 
 
@@ -136,7 +138,7 @@ Methods:
 **Object extensions**
 
 - **HasProperty():** Determines whether the specified property name exists.
-- **TryGetPropertyValue():** Determines whether the specified property name exists.
+- **TryGetPropertyValue():** Returns the value of the given property or null if the property does not exist.
 
 **Type extensions**
 

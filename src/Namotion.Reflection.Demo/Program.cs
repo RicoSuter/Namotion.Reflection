@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Linq;
 
 namespace Namotion.Reflection.Demo
 {
@@ -36,8 +36,9 @@ namespace Namotion.Reflection.Demo
                 .GetContextualProperties();
 
             var parameters = typeof(Person)
-                .GetMethod(nameof(Person.Update))
-                .GetContextualParameters();
+                .GetMethod(nameof(Person.Update))!
+                .GetParameters()
+                .Select(p => p.ToContextualParameter());
 
             Console.WriteLine(nameof(Person));
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using Xunit;
 
@@ -44,20 +45,19 @@ namespace Namotion.Reflection.Tests
         [Fact]
         public void OpenGenericsType()
         {
-            void DoTest(Type t, Nullability expectedNullability)
+            void DoTest(ContextualType t, Nullability expectedNullability)
             {
-                Assert.Equal(expectedNullability, t.GetTypeInfo().GenericTypeParameters[0].ToContextualType().Nullability);
-                Assert.Equal(expectedNullability, t.GetProperty("Prop")!.ToContextualProperty().Nullability);
+                Assert.Equal(expectedNullability, t.Properties.First(p => p.Name == "Prop")!.Nullability);
 
-                var method = t.GetMethod("DoStuff")!;
-                Assert.Equal(expectedNullability, method.ReturnParameter.ToContextualParameter().Nullability);
-                Assert.Equal(expectedNullability, method.GetParameters()[0].ToContextualParameter().Nullability);
+                var method = t.Methods.First(m => m.Name == "DoStuff")!;
+                Assert.Equal(expectedNullability, method.ReturnParameter.Nullability);
+                Assert.Equal(expectedNullability, method.Parameters[0].Nullability);
             }
 
-            DoTest(typeof(UnconstrainedGenericClass<>), Nullability.Nullable);
-            DoTest(typeof(NotNullGenericClass<>), Nullability.NotNullable);
-            DoTest(typeof(NullableGenericClass<>), Nullability.Nullable);
-            DoTest(typeof(StructGenericClass<>), Nullability.NotNullable);
+            DoTest(typeof(UnconstrainedGenericClass<>).ToContextualType(), Nullability.Nullable);
+            DoTest(typeof(NotNullGenericClass<>).ToContextualType(), Nullability.NotNullable);
+            DoTest(typeof(NullableGenericClass<>).ToContextualType(), Nullability.Nullable);
+            DoTest(typeof(StructGenericClass<>).ToContextualType(), Nullability.NotNullable);
         }
 
         public class ClosedGenericsClass
@@ -80,9 +80,9 @@ namespace Namotion.Reflection.Tests
             {
                 var property = typeof(ClosedGenericsClass).GetProperty(propertyName)!.ToContextualProperty();
 
-                Assert.Equal(expectedNullability, property.GenericArguments[0].Nullability);
-                Assert.Equal(expectedNullability, property.GetProperty("Prop")!.Nullability);
-                Assert.Equal(expectedNullability, property.GetField("Field")!.Nullability);
+                Assert.Equal(expectedNullability, property.PropertyType.GenericArguments[0].Nullability);
+                Assert.Equal(expectedNullability, property.PropertyType.GetProperty("Prop")!.Nullability);
+                Assert.Equal(expectedNullability, property.PropertyType.GetField("Field")!.Nullability);
             }
 
             DoTest(nameof(ClosedGenericsClass.NotNull1), Nullability.NotNullable);

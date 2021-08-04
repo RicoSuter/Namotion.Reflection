@@ -348,7 +348,14 @@ namespace Namotion.Reflection
                                     attribute = e.Attribute("cref");
                                     if (attribute != null)
                                     {
-                                        value.Append(attribute.Value.Trim('!', ':').Trim().Split('.').Last());
+                                        if (attribute.Value.Contains("("))
+                                        {
+                                            value.Append(attribute.Value.Trim('!', ':').Trim().Substring(0, attribute.Value.IndexOf('(')).Split('.').Last());
+                                        }
+                                        else
+                                        {
+                                            value.Append(attribute.Value.Trim('!', ':').Trim().Split('.').Last());
+                                        }
                                     }
                                     else
                                     {

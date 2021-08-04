@@ -47,7 +47,6 @@ namespace Namotion.Reflection.Tests
         {
             void DoTest(ContextualType t, Nullability expectedNullability)
             {
-                Assert.Equal(expectedNullability, t.GenericArguments[0].Nullability);
                 Assert.Equal(expectedNullability, t.Properties.First(p => p.Name == "Prop")!.Nullability);
 
                 var method = t.Methods.First(m => m.Name == "DoStuff")!;

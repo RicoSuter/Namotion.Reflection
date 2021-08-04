@@ -318,29 +318,26 @@ namespace Namotion.Reflection
                                 //    {
                                 //        var actualType = GenericArguments[genericProperty.PropertyType.GenericParameterPosition];
                                 //        var actualIndex = actualType._nullableFlagsIndex;
-                                //        return new ContextualMethodInfo
-                                //        {
-                                //            Parameters = method
+                                //        return new ContextualMethodInfo(
+                                //            method,
+                                //            new ContextualParameterInfo(method.ReturnParameter, ref actualIndex, null),
+                                //            method
                                 //                .GetParameters()
-                                //                .Select(p => new ContextualParameterInfo(p, ref actualIndex, actualType?._nullableFlags))
-                                //                .ToArray()
-                                //        };
+                                //                .Select(p => new ContextualParameterInfo(p, ref actualIndex, actualType?._nullableFlags)));
                                 //    }
                                 //}
 
                                 var index = 0;
-                                return new ContextualMethodInfo
-                                {
-                                    ReturnParameter = new ContextualParameterInfo(method.ReturnParameter, ref index, null),
-                                    Parameters = method
+                                return new ContextualMethodInfo(
+                                    method,
+                                    new ContextualParameterInfo(method.ReturnParameter, ref index, null),
+                                    method
                                         .GetParameters()
                                         .Select(p =>
                                         {
                                             var index = 0;
                                             return new ContextualParameterInfo(p, ref index, null);
-                                        })
-                                        .ToArray()
-                                };
+                                        }));
                             }).ToArray();
                         }
                     }

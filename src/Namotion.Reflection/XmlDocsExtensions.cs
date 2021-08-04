@@ -169,7 +169,7 @@ namespace Namotion.Reflection
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static XElement? GetXmlDocsElement(this Type type, string pathToXmlFile)
         {
-            return type.GetTypeInfo().GetXmlDocsElement(pathToXmlFile);
+            return ((MemberInfo)type.GetTypeInfo()).GetXmlDocsElement(pathToXmlFile);
         }
 
         /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>

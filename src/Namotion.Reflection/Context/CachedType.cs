@@ -24,7 +24,7 @@ namespace Namotion.Reflection
         private bool _isNullableType;
         private string? _typeName;
 
-        private Attribute[]? _inheritedTypeAttributes;
+        private Attribute[]? _inheritedAttributes;
 
         /// <summary>
         /// Internal generic arguments.
@@ -63,7 +63,7 @@ namespace Namotion.Reflection
         /// <summary>
         /// Gets all type attributes.
         /// </summary>
-        public virtual IEnumerable<Attribute> Attributes => InheritedTypeAttributes;
+        public virtual IEnumerable<Attribute> Attributes => InheritedAttributes;
 
         /// <summary>
         /// Gets the type name.
@@ -83,30 +83,30 @@ namespace Namotion.Reflection
         /// <summary>
         /// Gets the type's associated attributes of the type (inherited).
         /// </summary>
-        public Attribute[] InheritedTypeAttributes
+        public Attribute[] InheritedAttributes
         {
             get
             {
                 // TODO: Add type attributes property (only direct attributes without inherit)
 
-                if (_inheritedTypeAttributes != null)
+                if (_inheritedAttributes != null)
                 {
-                    return _inheritedTypeAttributes;
+                    return _inheritedAttributes;
                 }
 
                 UpdateOriginalGenericArguments();
                 lock (this)
                 {
-                    if (_inheritedTypeAttributes == null)
+                    if (_inheritedAttributes == null)
                     {
-                        _inheritedTypeAttributes = _type!
+                        _inheritedAttributes = _type!
                             .GetTypeInfo()
                             .GetCustomAttributes(true)
                             .OfType<Attribute>()
                             .ToArray();
                     }
 
-                    return _inheritedTypeAttributes;
+                    return _inheritedAttributes;
                 }
             }
         }
@@ -176,10 +176,10 @@ namespace Namotion.Reflection
         /// </summary>
         /// <typeparam name="T">The attribute type.</typeparam>
         /// <returns>The attribute or null.</returns>
-        public T? GetTypeAttribute<T>()
+        public T? GetInheritedAttribute<T>()
             where T : Attribute
         {
-            return InheritedTypeAttributes.OfType<T>().SingleOrDefault();
+            return InheritedAttributes.OfType<T>().SingleOrDefault();
         }
 
         /// <summary>
@@ -187,9 +187,9 @@ namespace Namotion.Reflection
         /// </summary>
         /// <typeparam name="T">The attribute type.</typeparam>
         /// <returns>The attributes.</returns>
-        public IEnumerable<T> GetTypeAttributes<T>()
+        public IEnumerable<T> GetInheritedAttributes<T>()
         {
-            return InheritedTypeAttributes.OfType<T>();
+            return InheritedAttributes.OfType<T>();
         }
 
         /// <inheritdocs />

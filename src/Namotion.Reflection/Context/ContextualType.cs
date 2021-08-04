@@ -230,7 +230,7 @@ namespace Namotion.Reflection
         /// <returns>The attribute or null.</returns>
         public T? GetAttribute<T>()
         {
-            return ContextAttributes.OfType<T>().Concat(InheritedTypeAttributes.OfType<T>()).FirstOrDefault();
+            return ContextAttributes.OfType<T>().Concat(InheritedAttributes.OfType<T>()).FirstOrDefault();
         }
 
         /// <summary>
@@ -240,7 +240,7 @@ namespace Namotion.Reflection
         /// <returns>The attributes.</returns>
         public IEnumerable<T> GetAttributes<T>()
         {
-            return ContextAttributes.OfType<T>().Concat(InheritedTypeAttributes.OfType<T>());
+            return ContextAttributes.OfType<T>().Concat(InheritedAttributes.OfType<T>());
         }
 
         /// <summary>

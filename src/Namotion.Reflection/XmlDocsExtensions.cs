@@ -36,7 +36,7 @@ namespace Namotion.Reflection
         /// <summary>
         /// Gets or sets a value indicating whether XML Docs files should be tried to be resolved from the NuGet or SDK directory (default: true).
         /// </summary>
-        public static bool ResolveFromNuGetCacheOrDotNetSdk { get; set; }
+        public static bool ResolveFromNuGetCacheOrDotNetSdk { get; set; } = true;
     }
 
     /// <summary>Provides extension methods for reading XML comments from reflected members.</summary>

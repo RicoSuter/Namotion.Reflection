@@ -256,23 +256,26 @@ namespace Namotion.Reflection
                     {
                         if (_properties == null)
                         {
-                            _properties = Type.GetRuntimeProperties().Select(property =>
-                            {
-                                if (TypeInfo.IsGenericType && !TypeInfo.ContainsGenericParameters)
+                            _properties = Type
+                                .GetRuntimeProperties()
+                                .Select(property =>
                                 {
-                                    var genericType = property.DeclaringType.GetGenericTypeDefinition();
-                                    var genericProperty = genericType.GetRuntimeProperty(property.Name);
-                                    if (genericProperty != null)
+                                    if (TypeInfo.IsGenericType && !TypeInfo.ContainsGenericParameters)
                                     {
-                                        var actualType = GenericArguments[genericProperty.PropertyType.GenericParameterPosition];
-                                        var actualIndex = actualType._nullableFlagsIndex;
-                                        return new ContextualPropertyInfo(property, ref actualIndex, actualType._nullableFlags);
+                                        var genericType = property.DeclaringType.GetGenericTypeDefinition();
+                                        var genericProperty = genericType.GetRuntimeProperty(property.Name);
+                                        if (genericProperty != null && genericProperty.PropertyType.IsGenericParameter)
+                                        {
+                                            var actualType = GenericArguments[genericProperty.PropertyType.GenericParameterPosition];
+                                            var actualIndex = actualType._nullableFlagsIndex;
+                                            return new ContextualPropertyInfo(property, ref actualIndex, actualType._nullableFlags);
+                                        }
                                     }
-                                }
 
-                                var index = 0;
-                                return new ContextualPropertyInfo(property, ref index, null);
-                            }).ToArray();
+                                    var index = 0;
+                                    return new ContextualPropertyInfo(property, ref index, null);
+                                })
+                                .ToArray();
                         }
                     }
                 }

@@ -15,6 +15,10 @@ namespace Namotion.Reflection.Tests
             public T Field = default!;
 
             public T DoStuff(T original) => original;
+
+            public string NotNullable { get; set; }
+
+            public string? Nullable { get; set; }
         }
         public class NotNullGenericClass<T> where T : notnull
         {
@@ -23,6 +27,10 @@ namespace Namotion.Reflection.Tests
             public T Field = default!;
 
             public T DoStuff(T original) => original;
+
+            public string NotNullable { get; set; }
+
+            public string? Nullable { get; set; }
         }
         public class NullableGenericClass<T> where T : class?
         {
@@ -31,6 +39,10 @@ namespace Namotion.Reflection.Tests
             public T Field = default!;
 
             public T DoStuff(T original) => original;
+
+            public string NotNullable { get; set; }
+
+            public string? Nullable { get; set; }
         }
 
         public class StructGenericClass<T> where T : struct
@@ -40,6 +52,10 @@ namespace Namotion.Reflection.Tests
             public T Field = default!;
 
             public T DoStuff(T original) => original;
+
+            public string NotNullable { get; set; }
+
+            public string? Nullable { get; set; }
         }
 
         [Fact]
@@ -48,6 +64,8 @@ namespace Namotion.Reflection.Tests
             void DoTest(ContextualType t, Nullability expectedNullability)
             {
                 Assert.Equal(expectedNullability, t.Properties.First(p => p.Name == "Prop")!.Nullability);
+                Assert.Equal(Nullability.NotNullable, t.Properties.First(p => p.Name == "NotNullable")!.Nullability);
+                Assert.Equal(Nullability.Nullable, t.Properties.First(p => p.Name == "Nullable")!.Nullability);
 
                 var method = t.Methods.First(m => m.Name == "DoStuff")!;
                 Assert.Equal(expectedNullability, method.ReturnParameter.Nullability);
@@ -71,6 +89,10 @@ namespace Namotion.Reflection.Tests
 
             public UnconstrainedGenericClass<string?> Nullable1 { get; set; }
             public NullableGenericClass<string?> Nullable2 { get; set; }
+
+            public string NotNullable { get; set; }
+
+            public string? Nullable { get; set; }
         }
 
         [Fact]
@@ -78,11 +100,15 @@ namespace Namotion.Reflection.Tests
         {
             void DoTest(string propertyName, Nullability expectedNullability)
             {
-                var property = typeof(ClosedGenericsClass).GetProperty(propertyName)!.ToContextualProperty();
+                var type = typeof(ClosedGenericsClass).ToContextualType();
+                var property = type.Properties.First(p => p.Name == propertyName);
 
                 Assert.Equal(expectedNullability, property.PropertyType.GenericArguments[0].Nullability);
                 Assert.Equal(expectedNullability, property.PropertyType.GetProperty("Prop")!.Nullability);
                 Assert.Equal(expectedNullability, property.PropertyType.GetField("Field")!.Nullability);
+
+                Assert.Equal(Nullability.NotNullable, type.Properties.First(p => p.Name == "NotNullable")!.Nullability);
+                Assert.Equal(Nullability.Nullable, type.Properties.First(p => p.Name == "Nullable")!.Nullability);
             }
 
             DoTest(nameof(ClosedGenericsClass.NotNull1), Nullability.NotNullable);

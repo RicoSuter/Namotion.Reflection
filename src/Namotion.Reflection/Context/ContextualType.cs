@@ -260,7 +260,8 @@ namespace Namotion.Reflection
                                 .GetRuntimeProperties()
                                 .Select(property =>
                                 {
-                                    if (TypeInfo.IsGenericType && !TypeInfo.ContainsGenericParameters)
+                                    if (property.DeclaringType.GetTypeInfo().IsGenericType && 
+                                        !property.DeclaringType.GetTypeInfo().ContainsGenericParameters)
                                     {
                                         var genericType = property.DeclaringType.GetGenericTypeDefinition();
                                         var genericProperty = genericType.GetRuntimeProperty(property.Name);

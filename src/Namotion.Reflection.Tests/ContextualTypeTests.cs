@@ -34,5 +34,32 @@ namespace Namotion.Reflection.Tests
             Assert.Equal("String", type1);
             Assert.Equal("Int32", type2);
         }
+
+        public class ParentClass
+        {
+            public string Property { get; set; }
+        }
+
+        public class GenericChildClass<T> : ParentClass
+        {
+        }
+
+        [Fact]
+        public void WhenReadingProperties_ThenNoExceptionIsThrown()
+        {
+            // Arrange
+            var ct = typeof(GenericChildClass<string>).ToContextualType();
+          
+            // Act
+            var properties = ct.Properties;
+
+            // Assert
+            Assert.NotNull(properties);
+        }
+
+        public void Repro()
+        {
+          
+        }
     }
 }

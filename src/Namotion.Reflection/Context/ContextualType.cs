@@ -421,7 +421,6 @@ namespace Namotion.Reflection
         private void InitializeNullableFlagsAndOriginalNullability(ref int nullableFlagsIndex, IEnumerable<dynamic>? customAttributeProviders)
         {
             var typeInfo = OriginalType.GetTypeInfo();
-
             try
             {
                 if (_nullableFlags == null)
@@ -433,6 +432,9 @@ namespace Namotion.Reflection
                     }
                     else if (typeInfo.IsGenericParameter)
                     {
+                        if (typeInfo.GenericParameterAttributes.HasFlag(GenericParameterAttributes.NotNullableValueTypeConstraint) || // specifically a struct - existing code works
+                            typeInfo.GenericParameterAttributes.HasFlag(GenericParameterAttributes.ReferenceTypeConstraint)) // specifically a class - existing code works
+                        {
                         nullableAttribute = typeInfo.GetCustomAttributes().FirstOrDefault(a => a.GetType().FullName == "System.Runtime.CompilerServices.NullableAttribute");
                         if (nullableAttribute is not null)
                         {
@@ -443,6 +445,20 @@ namespace Namotion.Reflection
                             // Default nullability (NullableContextAttribute) from the context
                             _nullableFlags = GetFlagsFromCustomAttributeProviders(typeInfo.DeclaringType.IsNested ? new dynamic[] { typeInfo.DeclaringType, typeInfo.DeclaringType.DeclaringType } : new dynamic[] { typeInfo.DeclaringType });
                         }
+                        }
+                        else
+                        {
+                            // unconstrained generic - take nullability from the context
+                            if (customAttributeProviders is not null)
+                            {
+                                _nullableFlags = GetFlagsFromCustomAttributeProviders(customAttributeProviders);
+                            }
+                            else
+                            {
+                                _nullableFlags = new byte[] { 0 }; // Unknown
+                            }
+                        }
+
                     }
                     else if (customAttributeProviders is not null)
                     {

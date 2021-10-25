@@ -42,7 +42,7 @@ namespace Namotion.Reflection
     /// <summary>Provides extension methods for reading XML comments from reflected members.</summary>
     public static class XmlDocsExtensions
     {
-        private static readonly ConcurrentDictionary<string, CachingXDocument?> Cache = 
+        private static readonly ConcurrentDictionary<string, CachingXDocument?> Cache =
             new ConcurrentDictionary<string, CachingXDocument?>(StringComparer.OrdinalIgnoreCase);
 
         internal static void ClearCache()
@@ -618,7 +618,11 @@ namespace Namotion.Reflection
                             x.ParameterType.FullName ??
                             (((dynamic)x.ParameterType).GenericTypeArguments.Length > 0 ?
                                 x.ParameterType.Namespace + "." + x.ParameterType.Name.Split('`')[0] +
-                                    "{" + string.Join(",", ((Type[])((dynamic)x.ParameterType).GenericTypeArguments).Select(a => "||" + a.GenericParameterPosition.ToString())) + "}" :
+                                    "{" + string.Join(",", ((Type[])((dynamic)x.ParameterType).GenericTypeArguments)
+                                        .Select(a => a.IsGenericParameter ? 
+                                            "||" + a.GenericParameterPosition.ToString() : 
+                                            a.Namespace + "." + a.Name + "[[||0]]")) // special case for Expression<Func...>>
+                                    + "}" :
                                 "||" + x.ParameterType.GenericParameterPosition)) :
                         (IEnumerable<string>)System.Linq.Enumerable.Select<dynamic, string>(member.Parameters, parameterTypeSelector);
 

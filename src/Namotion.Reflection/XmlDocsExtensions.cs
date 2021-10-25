@@ -17,6 +17,8 @@ using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using System.Runtime.CompilerServices;
 using System.Collections.Concurrent;
+using System.IO;
+using System.Runtime.InteropServices;
 
 [assembly: InternalsVisibleTo("Namotion.Reflection.Cecil, PublicKey=0024000004800000940000000602000000240000525341310004000001000100337d8a0b73ac39048dc55d8e48dd86dcebd0af16aa514c73fbf5f283a8e94d7075b4152e5621e18d234bf7a5aafcb6683091f79d87b80c3be3e806f688e6f940adf92b28cedf1f8f69aa443699c235fa049204b56b83d94f599dd9800171f28e45ab74351acab17d889cd65961354d2f6405bddb9e896956e69e60033c2574f1")]
 
@@ -42,7 +44,7 @@ namespace Namotion.Reflection
     /// <summary>Provides extension methods for reading XML comments from reflected members.</summary>
     public static class XmlDocsExtensions
     {
-        private static readonly ConcurrentDictionary<string, CachingXDocument?> Cache = 
+        private static readonly ConcurrentDictionary<string, CachingXDocument?> Cache =
             new ConcurrentDictionary<string, CachingXDocument?>(StringComparer.OrdinalIgnoreCase);
 
         internal static void ClearCache()
@@ -618,7 +620,11 @@ namespace Namotion.Reflection
                             x.ParameterType.FullName ??
                             (((dynamic)x.ParameterType).GenericTypeArguments.Length > 0 ?
                                 x.ParameterType.Namespace + "." + x.ParameterType.Name.Split('`')[0] +
-                                    "{" + string.Join(",", ((Type[])((dynamic)x.ParameterType).GenericTypeArguments).Select(a => "||" + a.GenericParameterPosition.ToString())) + "}" :
+                                    "{" + string.Join(",", ((Type[])((dynamic)x.ParameterType).GenericTypeArguments)
+                                        .Select(a => a.IsGenericParameter ? 
+                                            "||" + a.GenericParameterPosition.ToString() : 
+                                            a.Namespace + "." + a.Name + "[[||0]]")) // special case for Expression<Func...>>
+                                    + "}" :
                                 "||" + x.ParameterType.GenericParameterPosition)) :
                         (IEnumerable<string>)System.Linq.Enumerable.Select<dynamic, string>(member.Parameters, parameterTypeSelector);
 
@@ -692,8 +698,8 @@ namespace Namotion.Reflection
                     string? path;
                     if (!string.IsNullOrEmpty(assembly.Location))
                     {
-                        var assemblyDirectory = DynamicApis.PathGetDirectoryName((string)assembly.Location);
-                        path = DynamicApis.PathCombine(assemblyDirectory, assemblyName.Name + ".xml");
+                        path = GetPathByOs(assembly, assemblyName);
+
                         if (DynamicApis.FileExists(path))
                         {
                             return path;
@@ -779,6 +785,44 @@ namespace Namotion.Reflection
             {
                 return null;
             }
+        }
+
+        private static string? GetPathByOs(dynamic? assembly, AssemblyName assemblyName)
+        {
+#if NETSTANDARD2_0
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                var fullAssemblyVersion = (assembly as Assembly)?.GetCustomAttribute<AssemblyFileVersionAttribute>()?.Version;
+                if (fullAssemblyVersion == null)
+                    return null;
+            
+                var version = new Version(fullAssemblyVersion);
+                // NuGet cache only has the Major.Minor.Build version
+                var truncatedVersion = $"{version.Major}.{version.Minor}.{version.Build}";
+                // Path is like /Users/usernamehere/.nuget/packages/Microsoft.AspNetCore.Mvc.Core/2.2.1
+                var macOsPath = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.Personal), 
+                    ".nuget", 
+                    "packages",
+                    assemblyName.Name, 
+                    truncatedVersion);
+
+                if (!Directory.Exists(macOsPath))
+                    return null;
+
+                var file = Directory.GetFiles(macOsPath, "*.xml", SearchOption.AllDirectories)
+                    .OrderByDescending(f => f)
+                    .FirstOrDefault();
+                return file;
+            }
+#endif
+            return GetXmlAssemblyFilePathForWindows(assembly, assemblyName);
+        }
+
+        private static string GetXmlAssemblyFilePathForWindows(dynamic? assembly, AssemblyName assemblyName)
+        {
+            var assemblyDirectory = DynamicApis.PathGetDirectoryName((string)assembly.Location);
+            return DynamicApis.PathCombine(assemblyDirectory, assemblyName.Name + ".xml");
         }
 
         private static string? GetXmlDocsPathFromNuGetCacheOrDotNetSdk(string assemblyDirectory, AssemblyName assemblyName)

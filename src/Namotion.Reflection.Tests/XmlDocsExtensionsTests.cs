@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 using Xunit;
@@ -380,7 +381,7 @@ namespace Namotion.Reflection.Tests
             {
                 throw new NotImplementedException();
             }
-            
+
             /// <summary>
             /// NestedGenericParameter
             /// </summary>
@@ -388,7 +389,7 @@ namespace Namotion.Reflection.Tests
             {
                 throw new NotImplementedException();
             }
-            
+
             /// <summary>
             /// SingleAsync
             /// </summary>
@@ -404,7 +405,7 @@ namespace Namotion.Reflection.Tests
             {
                 throw new NotImplementedException();
             }
-            
+
             /// <summary>
             /// MultiGenericParameterAsync
             /// </summary>
@@ -563,7 +564,7 @@ namespace Namotion.Reflection.Tests
 
             //// Act
             var summary = typeof(Point).GetXmlDocsSummary();
-            
+
             //// Clean up
             Directory.SetCurrentDirectory("..");
             Directory.Delete("./wd", recursive: true);
@@ -642,6 +643,34 @@ namespace Namotion.Reflection.Tests
 
             //// Assert
             Assert.Equal("Boolean returned from method TryParse.", parameterXml);
+        }
+
+        /// <summary>
+        /// A test class
+        /// </summary>
+        public class TestClass<TModel>
+        {
+            /// <summary>
+            /// Summary for TestMethod
+            /// </summary>
+            /// <param name="expr">An expression</param>
+            public void TestMethod(Expression<Func<TModel>> expr)
+            {
+            }
+        }
+
+        [Fact]
+        public void When_parameter_is_expression_then_xmldocs_are_available()
+        {
+            //// Arrange
+            var t = typeof(TestClass<string>);
+
+            //// Act
+            var m = t.GetMethods().First();
+            var s = m.GetXmlDocsSummary();
+
+            //// Assert
+            Assert.False(string.IsNullOrWhiteSpace(s));
         }
     }
 }

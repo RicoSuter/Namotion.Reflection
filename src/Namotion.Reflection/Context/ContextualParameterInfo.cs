@@ -14,9 +14,9 @@ namespace Namotion.Reflection
         internal ContextualParameterInfo(ParameterInfo parameterInfo, ref int nullableFlagsIndex, byte[]? nullableFlags)
             : base(parameterInfo.ParameterType, GetContextualAttributes(parameterInfo),
                 null, ref nullableFlagsIndex, nullableFlags,
-                parameterInfo.Member.DeclaringType.IsNested ?
-                    new dynamic[] { parameterInfo.Member, parameterInfo.Member.DeclaringType, parameterInfo.Member.DeclaringType.DeclaringType, parameterInfo.Member.DeclaringType.GetTypeInfo().Assembly } :
-                    new dynamic[] { parameterInfo.Member, parameterInfo.Member.DeclaringType, parameterInfo.Member.DeclaringType.GetTypeInfo().Assembly })
+                parameterInfo.Member.DeclaringType.IsNested
+                    ? new[] { NullableFlagsSource.Create(parameterInfo.Member), NullableFlagsSource.Create(parameterInfo.Member.DeclaringType), NullableFlagsSource.Create(parameterInfo.Member.DeclaringType.DeclaringType, parameterInfo.Member.DeclaringType.GetTypeInfo().Assembly) }
+                    : new[] { NullableFlagsSource.Create(parameterInfo.Member), NullableFlagsSource.Create(parameterInfo.Member.DeclaringType, parameterInfo.Member.DeclaringType.GetTypeInfo().Assembly) })
         {
             ParameterInfo = parameterInfo;
         }
@@ -41,7 +41,14 @@ namespace Namotion.Reflection
         {
             try
             {
-                return parameterInfo.GetCustomAttributes(true).OfType<Attribute>().ToArray();
+                var attributes = parameterInfo.GetCustomAttributes(true);
+#if !NETSTANDARD1_0
+                if (attributes.Length == 0)
+                {
+                    return ArrayExt.Empty<Attribute>();
+                }
+#endif
+                return attributes.OfType<Attribute>().ToArray();
             }
             catch
             {

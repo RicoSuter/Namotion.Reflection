@@ -17,15 +17,18 @@ namespace Namotion.Reflection
         internal ContextualPropertyInfo(PropertyInfo propertyInfo, ref int nullableFlagsIndex, byte[]? nullableFlags)
         {
             PropertyInfo = propertyInfo;
+
+            var attributeProviders = propertyInfo.DeclaringType.IsNested
+                ? new [] { NullableFlagsSource.Create(propertyInfo.DeclaringType), NullableFlagsSource.Create(propertyInfo.DeclaringType.DeclaringType, propertyInfo.DeclaringType.GetTypeInfo().Assembly) }
+                : new [] { NullableFlagsSource.Create(propertyInfo.DeclaringType, propertyInfo.DeclaringType.GetTypeInfo().Assembly) };
+
             PropertyType = new ContextualType(
                 propertyInfo.PropertyType,
                 propertyInfo.GetCustomAttributes(true).OfType<Attribute>().ToArray(),
-                null, 
-                ref nullableFlagsIndex, 
+                null,
+                ref nullableFlagsIndex,
                 nullableFlags,
-                propertyInfo.DeclaringType.IsNested ?
-                    new dynamic[] { propertyInfo.DeclaringType, propertyInfo.DeclaringType.DeclaringType, propertyInfo.DeclaringType.GetTypeInfo().Assembly } :
-                    new dynamic[] { propertyInfo.DeclaringType, propertyInfo.DeclaringType.GetTypeInfo().Assembly });
+                attributeProviders);
         }
 
         /// <summary>

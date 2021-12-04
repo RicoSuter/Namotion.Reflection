@@ -15,7 +15,7 @@ namespace Namotion.Reflection
         }
     }
 
-    internal class PropertyWriter<TObject, TValue> : IPropertyWriter
+    internal sealed class PropertyWriter<TObject, TValue> : IPropertyWriter
     {
         private readonly PropertyInfo _propertyInfo;
 #if !NET40 && !NETSTANDARD1_0

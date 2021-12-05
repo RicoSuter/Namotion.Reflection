@@ -857,13 +857,13 @@ namespace Namotion.Reflection
                                     var packagePath = DynamicApis.PathCombine(path, assemblyName.Name + "/" + assemblyName.Version.ToString(3));
                                     if (DynamicApis.DirectoryExists(packagePath))
                                     {
-                                        var files = DynamicApis.DirectoryGetAllFiles(packagePath, assemblyName.Name + ".xml")
-                                            .OrderBy(f => f)
-                                            .ToArray();
+                                        var file = DynamicApis.DirectoryGetAllFiles(packagePath, assemblyName.Name + ".xml")
+                                            .OrderByDescending(f => f)
+                                            .FirstOrDefault();
 
-                                        if (files.Any())
+                                        if (file is not null)
                                         {
-                                            return files.Last();
+                                            return file;
                                         }
                                     }
                                 }
@@ -882,14 +882,15 @@ namespace Namotion.Reflection
                                         try
                                         {
                                             path = DynamicApis.PathCombine(path, "packs");
-                                            var files = DynamicApis.DirectoryGetAllFiles(path, assemblyName.Name + ".xml")
-                                               .OrderBy(f => f)
-                                               .Where(f => f.Replace('\\', '/').Contains("/" + assemblyName.Version.ToString(2)))
-                                               .ToArray();
+                                            var search = "/" + assemblyName.Version.ToString(2);
+                                            var file = DynamicApis.DirectoryGetAllFiles(path, assemblyName.Name + ".xml")
+                                               .Where(f => f.Replace('\\', '/').Contains(search))
+                                               .OrderByDescending(f => f)
+                                               .FirstOrDefault();
 
-                                            if (files.Any())
+                                            if (file is not null)
                                             {
-                                                return files.Last();
+                                                return file;
                                             }
                                         }
                                         catch

@@ -13,23 +13,23 @@ namespace Namotion.Reflection
     internal readonly struct NullableFlagsSource
     {
         private readonly record struct CacheKey(Type Type, Assembly? Assembly);
-        private static Dictionary<CacheKey, NullableFlagsSource> _typeToAttributeSource = new();
+        private static Dictionary<CacheKey, NullableFlagsSource> _nullableCache = new();
 
         public readonly byte[]? NullableFlags;
 
         public static NullableFlagsSource Create(Type type, Assembly? assembly = null)
         {
-            var sourceMapping = _typeToAttributeSource;
+            var nullableCache = _nullableCache;
 
             var key = new CacheKey(type, assembly);
-            if (!sourceMapping.TryGetValue(key, out var source))
+            if (!nullableCache.TryGetValue(key, out var source))
             {
                 // this is racy logic, but benefits from less synchronization primitives and faster reads
                 source = new NullableFlagsSource(type, assembly);
-                Interlocked.CompareExchange(ref _typeToAttributeSource, new Dictionary<CacheKey, NullableFlagsSource>(_typeToAttributeSource)
+                Interlocked.CompareExchange(ref _nullableCache, new Dictionary<CacheKey, NullableFlagsSource>(nullableCache)
                 {
                     [key] = source
-                }, sourceMapping);
+                }, nullableCache);
             }
 
             return source;
@@ -42,18 +42,11 @@ namespace Namotion.Reflection
 
         private NullableFlagsSource(Type type, Assembly? assembly)
         {
-            byte[]? flags = null;
+            var flags = GetNullableFlags(type);
 
-            // assembly level is the normal case
-            if (assembly is not null)
+            if (flags is null && assembly is not null)
             {
                 flags = GetNullableFlags(assembly);
-            }
-
-            if (flags is null)
-            {
-                // search type
-                flags = GetNullableFlags(type);
             }
 
             NullableFlags = flags;
@@ -65,7 +58,7 @@ namespace Namotion.Reflection
         }
 
 #if !NETSTANDARD1_0 && !NET40
-        private static byte[]? GetNullableFlags(ICustomAttributeProvider provider)
+        private static byte[]? GetNullableFlags<T>(T provider) where T : ICustomAttributeProvider
         {
             var attributes = provider.GetCustomAttributes(false);
             foreach (var attribute in attributes)

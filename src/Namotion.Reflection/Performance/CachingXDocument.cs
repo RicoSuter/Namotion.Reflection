@@ -6,7 +6,7 @@ namespace Namotion.Reflection
     /// <summary>
     /// Caching layer hiding the details of accessing DLL documentation.
     /// </summary>
-    internal class CachingXDocument
+    internal sealed class CachingXDocument
     {
         private static readonly object Lock = new();
         private static readonly Dictionary<string, XElement?> ElementByNameCache = new();

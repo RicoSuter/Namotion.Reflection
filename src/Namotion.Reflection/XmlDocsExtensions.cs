@@ -621,8 +621,8 @@ namespace Namotion.Reflection
                             (((dynamic)x.ParameterType).GenericTypeArguments.Length > 0 ?
                                 x.ParameterType.Namespace + "." + x.ParameterType.Name.Split('`')[0] +
                                     "{" + string.Join(",", ((Type[])((dynamic)x.ParameterType).GenericTypeArguments)
-                                        .Select(a => a.IsGenericParameter ? 
-                                            "||" + a.GenericParameterPosition.ToString() : 
+                                        .Select(a => a.IsGenericParameter ?
+                                            "||" + a.GenericParameterPosition.ToString() :
                                             a.Namespace + "." + a.Name + "[[||0]]")) // special case for Expression<Func...>>
                                     + "}" :
                                 "||" + x.ParameterType.GenericParameterPosition)) :
@@ -795,16 +795,16 @@ namespace Namotion.Reflection
                 var fullAssemblyVersion = (assembly as Assembly)?.GetCustomAttribute<AssemblyFileVersionAttribute>()?.Version;
                 if (fullAssemblyVersion == null)
                     return null;
-            
+
                 var version = new Version(fullAssemblyVersion);
                 // NuGet cache only has the Major.Minor.Build version
                 var truncatedVersion = $"{version.Major}.{version.Minor}.{version.Build}";
                 // Path is like /Users/usernamehere/.nuget/packages/Microsoft.AspNetCore.Mvc.Core/2.2.1
                 var macOsPath = Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.Personal), 
-                    ".nuget", 
+                    Environment.GetFolderPath(Environment.SpecialFolder.Personal),
+                    ".nuget",
                     "packages",
-                    assemblyName.Name, 
+                    assemblyName.Name,
                     truncatedVersion);
 
                 if (!Directory.Exists(macOsPath))
@@ -825,6 +825,8 @@ namespace Namotion.Reflection
             return DynamicApis.PathCombine(assemblyDirectory, assemblyName.Name + ".xml");
         }
 
+        private static readonly Regex runtimeConfigRegex = new Regex("\"((.*?)((\\\\\\\\)|(////))(.*?))\"", RegexOptions.IgnoreCase);
+
         private static string? GetXmlDocsPathFromNuGetCacheOrDotNetSdk(string assemblyDirectory, AssemblyName assemblyName)
         {
             var configs = DynamicApis.DirectoryGetAllFiles(assemblyDirectory, "*.runtimeconfig.dev.json");
@@ -834,7 +836,7 @@ namespace Namotion.Reflection
                 {
                     // Retrieve NuGet package cache directories from *.runtimeconfig.dev.json
                     var json = DynamicApis.FileReadAllText(configs.First());
-                    var matches = Regex.Matches(json, $"\"((.*?)((\\\\\\\\)|(////))(.*?))\"", RegexOptions.IgnoreCase);
+                    var matches = runtimeConfigRegex.Matches(json);
                     if (matches.Count > 0)
                     {
                         foreach (Match match in matches)
@@ -855,13 +857,13 @@ namespace Namotion.Reflection
                                     var packagePath = DynamicApis.PathCombine(path, assemblyName.Name + "/" + assemblyName.Version.ToString(3));
                                     if (DynamicApis.DirectoryExists(packagePath))
                                     {
-                                        var files = DynamicApis.DirectoryGetAllFiles(packagePath, assemblyName.Name + ".xml")
-                                            .OrderBy(f => f)
-                                            .ToArray();
+                                        var file = DynamicApis.DirectoryGetAllFiles(packagePath, assemblyName.Name + ".xml")
+                                            .OrderByDescending(f => f)
+                                            .FirstOrDefault();
 
-                                        if (files.Any())
+                                        if (file is not null)
                                         {
-                                            return files.Last();
+                                            return file;
                                         }
                                     }
                                 }
@@ -880,14 +882,15 @@ namespace Namotion.Reflection
                                         try
                                         {
                                             path = DynamicApis.PathCombine(path, "packs");
-                                            var files = DynamicApis.DirectoryGetAllFiles(path, assemblyName.Name + ".xml")
-                                               .OrderBy(f => f)
-                                               .Where(f => f.Replace('\\', '/').Contains("/" + assemblyName.Version.ToString(2)))
-                                               .ToArray();
+                                            var search = "/" + assemblyName.Version.ToString(2);
+                                            var file = DynamicApis.DirectoryGetAllFiles(path, assemblyName.Name + ".xml")
+                                               .Where(f => f.Replace('\\', '/').Contains(search))
+                                               .OrderByDescending(f => f)
+                                               .FirstOrDefault();
 
-                                            if (files.Any())
+                                            if (file is not null)
                                             {
-                                                return files.Last();
+                                                return file;
                                             }
                                         }
                                         catch

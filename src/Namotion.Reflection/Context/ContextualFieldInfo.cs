@@ -14,15 +14,18 @@ namespace Namotion.Reflection
         internal ContextualFieldInfo(FieldInfo fieldInfo, ref int nullableFlagsIndex, byte[]? nullableFlags)
         {
             FieldInfo = fieldInfo;
+
+            var attributeProviders = fieldInfo.DeclaringType.IsNested
+                ? new [] { NullableFlagsSource.Create(fieldInfo.DeclaringType), NullableFlagsSource.Create(fieldInfo.DeclaringType.DeclaringType, fieldInfo.DeclaringType.GetTypeInfo().Assembly) }
+                : new [] { NullableFlagsSource.Create(fieldInfo.DeclaringType, fieldInfo.DeclaringType.GetTypeInfo().Assembly) };
+
             FieldType = new ContextualType(
                fieldInfo.FieldType,
                fieldInfo.GetCustomAttributes(true).OfType<Attribute>().ToArray(),
                null,
                ref nullableFlagsIndex,
                nullableFlags,
-               fieldInfo.DeclaringType.IsNested ?
-                   new dynamic[] { fieldInfo.DeclaringType, fieldInfo.DeclaringType.DeclaringType, fieldInfo.DeclaringType.GetTypeInfo().Assembly } :
-                   new dynamic[] { fieldInfo.DeclaringType, fieldInfo.DeclaringType.GetTypeInfo().Assembly });
+               attributeProviders);
         }
 
         /// <summary>

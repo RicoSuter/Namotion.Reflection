@@ -7,11 +7,25 @@ using System.Reflection;
 namespace Namotion.Reflection
 {
     /// <summary>
+    /// Helper to support old runtimes.
+    /// </summary>
+    internal static class ArrayExt
+    {
+        private static class EmptyHolder<T>
+        {
+            internal static readonly T[] _empty = new T[0];
+        }
+
+        public static T[] Empty<T>() => EmptyHolder<T>._empty;
+    }
+
+    /// <summary>
     /// Type and member extension methods to extract contextual or cached types.
     /// </summary>
     public static class ContextualTypeExtensions
     {
-        private static readonly ConcurrentDictionary<string, object> Cache = new ConcurrentDictionary<string, object>();
+        private readonly record struct CacheKey(string Prefix, string Key1, string? Key2 = null, string? Key3 = null, string? Key4 = null);
+        private static readonly ConcurrentDictionary<CacheKey, object> Cache = new();
 
         internal static void ClearCache()
         {
@@ -27,11 +41,11 @@ namespace Namotion.Reflection
         {
             if (type.FullName == null)
             {
-                return ContextualType.ForType(type, new Attribute[0]);
+                return ContextualType.ForType(type, ArrayExt.Empty<Attribute>());
             }
 
-            var key = "Type:Context:" + type.FullName;
-            return (ContextualType)Cache.GetOrAdd(key, k => ContextualType.ForType(type, new Attribute[0]));
+            var key = new CacheKey("Type:Context", type.FullName);
+            return (ContextualType) Cache.GetOrAdd(key, k => ContextualType.ForType(type, ArrayExt.Empty<Attribute>()));
         }
 
         /// <summary>
@@ -47,8 +61,8 @@ namespace Namotion.Reflection
                 return new CachedType(type);
             }
 
-            var key = "Type:" + type.FullName;
-            return (CachedType)Cache.GetOrAdd(key, k => new CachedType(type));
+            var key = new CacheKey("Type", type.FullName);
+            return (CachedType) Cache.GetOrAdd(key, k => new CachedType(type));
         }
 
         /// <summary>
@@ -103,8 +117,8 @@ namespace Namotion.Reflection
         public static ContextualParameterInfo ToContextualParameter(this ParameterInfo parameterInfo)
         {
             // TODO: Remove usages of this method in code (might lose context)!!
-            var key = "Parameter:" + parameterInfo.Name + ":" + parameterInfo.ParameterType.FullName + ":" + parameterInfo.Member.Name + ":" + parameterInfo.Member.DeclaringType.FullName;
-            return (ContextualParameterInfo)Cache.GetOrAdd(key, k =>
+            var key = new CacheKey("Parameter", parameterInfo.Name, parameterInfo.ParameterType.FullName, parameterInfo.Member.Name, parameterInfo.Member.DeclaringType.FullName);
+            return (ContextualParameterInfo) Cache.GetOrAdd(key, k =>
             {
                 var index = 0;
                 return new ContextualParameterInfo(parameterInfo, ref index, null);
@@ -120,8 +134,8 @@ namespace Namotion.Reflection
         public static ContextualPropertyInfo ToContextualProperty(this PropertyInfo propertyInfo)
         {
             // TODO: Remove usages of this method in code (might lose context)!!
-            var key = "Property:" + propertyInfo.Name + ":" + propertyInfo.DeclaringType.FullName;
-            return (ContextualPropertyInfo)Cache.GetOrAdd(key, k =>
+            var key = new CacheKey("Property",propertyInfo.Name, propertyInfo.DeclaringType.FullName);
+            return (ContextualPropertyInfo) Cache.GetOrAdd(key, k =>
             {
                 var index = 0;
                 return new ContextualPropertyInfo(propertyInfo, nullableFlagsIndex: ref index, nullableFlags: null);
@@ -137,8 +151,8 @@ namespace Namotion.Reflection
         public static ContextualFieldInfo ToContextualField(this FieldInfo fieldInfo)
         {
             // TODO: Remove usages of this method in code (might lose context)!!
-            var key = "Field:" + fieldInfo.Name + ":" + fieldInfo.DeclaringType.FullName;
-            return (ContextualFieldInfo)Cache.GetOrAdd(key, k =>
+            var key = new CacheKey("Field", fieldInfo.Name, fieldInfo.DeclaringType.FullName);
+            return (ContextualFieldInfo) Cache.GetOrAdd(key, k =>
             {
                 var index = 0;
                 return new ContextualFieldInfo(fieldInfo, nullableFlagsIndex: ref index, nullableFlags: null);

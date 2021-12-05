@@ -15,7 +15,7 @@ namespace Namotion.Reflection
         }
     }
 
-    internal class PropertyReader<TObject, TValue> : IPropertyReader
+    internal sealed class PropertyReader<TObject, TValue> : IPropertyReader
     {
         private readonly PropertyInfo _propertyInfo;
 #if !NET40 && !NETSTANDARD1_0

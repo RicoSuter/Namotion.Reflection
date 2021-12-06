@@ -65,5 +65,17 @@ namespace Namotion.Reflection
 
             return typeof(object);
         }
+
+        internal static T? GetFirstOrDefault<T>(this Attribute[] attributes)
+        {
+            foreach (var attribute in attributes)
+            {
+                if (attribute is T typed)
+                {
+                    return typed;
+                }
+            }
+            return default;
+        }
     }
 }

@@ -25,7 +25,13 @@ namespace Namotion.Reflection
         /// <returns>The objects which are assignable.</returns>
         public static IEnumerable<T> GetAssignableToTypeName<T>(this IEnumerable<T> objects, string typeName, TypeNameStyle typeNameStyle = TypeNameStyle.FullName)
         {
-            return objects.Where(o => o!.GetType().IsAssignableToTypeName(typeName, typeNameStyle));
+            foreach (T o in objects)
+            {
+                if (o.GetType().IsAssignableToTypeName(typeName, typeNameStyle))
+                {
+                    yield return o;
+                }
+            }
         }
 
         /// <summary>Tries to get the first object which is assignable to the given type name.</summary>

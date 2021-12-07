@@ -324,6 +324,9 @@ namespace Namotion.Reflection
             }
         }
 
+        // prevent array allocations on old runtimes
+        private static readonly char[] ToXmlDocsContentTrimChars = { '!', ':' };
+
         /// <summary>Converts the given XML documentation <see cref="XElement"/> to text.</summary>
         /// <param name="element">The XML element.</param>
         /// <returns>The text</returns>
@@ -341,7 +344,6 @@ namespace Namotion.Reflection
                             var attribute = e.Attribute("langword");
                             if (attribute != null)
                             {
-
                                 value.Append(attribute.Value);
                             }
                             else
@@ -355,14 +357,10 @@ namespace Namotion.Reflection
                                     attribute = e.Attribute("cref");
                                     if (attribute != null)
                                     {
-                                        if (attribute.Value.Contains("("))
-                                        {
-                                            value.Append(attribute.Value.Trim('!', ':').Trim().Substring(0, attribute.Value.IndexOf('(')).Split('.').Last());
-                                        }
-                                        else
-                                        {
-                                            value.Append(attribute.Value.Trim('!', ':').Trim().Split('.').Last());
-                                        }
+                                        var trimmed = attribute.Value.Trim(ToXmlDocsContentTrimChars).Trim();
+                                        trimmed = trimmed.FirstToken('(');
+                                        trimmed = trimmed.LastToken('.');
+                                        value.Append(trimmed);
                                     }
                                     else
                                     {
@@ -539,6 +537,9 @@ namespace Namotion.Reflection
 #endif
         }
 
+        private static readonly char[] RemoveLineBreakWhiteSpacesTrimChars = { '\n' };
+        private static readonly Regex LineBreakRegex = new("(\\n[ \\t]*)", (RegexOptions) 8); // Compiled
+
         private static string RemoveLineBreakWhiteSpaces(string? documentation)
         {
             if (string.IsNullOrEmpty(documentation))
@@ -546,12 +547,12 @@ namespace Namotion.Reflection
                 return string.Empty;
             }
 
-            documentation = "\n" + documentation!.Replace("\r", string.Empty).Trim('\n');
+            documentation = "\n" + documentation!.Replace("\r", string.Empty).Trim(RemoveLineBreakWhiteSpacesTrimChars);
 
-            var whitespace = Regex.Match(documentation, "(\\n[ \\t]*)").Value;
+            var whitespace = LineBreakRegex.Match(documentation).Value;
             documentation = documentation.Replace(whitespace, "\n");
 
-            return documentation.Trim('\n');
+            return documentation.Trim(RemoveLineBreakWhiteSpacesTrimChars);
         }
 
         /// <exception cref="ArgumentException">Unknown member type.</exception>
@@ -594,7 +595,7 @@ namespace Namotion.Reflection
             else
             {
                 memberName = member is Type type && !string.IsNullOrEmpty(memberType.FullName) ?
-                    type.FullName.Split('[')[0] : ((string)member.DeclaringType.FullName).Split('[')[0] + "." + member.Name;
+                    type.FullName.FirstToken('[') : ((string)member.DeclaringType.FullName).FirstToken('[') + "." + member.Name;
 
                 memberTypeName = (string)member.MemberType.ToString();
             }
@@ -611,7 +612,7 @@ namespace Namotion.Reflection
                     Func<dynamic, string> parameterTypeSelector = p =>
                         p.ParameterType.ContainsGenericParameter ?
                         (ObjectExtensions.HasProperty(p.ParameterType, "GenericArguments") && p.ParameterType.GenericArguments.Count > 0 ?
-                            ((string)p.ParameterType.FullName).Split('`')[0] + "{" + string.Join(",", ((ICollection)p.ParameterType.GenericArguments).Cast<dynamic>().Select(u => "||" + u.Position)) + "}" :
+                            ((string)p.ParameterType.FullName).FirstToken('`') + "{" + string.Join(",", ((ICollection)p.ParameterType.GenericArguments).Cast<dynamic>().Select(u => "||" + u.Position)) + "}" :
                             "||" + p.ParameterType.Position) :
                         (string)p.ParameterType.FullName;
 
@@ -619,7 +620,7 @@ namespace Namotion.Reflection
                         ((MethodBase)member).GetParameters().Select(x =>
                             x.ParameterType.FullName ??
                             (((dynamic)x.ParameterType).GenericTypeArguments.Length > 0 ?
-                                x.ParameterType.Namespace + "." + x.ParameterType.Name.Split('`')[0] +
+                                x.ParameterType.Namespace + "." + x.ParameterType.Name.FirstToken('`') +
                                     "{" + string.Join(",", ((Type[])((dynamic)x.ParameterType).GenericTypeArguments)
                                         .Select(a => a.IsGenericParameter ?
                                             "||" + a.GenericParameterPosition.ToString() :

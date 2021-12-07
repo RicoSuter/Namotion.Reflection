@@ -195,7 +195,7 @@ namespace Namotion.Reflection
         /// <inheritdocs />
         public override string ToString()
         {
-            var result = Type.Name.Split('`').First() + "\n  " +
+            var result = Type.Name.FirstToken('`') + "\n  " +
                 string.Join("\n", GenericArguments.Select(a => a.ToString())).Replace("\n", "\n  ");
 
             return result.Trim();

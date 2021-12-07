@@ -209,9 +209,9 @@ namespace Namotion.Reflection
         /// </summary>
         /// <typeparam name="T">The attribute type.</typeparam>
         /// <returns>The attribute or null.</returns>
-        public T? GetContextAttribute<T>()
+        public T? GetContextAttribute<T>() where T : Attribute
         {
-            return ContextAttributes.OfType<T>().SingleOrDefault();
+            return ContextAttributes.GetSingleOrDefault<T>();
         }
 
         /// <summary>
@@ -231,7 +231,7 @@ namespace Namotion.Reflection
         /// <returns>The attribute or null.</returns>
         public T? GetAttribute<T>()
         {
-            return ContextAttributes.OfType<T>().Concat(InheritedAttributes.OfType<T>()).FirstOrDefault();
+            return ContextAttributes.GetSingleOrDefault<T>() ?? InheritedAttributes.GetSingleOrDefault<T>();
         }
 
         /// <summary>

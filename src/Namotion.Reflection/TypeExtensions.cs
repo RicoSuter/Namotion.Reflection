@@ -149,7 +149,7 @@ namespace Namotion.Reflection
             if (nType.Type.IsGenericType)
 #endif
             {
-                return GetName(nType).Split('`').First() + "Of" +
+                return GetName(nType).FirstToken('`') + "Of" +
                        string.Join("And", nType.GenericArguments
                                                .Select(a => GetDisplayName(a.OriginalType)));
             }

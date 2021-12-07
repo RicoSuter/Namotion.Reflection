@@ -383,6 +383,11 @@ namespace Namotion.Reflection
                             value.Append(e.Value);
                         }
                     }
+                    else if (node is XText text)
+                    {
+                        // take value directly without costly ToString()
+                        value.Append(text.Value);
+                    }
                     else
                     {
                         value.Append(node);

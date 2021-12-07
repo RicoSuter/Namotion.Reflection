@@ -42,14 +42,26 @@ namespace Namotion.Reflection
                 return true;
             }
 
-            return type.InheritsFromTypeName(typeName, typeNameStyle) ||
+            if (type.InheritsFromTypeName(typeName, typeNameStyle))
+            {
+                return true;
+            }
+
 #if NETSTANDARD1_0
-                (typeNameStyle == TypeNameStyle.Name && type.GetTypeInfo().ImplementedInterfaces.Any(i => i.Name == typeName)) ||
-                (typeNameStyle == TypeNameStyle.FullName && type.GetTypeInfo().ImplementedInterfaces.Any(i => i.FullName == typeName));
+            var interfaces = type.GetTypeInfo().ImplementedInterfaces;
 #else
-                (typeNameStyle == TypeNameStyle.Name && type.GetInterfaces().Any(i => i.Name == typeName)) ||
-                (typeNameStyle == TypeNameStyle.FullName && type.GetInterfaces().Any(i => i.FullName == typeName));
+            var interfaces = type.GetInterfaces();
 #endif
+            foreach (var i in interfaces)
+            {
+                if (typeNameStyle == TypeNameStyle.Name && i.Name == typeName
+                    || typeNameStyle == TypeNameStyle.FullName && i.FullName == typeName)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>Checks whether the given type inherits from the given type name.</summary>
@@ -149,7 +161,7 @@ namespace Namotion.Reflection
             if (nType.Type.IsGenericType)
 #endif
             {
-                return GetName(nType).Split('`').First() + "Of" +
+                return GetName(nType).FirstToken('`') + "Of" +
                        string.Join("And", nType.GenericArguments
                                                .Select(a => GetDisplayName(a.OriginalType)));
             }

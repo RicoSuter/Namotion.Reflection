@@ -25,7 +25,13 @@ namespace Namotion.Reflection
         /// <returns>The objects which are assignable.</returns>
         public static IEnumerable<T> GetAssignableToTypeName<T>(this IEnumerable<T> objects, string typeName, TypeNameStyle typeNameStyle = TypeNameStyle.FullName)
         {
-            return objects.Where(o => o!.GetType().IsAssignableToTypeName(typeName, typeNameStyle));
+            foreach (T o in objects)
+            {
+                if (o.GetType().IsAssignableToTypeName(typeName, typeNameStyle))
+                {
+                    yield return o;
+                }
+            }
         }
 
         /// <summary>Tries to get the first object which is assignable to the given type name.</summary>
@@ -58,6 +64,29 @@ namespace Namotion.Reflection
             }
 
             return typeof(object);
+        }
+
+        internal static T? GetSingleOrDefault<T>(this Attribute[] attributes)
+        {
+            static void ThrowInvalidOperation()
+            {
+                throw new InvalidOperationException("Found more than one element");
+            }
+
+            T? found = default;
+            foreach (var attribute in attributes)
+            {
+                if (attribute is T typed)
+                {
+                    if (found is not null)
+                    {
+                        ThrowInvalidOperation();
+                    }
+
+                    found = typed;
+                }
+            }
+            return found;
         }
     }
 }

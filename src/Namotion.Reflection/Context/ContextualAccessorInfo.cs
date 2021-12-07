@@ -43,7 +43,7 @@ namespace Namotion.Reflection
         /// <returns>The attribute or null.</returns>
         public T? GetContextAttribute<T>()
         {
-            return ContextAttributes.OfType<T>().SingleOrDefault();
+            return ContextAttributes.GetSingleOrDefault<T>();
         }
 
         /// <summary>

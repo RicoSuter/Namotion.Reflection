@@ -25,7 +25,7 @@ namespace Namotion.Reflection
         /// <returns>The objects which are assignable.</returns>
         public static IEnumerable<T> GetAssignableToTypeName<T>(this IEnumerable<T> objects, string typeName, TypeNameStyle typeNameStyle = TypeNameStyle.FullName)
         {
-            foreach (T o in objects)
+            foreach (var o in objects)
             {
                 if (o.GetType().IsAssignableToTypeName(typeName, typeNameStyle))
                 {
@@ -41,9 +41,37 @@ namespace Namotion.Reflection
         /// <returns>May return null (not found).</returns>
         public static T? FirstAssignableToTypeNameOrDefault<T>(this IEnumerable<T>? objects, string typeName, TypeNameStyle typeNameStyle = TypeNameStyle.FullName)
         {
-            return objects != null ?
-                objects.GetAssignableToTypeName(typeName, typeNameStyle).FirstOrDefault() :
-                default;
+            if (objects != null)
+            {
+                foreach (var o in objects)
+                {
+                    if (o.GetType().IsAssignableToTypeName(typeName, typeNameStyle))
+                    {
+                        return o;
+                    }
+                }
+            }
+            return default;
+        }
+
+        /// <summary>Tries to get the first object which is assignable to the given type name.</summary>
+        /// <param name="objects">The objects.</param>
+        /// <param name="typeName">Type of the attribute.</param>
+        /// <param name="typeNameStyle">The type name style.</param>
+        /// <returns>May return null (not found).</returns>
+        public static T? FirstAssignableToTypeNameOrDefault<T>(this T[]? objects, string typeName, TypeNameStyle typeNameStyle = TypeNameStyle.FullName)
+        {
+            if (objects != null)
+            {
+                foreach (var o in objects)
+                {
+                    if (o.GetType().IsAssignableToTypeName(typeName, typeNameStyle))
+                    {
+                        return o;
+                    }
+                }
+            }
+            return default;
         }
 
         /// <summary>Finds the first common base type of the given types.</summary>

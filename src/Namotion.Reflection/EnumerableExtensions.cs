@@ -66,16 +66,27 @@ namespace Namotion.Reflection
             return typeof(object);
         }
 
-        internal static T? GetFirstOrDefault<T>(this Attribute[] attributes)
+        internal static T? GetSingleOrDefault<T>(this Attribute[] attributes)
         {
+            static void ThrowInvalidOperation()
+            {
+                throw new InvalidOperationException("Found more than one element");
+            }
+
+            T? found = default;
             foreach (var attribute in attributes)
             {
                 if (attribute is T typed)
                 {
-                    return typed;
+                    if (found is not null)
+                    {
+                        ThrowInvalidOperation();
+                    }
+
+                    found = typed;
                 }
             }
-            return default;
+            return found;
         }
     }
 }

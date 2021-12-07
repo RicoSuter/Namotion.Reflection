@@ -211,7 +211,7 @@ namespace Namotion.Reflection
         /// <returns>The attribute or null.</returns>
         public T? GetContextAttribute<T>() where T : Attribute
         {
-            return ContextAttributes.GetFirstOrDefault<T>();
+            return ContextAttributes.GetSingleOrDefault<T>();
         }
 
         /// <summary>
@@ -231,7 +231,7 @@ namespace Namotion.Reflection
         /// <returns>The attribute or null.</returns>
         public T? GetAttribute<T>()
         {
-            return ContextAttributes.GetFirstOrDefault<T>() ?? InheritedAttributes.GetFirstOrDefault<T>();
+            return ContextAttributes.GetSingleOrDefault<T>() ?? InheritedAttributes.GetSingleOrDefault<T>();
         }
 
         /// <summary>

@@ -179,7 +179,7 @@ namespace Namotion.Reflection
         public T? GetInheritedAttribute<T>()
             where T : Attribute
         {
-            return InheritedAttributes.GetFirstOrDefault<T>();
+            return InheritedAttributes.GetSingleOrDefault<T>();
         }
 
         /// <summary>

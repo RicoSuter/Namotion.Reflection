@@ -34,11 +34,6 @@ namespace Namotion.Reflection
         {
             XmlDocsExtensions.ClearCache();
         }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether XML Docs files should be tried to be resolved from the NuGet or SDK directory (default: true).
-        /// </summary>
-        public static bool ResolveFromNuGetCacheOrDotNetSdk { get; set; } = true;
     }
 
     /// <summary>Provides extension methods for reading XML comments from reflected members.</summary>
@@ -56,107 +51,119 @@ namespace Namotion.Reflection
 
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
+        /// <param name="tryResolveFromNuGetCacheOrDotNetSdk">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsSummary(this CachedType type)
+        public static string GetXmlDocsSummary(this CachedType type, bool tryResolveFromNuGetCacheOrDotNetSdk = true)
         {
-            return type.Type.GetXmlDocsSummary();
+            return type.Type.GetXmlDocsSummary(tryResolveFromNuGetCacheOrDotNetSdk);
         }
 
         /// <summary>Returns the contents of the "remarks" XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
+        /// <param name="tryResolveFromNuGetCacheOrDotNetSdk">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsRemarks(this CachedType type)
+        public static string GetXmlDocsRemarks(this CachedType type, bool tryResolveFromNuGetCacheOrDotNetSdk = true)
         {
-            return type.Type.GetXmlDocsRemarks();
+            return type.Type.GetXmlDocsRemarks(tryResolveFromNuGetCacheOrDotNetSdk);
         }
 
         /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
         /// <param name="tagName">Name of the tag.</param>
+        /// <param name="tryResolveFromNuGetCacheOrDotNetSdk">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsTag(this CachedType type, string tagName)
+        public static string GetXmlDocsTag(this CachedType type, string tagName, bool tryResolveFromNuGetCacheOrDotNetSdk = true)
         {
-            return type.Type.GetXmlDocsTag(tagName);
+            return type.Type.GetXmlDocsTag(tagName, tryResolveFromNuGetCacheOrDotNetSdk);
         }
 
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
+        /// <param name="tryResolveFromNuGetCacheOrDotNetSdk">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsSummary(this ContextualMemberInfo member)
+        public static string GetXmlDocsSummary(this ContextualMemberInfo member, bool tryResolveFromNuGetCacheOrDotNetSdk = true)
         {
-            return member.MemberInfo.GetXmlDocsSummary();
+            return member.MemberInfo.GetXmlDocsSummary(tryResolveFromNuGetCacheOrDotNetSdk);
         }
 
         /// <summary>Returns the contents of the "remarks" XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
+        /// <param name="tryResolveFromNuGetCacheOrDotNetSdk">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsRemarks(this ContextualMemberInfo member)
+        public static string GetXmlDocsRemarks(this ContextualMemberInfo member, bool tryResolveFromNuGetCacheOrDotNetSdk = true)
         {
-            return member.MemberInfo.GetXmlDocsRemarks();
+            return member.MemberInfo.GetXmlDocsRemarks(tryResolveFromNuGetCacheOrDotNetSdk);
         }
 
         /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
         /// <param name="tagName">Name of the tag.</param>
+        /// <param name="tryResolveFromNuGetCacheOrDotNetSdk">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsTag(this ContextualMemberInfo member, string tagName)
+        public static string GetXmlDocsTag(this ContextualMemberInfo member, string tagName, bool tryResolveFromNuGetCacheOrDotNetSdk = true)
         {
-            return member.MemberInfo.GetXmlDocsTag(tagName);
+            return member.MemberInfo.GetXmlDocsTag(tagName, tryResolveFromNuGetCacheOrDotNetSdk);
         }
 
         /// <summary>Returns the contents of the "returns" or "param" XML documentation tag for the specified parameter.</summary>
         /// <param name="parameter">The reflected parameter or return info.</param>
+        /// <param name="tryResolveFromNuGetCacheOrDotNetSdk">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
         /// <returns>The contents of the "returns" or "param" tag.</returns>
-        public static string GetXmlDocs(this ContextualParameterInfo parameter)
+        public static string GetXmlDocs(this ContextualParameterInfo parameter, bool tryResolveFromNuGetCacheOrDotNetSdk = true)
         {
-            return parameter.ParameterInfo.GetXmlDocs();
+            return parameter.ParameterInfo.GetXmlDocs(tryResolveFromNuGetCacheOrDotNetSdk);
         }
 
         /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
+        /// <param name="tryResolveFromNuGetCacheOrDotNetSdk">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static XElement? GetXmlDocsElement(this ContextualMemberInfo member)
+        public static XElement? GetXmlDocsElement(this ContextualMemberInfo member, bool tryResolveFromNuGetCacheOrDotNetSdk = true)
         {
-            return member.MemberInfo.GetXmlDocsElement();
+            return member.MemberInfo.GetXmlDocsElement(tryResolveFromNuGetCacheOrDotNetSdk);
         }
 
         #endregion
 
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
+        /// <param name="tryResolveFromNuGetCacheOrDotNetSdk">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsSummary(this Type type)
+        public static string GetXmlDocsSummary(this Type type, bool tryResolveFromNuGetCacheOrDotNetSdk = true)
         {
-            return GetXmlDocsTag((MemberInfo)type.GetTypeInfo(), "summary");
+            return GetXmlDocsTag((MemberInfo)type.GetTypeInfo(), "summary", tryResolveFromNuGetCacheOrDotNetSdk);
         }
 
         /// <summary>Returns the contents of the "remarks" XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
+        /// <param name="tryResolveFromNuGetCacheOrDotNetSdk">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsRemarks(this Type type)
+        public static string GetXmlDocsRemarks(this Type type, bool tryResolveFromNuGetCacheOrDotNetSdk = true)
         {
-            return GetXmlDocsTag((MemberInfo)type.GetTypeInfo(), "remarks");
+            return GetXmlDocsTag((MemberInfo)type.GetTypeInfo(), "remarks", tryResolveFromNuGetCacheOrDotNetSdk);
         }
 
         /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
         /// <param name="tagName">Name of the tag.</param>
+        /// <param name="tryResolveFromNuGetCacheOrDotNetSdk">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsTag(this Type type, string tagName)
+        public static string GetXmlDocsTag(this Type type, string tagName, bool tryResolveFromNuGetCacheOrDotNetSdk = true)
         {
-            return GetXmlDocsTag((MemberInfo)type.GetTypeInfo(), tagName);
+            return GetXmlDocsTag((MemberInfo)type.GetTypeInfo(), tagName, tryResolveFromNuGetCacheOrDotNetSdk);
         }
 
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
+        /// <param name="tryResolveFromNuGetCacheOrDotNetSdk">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsSummary(this MemberInfo member)
+        public static string GetXmlDocsSummary(this MemberInfo member, bool tryResolveFromNuGetCacheOrDotNetSdk = true)
         {
-            var docs = GetXmlDocsTag(member, "summary");
+            var docs = GetXmlDocsTag(member, "summary", tryResolveFromNuGetCacheOrDotNetSdk);
 
             if (string.IsNullOrEmpty(docs) && member is PropertyInfo propertyInfo)
             {
-                return propertyInfo.GetXmlDocsRecordPropertySummary();
+                return propertyInfo.GetXmlDocsRecordPropertySummary(tryResolveFromNuGetCacheOrDotNetSdk);
             }
 
             return docs;
@@ -164,25 +171,28 @@ namespace Namotion.Reflection
 
         /// <summary>Returns the contents of the "remarks" XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
+        /// <param name="tryResolveFromNuGetCacheOrDotNetSdk">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsRemarks(this MemberInfo member)
+        public static string GetXmlDocsRemarks(this MemberInfo member, bool tryResolveFromNuGetCacheOrDotNetSdk = true)
         {
-            return GetXmlDocsTag(member, "remarks");
+            return GetXmlDocsTag(member, "remarks", tryResolveFromNuGetCacheOrDotNetSdk);
         }
 
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
         /// <param name="pathToXmlFile">The path to the XML documentation file.</param>
+        /// <param name="tryResolveFromNuGetCacheOrDotNetSdk">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static XElement? GetXmlDocsElement(this Type type, string pathToXmlFile)
+        public static XElement? GetXmlDocsElement(this Type type, string pathToXmlFile, bool tryResolveFromNuGetCacheOrDotNetSdk = true)
         {
-            return ((MemberInfo)type.GetTypeInfo()).GetXmlDocsElement(pathToXmlFile);
+            return ((MemberInfo)type.GetTypeInfo()).GetXmlDocsElement(pathToXmlFile, tryResolveFromNuGetCacheOrDotNetSdk);
         }
 
         /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
+        /// <param name="tryResolveFromNuGetCacheOrDotNetSdk">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static XElement? GetXmlDocsElement(this MemberInfo member)
+        public static XElement? GetXmlDocsElement(this MemberInfo member, bool tryResolveFromNuGetCacheOrDotNetSdk = true)
         {
             if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false || DynamicApis.SupportsPathApis == false)
             {
@@ -195,15 +205,16 @@ namespace Namotion.Reflection
                 return null;
             }
 
-            var documentationPath = GetXmlDocsPath(member.Module.Assembly);
-            return GetXmlDocsElement(member, documentationPath!);
+            var documentationPath = GetXmlDocsPath(member.Module.Assembly, tryResolveFromNuGetCacheOrDotNetSdk);
+            return GetXmlDocsElement(member, documentationPath!, tryResolveFromNuGetCacheOrDotNetSdk);
         }
 
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
         /// <param name="pathToXmlFile">The path to the XML documentation file.</param>
+        /// <param name="tryResolveFromNuGetCacheOrDotNetSdk">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static XElement? GetXmlDocsElement(this MemberInfo member, string pathToXmlFile)
+        public static XElement? GetXmlDocsElement(this MemberInfo member, string pathToXmlFile, bool tryResolveFromNuGetCacheOrDotNetSdk = true)
         {
             try
             {
@@ -220,7 +231,7 @@ namespace Namotion.Reflection
                 }
 
                 var element = GetXmlDocsElement(member, document);
-                ReplaceInheritdocElements(member, element);
+                ReplaceInheritdocElements(member, element, tryResolveFromNuGetCacheOrDotNetSdk);
                 return element;
             }
             catch
@@ -232,8 +243,9 @@ namespace Namotion.Reflection
         /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
         /// <param name="tagName">Name of the tag.</param>
+        /// <param name="tryResolveFromNuGetCacheOrDotNetSdk">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsTag(this MemberInfo member, string tagName)
+        public static string GetXmlDocsTag(this MemberInfo member, string tagName, bool tryResolveFromNuGetCacheOrDotNetSdk = true)
         {
             if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false || DynamicApis.SupportsPathApis == false)
             {
@@ -249,15 +261,16 @@ namespace Namotion.Reflection
                 return string.Empty;
             }
 
-            var documentationPath = GetXmlDocsPath(member.Module.Assembly);
-            var element = GetXmlDocsElement(member, documentationPath!);
+            var documentationPath = GetXmlDocsPath(member.Module.Assembly, tryResolveFromNuGetCacheOrDotNetSdk);
+            var element = GetXmlDocsElement(member, documentationPath!, tryResolveFromNuGetCacheOrDotNetSdk);
             return ToXmlDocsContent(element?.Element(tagName));
         }
 
         /// <summary>Returns the property summary of a Record type which is read from the param tag on the type.</summary>
         /// <param name="member">The reflected member.</param>
+        /// <param name="tryResolveFromNuGetCacheOrDotNetSdk">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
         /// <returns>The contents of the "param" tag of the Record property.</returns>
-        public static string GetXmlDocsRecordPropertySummary(this PropertyInfo member)
+        public static string GetXmlDocsRecordPropertySummary(this PropertyInfo member, bool tryResolveFromNuGetCacheOrDotNetSdk = true)
         {
             if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false || DynamicApis.SupportsPathApis == false)
             {
@@ -272,8 +285,8 @@ namespace Namotion.Reflection
                 return string.Empty;
             }
 
-            var documentationPath = GetXmlDocsPath(member.Module.Assembly);
-            var parentElement = GetXmlDocsElement(member.DeclaringType.GetTypeInfo(), documentationPath!);
+            var documentationPath = GetXmlDocsPath(member.Module.Assembly, tryResolveFromNuGetCacheOrDotNetSdk);
+            var parentElement = GetXmlDocsElement(member.DeclaringType.GetTypeInfo(), documentationPath!, tryResolveFromNuGetCacheOrDotNetSdk);
             var paramElement = parentElement?
                 .Elements("param")?
                 .FirstOrDefault(x => x.Attribute("name")?
@@ -284,8 +297,9 @@ namespace Namotion.Reflection
 
         /// <summary>Returns the contents of the "returns" or "param" XML documentation tag for the specified parameter.</summary>
         /// <param name="parameter">The reflected parameter or return info.</param>
+        /// <param name="tryResolveFromNuGetCacheOrDotNetSdk">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
         /// <returns>The contents of the "returns" or "param" tag.</returns>
-        public static string GetXmlDocs(this ParameterInfo parameter)
+        public static string GetXmlDocs(this ParameterInfo parameter, bool tryResolveFromNuGetCacheOrDotNetSdk = true)
         {
             if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false || DynamicApis.SupportsPathApis == false)
             {
@@ -298,16 +312,17 @@ namespace Namotion.Reflection
                 return string.Empty;
             }
 
-            var documentationPath = GetXmlDocsPath(parameter.Member.Module.Assembly);
-            var element = GetXmlDocs(parameter, documentationPath);
+            var documentationPath = GetXmlDocsPath(parameter.Member.Module.Assembly, tryResolveFromNuGetCacheOrDotNetSdk);
+            var element = GetXmlDocs(parameter, documentationPath, tryResolveFromNuGetCacheOrDotNetSdk);
             return ToXmlDocsContent(element);
         }
 
         /// <summary>Returns the contents of the "returns" or "param" XML documentation tag for the specified parameter.</summary>
         /// <param name="parameter">The reflected parameter or return info.</param>
         /// <param name="pathToXmlFile">The path to the XML documentation file.</param>
+        /// <param name="tryResolveFromNuGetCacheOrDotNetSdk">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
         /// <returns>The contents of the "returns" or "param" tag.</returns>
-        public static XElement? GetXmlDocsElement(this ParameterInfo parameter, string pathToXmlFile)
+        public static XElement? GetXmlDocsElement(this ParameterInfo parameter, string pathToXmlFile, bool tryResolveFromNuGetCacheOrDotNetSdk = true)
         {
             try
             {
@@ -316,7 +331,7 @@ namespace Namotion.Reflection
                     return null;
                 }
 
-                return GetXmlDocs(parameter, pathToXmlFile);
+                return GetXmlDocs(parameter, pathToXmlFile, tryResolveFromNuGetCacheOrDotNetSdk);
             }
             catch
             {
@@ -400,7 +415,7 @@ namespace Namotion.Reflection
             return string.Empty;
         }
 
-        private static XElement? GetXmlDocs(this ParameterInfo parameter, string? pathToXmlFile)
+        private static XElement? GetXmlDocs(this ParameterInfo parameter, string? pathToXmlFile, bool tryResolveFromNuGetCacheOrDotNetSdk = true)
         {
             try
             {
@@ -416,7 +431,7 @@ namespace Namotion.Reflection
                     return null;
                 }
 
-                return GetXmlDocsElement(parameter, document);
+                return GetXmlDocsElement(parameter, document, tryResolveFromNuGetCacheOrDotNetSdk);
             }
             catch
             {
@@ -464,13 +479,13 @@ namespace Namotion.Reflection
             return CachingXDocument.GetXmlDocsElement(xml, name);
         }
 
-        private static XElement? GetXmlDocsElement(this ParameterInfo parameter, CachingXDocument xml)
+        private static XElement? GetXmlDocsElement(this ParameterInfo parameter, CachingXDocument xml, bool tryResolveFromNuGetCacheOrDotNetSdk = true)
         {
             var name = GetMemberElementName(parameter.Member);
             var element = xml.GetXmlDocsElement(name);
             if (element != null)
             {
-                ReplaceInheritdocElements(parameter.Member, element);
+                ReplaceInheritdocElements(parameter.Member, element, tryResolveFromNuGetCacheOrDotNetSdk);
 
                 IEnumerable result;
                 if (parameter.IsRetval || string.IsNullOrEmpty(parameter.Name))
@@ -488,7 +503,7 @@ namespace Namotion.Reflection
             return null;
         }
 
-        private static void ReplaceInheritdocElements(this MemberInfo member, XElement? element)
+        private static void ReplaceInheritdocElements(this MemberInfo member, XElement? element, bool tryResolveFromNuGetCacheOrDotNetSdk = true)
         {
 #if !NET40
             if (element == null)
@@ -505,7 +520,7 @@ namespace Namotion.Reflection
                     var baseMember = baseType?.GetTypeInfo().DeclaredMembers.SingleOrDefault(m => m.Name == member.Name);
                     if (baseMember != null)
                     {
-                        var baseDoc = baseMember.GetXmlDocsElement();
+                        var baseDoc = baseMember.GetXmlDocsElement(tryResolveFromNuGetCacheOrDotNetSdk);
                         if (baseDoc != null)
                         {
                             var nodes = baseDoc.Nodes().OfType<object>().ToArray();
@@ -513,25 +528,25 @@ namespace Namotion.Reflection
                         }
                         else
                         {
-                            ProcessInheritdocInterfaceElements(member, child);
+                            ProcessInheritdocInterfaceElements(member, child, tryResolveFromNuGetCacheOrDotNetSdk);
                         }
                     }
                     else
                     {
-                        ProcessInheritdocInterfaceElements(member, child);
+                        ProcessInheritdocInterfaceElements(member, child, tryResolveFromNuGetCacheOrDotNetSdk);
                     }
                 }
             }
         }
 
-        private static void ProcessInheritdocInterfaceElements(this MemberInfo member, XElement child)
+        private static void ProcessInheritdocInterfaceElements(this MemberInfo member, XElement child, bool tryResolveFromNuGetCacheOrDotNetSdk = true)
         {
             foreach (var baseInterface in member.DeclaringType.GetTypeInfo().ImplementedInterfaces)
             {
                 var baseMember = baseInterface?.GetTypeInfo().DeclaredMembers.SingleOrDefault(m => m.Name == member.Name);
                 if (baseMember != null)
                 {
-                    var baseDoc = baseMember.GetXmlDocsElement();
+                    var baseDoc = baseMember.GetXmlDocsElement(tryResolveFromNuGetCacheOrDotNetSdk);
                     if (baseDoc != null)
                     {
                         var nodes = baseDoc.Nodes().OfType<object>().ToArray();
@@ -677,7 +692,7 @@ namespace Namotion.Reflection
             return string.Format("{0}:{1}", prefixCode, memberName.Replace("+", "."));
         }
 
-        private static string? GetXmlDocsPath(dynamic? assembly)
+        private static string? GetXmlDocsPath(dynamic? assembly, bool tryResolveFromNuGetCacheOrDotNetSdk = true)
         {
             try
             {
@@ -761,7 +776,7 @@ namespace Namotion.Reflection
                         return path;
                     }
 
-                    if (XmlDocs.ResolveFromNuGetCacheOrDotNetSdk)
+                    if (tryResolveFromNuGetCacheOrDotNetSdk)
                     {
                         dynamic? executingAssembly = typeof(Assembly)
                             .GetRuntimeMethod("GetExecutingAssembly", new Type[0])?

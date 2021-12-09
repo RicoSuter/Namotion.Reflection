@@ -36,7 +36,15 @@ namespace Namotion.Reflection
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether XML Docs files should be tried to be resolved from the NuGet or SDK directory (default: true).
+        /// Gets or sets a value indicating whether XML Docs files should be tried at all (default: true).
+        /// </summary>
+        /// <remarks>
+        /// This is meant as a master switch to be used in conjunction with libraries that query information.
+        /// </remarks>
+        public static bool Enabled { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether XML Docs files should also be tried to be resolved from the NuGet or SDK directory (default: true).
         /// </summary>
         public static bool ResolveFromNuGetCacheOrDotNetSdk { get; set; } = true;
     }
@@ -44,8 +52,7 @@ namespace Namotion.Reflection
     /// <summary>Provides extension methods for reading XML comments from reflected members.</summary>
     public static class XmlDocsExtensions
     {
-        private static readonly ConcurrentDictionary<string, CachingXDocument?> Cache =
-            new ConcurrentDictionary<string, CachingXDocument?>(StringComparer.OrdinalIgnoreCase);
+        private static readonly ConcurrentDictionary<string, CachingXDocument?> Cache = new(StringComparer.OrdinalIgnoreCase);
 
         internal static void ClearCache()
         {
@@ -679,6 +686,11 @@ namespace Namotion.Reflection
 
         private static string? GetXmlDocsPath(dynamic? assembly)
         {
+            if (!XmlDocs.Enabled)
+            {
+                return null;
+            }
+
             try
             {
                 if (assembly == null)

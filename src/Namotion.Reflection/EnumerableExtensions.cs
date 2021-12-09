@@ -41,9 +41,9 @@ namespace Namotion.Reflection
         /// <returns>May return null (not found).</returns>
         public static T? FirstAssignableToTypeNameOrDefault<T>(this IEnumerable<T>? objects, string typeName, TypeNameStyle typeNameStyle = TypeNameStyle.FullName)
         {
-            if (objects != null)
+            if (objects is T[] array)
             {
-                foreach (var o in objects)
+                foreach (var o in array)
                 {
                     if (o.GetType().IsAssignableToTypeName(typeName, typeNameStyle))
                     {
@@ -51,17 +51,7 @@ namespace Namotion.Reflection
                     }
                 }
             }
-            return default;
-        }
-
-        /// <summary>Tries to get the first object which is assignable to the given type name.</summary>
-        /// <param name="objects">The objects.</param>
-        /// <param name="typeName">Type of the attribute.</param>
-        /// <param name="typeNameStyle">The type name style.</param>
-        /// <returns>May return null (not found).</returns>
-        public static T? FirstAssignableToTypeNameOrDefault<T>(this T[]? objects, string typeName, TypeNameStyle typeNameStyle = TypeNameStyle.FullName)
-        {
-            if (objects != null)
+            else if (objects is not null)
             {
                 foreach (var o in objects)
                 {

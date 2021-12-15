@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.OData.Query;
 using Namotion.Reflection.Tests.FullAssembly;
 using System;
 using System.Collections;
@@ -425,6 +426,18 @@ namespace Namotion.Reflection.Tests
                 Assert.Equal("String", itemType!.TypeName);
                 Assert.Equal(Nullability.Nullable, itemType!.Nullability);
             }
+        }
+
+        public class MyEntity { }
+
+        [Fact]
+        public void When_properties_are_retrieved_from_generic_type_then_no_exception_is_thrown()
+        {
+            // Act
+            var properties = typeof(ODataQueryOptions<MyEntity>).GetContextualAccessors();
+
+            // Assert
+            Assert.Contains(properties, p => p.Name == "IfMatch");
         }
     }
 }

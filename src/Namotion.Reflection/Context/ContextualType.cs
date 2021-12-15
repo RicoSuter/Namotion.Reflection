@@ -264,7 +264,10 @@ namespace Namotion.Reflection
                                     if (TypeInfo.IsGenericType && !TypeInfo.ContainsGenericParameters)
                                     {
                                         var genericType = TypeInfo.GetGenericTypeDefinition();
-                                        var genericProperty = genericType.GetRuntimeProperty(property.Name);
+                                        var genericProperty = genericType
+                                            .GetRuntimeProperties()
+                                            .SingleOrDefault(p => p.Name == property.Name && p.DeclaringType == genericType);
+
                                         if (genericProperty != null && genericProperty.PropertyType.IsGenericParameter)
                                         {
                                             var actualType = GenericArguments[genericProperty.PropertyType.GenericParameterPosition];
@@ -510,7 +513,7 @@ namespace Namotion.Reflection
 #if NET40
             return (byte[]?)nullableAttribute?.GetType().GetField("NullableFlags")?.GetValue(nullableAttribute) ?? _emptyNullableFlags;
 #else
-            return (byte[]?)nullableAttribute?.GetType().GetRuntimeField("NullableFlags")?.GetValue(nullableAttribute) ??_emptyNullableFlags;
+            return (byte[]?)nullableAttribute?.GetType().GetRuntimeField("NullableFlags")?.GetValue(nullableAttribute) ?? _emptyNullableFlags;
 #endif
         }
 

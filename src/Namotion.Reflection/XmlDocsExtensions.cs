@@ -218,7 +218,9 @@ namespace Namotion.Reflection
         {
             try
             {
-                if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false || DynamicApis.SupportsPathApis == false)
+                if (DynamicApis.SupportsXPathApis == false 
+                    || DynamicApis.SupportsFileApis == false 
+                    || DynamicApis.SupportsPathApis == false)
                 {
                     return null;
                 }
@@ -503,7 +505,10 @@ namespace Namotion.Reflection
             return null;
         }
 
-        private static void ReplaceInheritdocElements(this MemberInfo member, XElement? element, bool resolveExternalXmlDocs = true)
+        private static void ReplaceInheritdocElements(
+            this MemberInfo member,
+            XElement? element,
+            bool resolveExternalXmlDocs = true)
         {
 #if !NET40
             if (element == null)
@@ -516,6 +521,13 @@ namespace Namotion.Reflection
             {
                 if (child.Name.LocalName.ToLowerInvariant() == "inheritdoc")
                 {
+                    #if !NETSTANDARD1_0
+                    // if this is not a member of a class/type // is a Type itself
+                    if (member.MemberType == MemberTypes.TypeInfo) {
+                        ProcessInheritDocTypeElements(member, element, child);
+                        continue;
+                    }
+                    #endif
                     var baseType = member.DeclaringType.GetTypeInfo().BaseType;
                     var baseMember = baseType?.GetTypeInfo().DeclaredMembers.SingleOrDefault(m => m.Name == member.Name);
                     if (baseMember != null)
@@ -541,7 +553,7 @@ namespace Namotion.Reflection
 
         private static void ProcessInheritdocInterfaceElements(this MemberInfo member, XElement child, bool resolveExternalXmlDocs = true)
         {
-            foreach (var baseInterface in member.DeclaringType.GetTypeInfo().ImplementedInterfaces)
+            foreach (var baseInterface in member.DeclaringType.GetTypeInfo().ImplementedInterfaces ?? new Type[]{})
             {
                 var baseMember = baseInterface?.GetTypeInfo().DeclaredMembers.SingleOrDefault(m => m.Name == member.Name);
                 if (baseMember != null)
@@ -581,6 +593,11 @@ namespace Namotion.Reflection
             char prefixCode;
             string memberName;
             string memberTypeName;
+
+            if (member is null)
+            {
+                throw new ArgumentNullException(nameof(member));
+            }
 
             if (member is MemberInfo memberInfo &&
                 memberInfo.DeclaringType != null &&
@@ -692,8 +709,14 @@ namespace Namotion.Reflection
             return string.Format("{0}:{1}", prefixCode, memberName.Replace("+", "."));
         }
 
-        private static string? GetXmlDocsPath(dynamic? assembly, bool resolveExternalXmlDocs = true)
+        #if NETSTANDARD1_0
+        // ReSharper disable once MemberCanBePrivate.Global
+        public static string? GetXmlDocsPath(dynamic? assembly, bool resolveExternalXmlDocs = true) 
         {
+        #else
+        public static string? GetXmlDocsPath(Assembly? assembly, bool resolveExternalXmlDocs = true)
+        {
+        #endif
             try
             {
                 if (assembly == null)
@@ -807,6 +830,145 @@ namespace Namotion.Reflection
                 return null;
             }
         }
+        
+#if !NETSTANDARD1_0
+
+        /// <summary>
+        /// Get Type from a referencing string such as <c>!:MyType</c> or <c>!:MyType.MyProperty</c>
+        /// </summary>
+        /// <param name="referencingType">
+        ///     The type whose documentation contains the reference to <paramref name="referencedTypeXmlId"/>
+        /// </param>
+        /// <param name="referencedTypeXmlId">
+        ///     String within <c>inheritdoc cref=</c> referencing an unknown type (prefaced with <c>!:</c>
+        /// </param>
+        /// <returns></returns>
+        private static void ProcessInheritDocTypeElements(this MemberInfo member, XElement element, XElement child)
+        {
+            var referencedTypeXmlId = child.Attribute("cref")?.Value;
+
+            if (referencedTypeXmlId is not null)
+            {
+                Match? matches;
+                string? referencedTypeName;
+                MemberInfo? referencedType = null;
+                Assembly? docAssembly = null;
+                switch (referencedTypeXmlId[0])
+                {
+                    case 'P':
+                        matches = Regex.Match(
+                            referencedTypeXmlId,
+                            @"(?<FullName>(?<FullTypeName>(?<AssemblyName>[a-zA-Z.]*)\.(?<TypeName>[a-zA-Z]*))\.
+                        (?<MemberName>[a-zA-Z]*))");
+                        referencedTypeName = matches.Groups["FullTypeName"].Value;
+                        break;
+                    case '!':
+                        referencedType = ResolveBrokenTypeReference(member, referencedTypeXmlId);
+                        referencedTypeName = referencedType?.Name;
+                        docAssembly = referencedType?.Module.Assembly;
+                        if (referencedType is not null)
+                        {
+                            referencedTypeXmlId = GetMemberElementName(referencedType);
+                        }
+
+                        break;
+                    default:
+                        matches = Regex.Match(
+                            referencedTypeXmlId,
+                            @"[A-Z]:(?<FullName>(?<Namespace>[a-zA-Z.]*)\.(?<TypeName>[a-zA-Z]*))");
+                        referencedTypeName = matches.Groups["FullName"].Value;
+                        break;
+                }
+
+
+                if (docAssembly is null && referencedTypeName is not null)
+                {
+                    docAssembly = member.Module.Assembly;
+                    referencedType = docAssembly.GetType(referencedTypeName);
+                    // check member's assembly first
+                    if (referencedType is null)
+                    {
+                        foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+                        {
+                            referencedType = assembly.GetType(referencedTypeName);
+                            // limit the Assemblies that are searched by doing a basic name check.
+                            if (referencedTypeXmlId.Contains(assembly.GetName().Name))
+                            {
+                                if (referencedType != null)
+                                {
+                                    docAssembly = assembly;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (referencedType is null ||
+                    docAssembly is null)
+                {
+                    return;
+                }
+
+                var referencedDocs = TryGetXmlDocsDocument(
+                    docAssembly.GetName(),
+                    GetXmlDocsPath(docAssembly),
+                    true
+                )?.GetXmlDocsElement(referencedTypeXmlId);
+
+                /* for Record types ( as opposed to Class types ) the above lookup will fail for parameters defined in
+                 * shorthand form on the Constructor. Constructor-defined Properties will show up on the constructor
+                 * as <param name="PropertyName">...</param> rather than have the xml doc member element as a typical
+                 * property would.
+                */
+                if (referencedDocs is null && referencedType.MemberType == MemberTypes.Property)
+                {
+                    var documentationPath = GetXmlDocsPath(member.Module.Assembly);
+                    if (documentationPath is null)
+                        return;
+                    var parentElement = GetXmlDocsElement(
+                        referencedType.DeclaringType.GetTypeInfo(),
+                        documentationPath
+                    );
+                    referencedDocs = parentElement?
+                        .Elements("param")?
+                        .FirstOrDefault(x => x.Attribute("name")?
+                            .Value == referencedType.Name);
+                    // for records, replace node with the entirety of the found docs. So the whole <param> tag.
+                    child.ReplaceWith(referencedDocs);
+                    return;
+                }
+
+                if (referencedDocs != null)
+                {
+                    var nodes = referencedDocs.Nodes().OfType<object>().ToArray();
+                    child.ReplaceWith(nodes);
+                }
+            }
+        }
+
+        private static MemberInfo? ResolveBrokenTypeReference(MemberInfo referencingType, string referencedTypeXmlId)
+        {
+            var matches = Regex.Match(
+                referencedTypeXmlId,
+                @"[A-Z!]:(?<FullName>(?<TypeName>[a-zA-Z]*)\.?(?<MemberName>[a-zA-Z]*)?)");
+            var referencedTypeName = matches.Groups["TypeName"].Value;
+            var referencedMemberName = matches.Groups["MemberName"].Value;
+            var lookupNamespace = referencingType.ReflectedType?.Namespace
+                                  ?? referencingType.DeclaringType?.Namespace
+                                  ?? (referencingType as Type)?.Namespace
+                                  ?? throw new Exception($"failed to lookup namespace on type {referencingType}");
+            var referencedType = referencingType.Module.Assembly.GetType(lookupNamespace + "." + referencedTypeName);
+            if (referencedType is not null)
+            {
+                return !String.IsNullOrEmpty(referencedMemberName)
+                    ? referencedType.GetMember(referencedMemberName).Single()
+                    : referencedType;
+            }
+
+            return null;
+        }
+#endif
 
         private static string? GetPathByOs(dynamic? assembly, AssemblyName assemblyName)
         {

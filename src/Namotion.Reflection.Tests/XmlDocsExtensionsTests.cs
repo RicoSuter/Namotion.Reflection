@@ -14,6 +14,126 @@ namespace Namotion.Reflection.Tests
 {
     public class XmlDocsExtensionsTests
     {
+        /// <summary>WithSummary</summary>
+        public class SummaryXmlDoc
+        {
+            /// <summary>Foo</summary>
+            public string Foo { get; set; }
+        }
+
+        public class CrefInheritXmlDoc
+        {
+            /// <inheritdoc cref="SummaryXmlDoc.Foo"/>
+            public string Bar { get; set; }
+        }
+
+        [Fact]
+        public void When_xml_doc_with_cref_inheritdoc_on_property_is_read_then_inherited_type_is_valid()
+        {
+            // Arrange
+            XmlDocs.ClearCache();
+            
+            // Act
+            var fooElement = typeof(SummaryXmlDoc).GetProperty("Foo").GetXmlDocsElement();
+            var fooResponse = fooElement.Elements("summary");
+            var fooValue = fooResponse.Single().Value;
+            
+            var barElement = typeof(CrefInheritXmlDoc).GetProperty("Bar").GetXmlDocsElement();
+            var barResponse = barElement.Elements("summary");
+            var varValue = barResponse.Single().Value;
+
+            Assert.Equal(fooValue, varValue);
+        }
+        
+        public class CrefInheritXmlDocForType
+        {
+            /// <inheritdoc cref="SummaryXmlDoc"/>
+            public string Bar { get; set; }
+        }
+        
+        [Fact]
+        public void When_xml_doc_with_cref_inheritdoc_on_type_is_read_then_inherited_type_is_valid()
+        {
+            // Arrange
+            XmlDocs.ClearCache();
+            
+            // Act
+            var summaryElement = typeof(SummaryXmlDoc).GetXmlDocsElement();
+            var summaryResponse = summaryElement.Elements("summary");
+            var summaryValue = summaryResponse.Single().Value;
+            
+            var barElement = typeof(CrefInheritXmlDocForType).GetProperty("Bar").GetXmlDocsElement();
+            var barResponse = barElement.Elements("summary");
+            var barValue = barResponse.Single().Value;
+
+            Assert.Equal(summaryValue, barValue);
+        }
+        
+        /// <summary>WithSummary</summary>
+        public class SummaryXmlDocGeneric<T>
+        {
+            /// <summary>FooGeneric</summary>
+            public List<T> Foo { get; set; }
+        }
+
+        public class CrefInheritXmlDocGeneric
+        {
+            /// <inheritdoc cref="SummaryXmlDocGeneric{T}.Foo"/>
+            public string Bar { get; set; }
+        }
+        
+        [Fact]
+        public void When_xml_doc_with_cref_inheritdoc_on_generic_property_is_read_then_inherited_type_is_valid()
+        {
+            // Arrange
+            XmlDocs.ClearCache();
+            
+            // Act
+            var fooElement = typeof(SummaryXmlDocGeneric<object>).GetProperty("Foo").GetXmlDocsElement();
+            var fooResponse = fooElement.Elements("summary");
+            var fooValue = fooResponse.Single().Value;
+            
+            var barElement = typeof(CrefInheritXmlDocGeneric).GetProperty("Bar").GetXmlDocsElement();
+            var barResponse = barElement.Elements("summary");
+            var barValue = barResponse.Single().Value;
+
+            Assert.Equal(fooValue, barValue);
+        }
+        
+        /// <summary>WithSummary</summary>
+        public class SummaryXmlDocParent
+        {
+            public class SummaryXmlDocChild
+            {
+                /// <summary>Foo</summary>
+                public string Foo { get; set; }
+            }
+        }
+        
+        public class CrefInheritNestedXmlDoc
+        {
+            /// <inheritdoc cref="SummaryXmlDocParent.SummaryXmlDocChild.Foo"/>
+            public string Bar { get; set; }
+        }
+        
+        [Fact]
+        public void When_xml_doc_with_cref_inheritdoc_on_nested_class_property_is_read_then_inherited_type_is_valid()
+        {
+            // Arrange
+            XmlDocs.ClearCache();
+            
+            // Act
+            var fooElement = typeof(SummaryXmlDocParent.SummaryXmlDocChild).GetProperty("Foo").GetXmlDocsElement();
+            var fooResponse = fooElement.Elements("summary");
+            var fooValue = fooResponse.Single().Value;
+            
+            var barElement = typeof(CrefInheritNestedXmlDoc).GetProperty("Bar").GetXmlDocsElement();
+            var barResponse = barElement.Elements("summary");
+            var barValue = barResponse.Single().Value;
+
+            Assert.Equal(fooValue, barValue);
+        }
+        
         public class WithComplexXmlDoc
         {
             /// <summary>

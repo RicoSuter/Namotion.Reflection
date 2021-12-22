@@ -40,7 +40,7 @@ namespace Namotion.Reflection
     public static class XmlDocsExtensions
     {
         private static readonly ConcurrentDictionary<string, CachingXDocument?> Cache =
-            new ConcurrentDictionary<string, CachingXDocument?>(StringComparer.OrdinalIgnoreCase);
+            new(StringComparer.OrdinalIgnoreCase);
 
         internal static void ClearCache()
         {
@@ -522,8 +522,9 @@ namespace Namotion.Reflection
                 if (child.Name.LocalName.ToLowerInvariant() == "inheritdoc")
                 {
                     #if !NETSTANDARD1_0
-                    // if this is not a member of a class/type // is a Type itself
-                    if (member.MemberType == MemberTypes.TypeInfo) {
+                    // if this a class/type
+                    if (child.HasAttributes && (member.MemberType is MemberTypes.TypeInfo or MemberTypes.Property)) 
+                    {
                         ProcessInheritDocTypeElements(member, element, child);
                         continue;
                     }
@@ -858,19 +859,8 @@ namespace Namotion.Reflection
                     case 'P':
                         matches = Regex.Match(
                             referencedTypeXmlId,
-                            @"(?<FullName>(?<FullTypeName>(?<AssemblyName>[a-zA-Z.]*)\.(?<TypeName>[a-zA-Z]*))\.
-                        (?<MemberName>[a-zA-Z]*))");
+                            @"(?<FullName>(?<FullTypeName>(?<AssemblyName>[a-zA-Z.]*)\.(?<TypeName>[a-zA-Z]*))\.(?<MemberName>[a-zA-Z]*))");
                         referencedTypeName = matches.Groups["FullTypeName"].Value;
-                        break;
-                    case '!':
-                        referencedType = ResolveBrokenTypeReference(member, referencedTypeXmlId);
-                        referencedTypeName = referencedType?.Name;
-                        docAssembly = referencedType?.Module.Assembly;
-                        if (referencedType is not null)
-                        {
-                            referencedTypeXmlId = GetMemberElementName(referencedType);
-                        }
-
                         break;
                     default:
                         matches = Regex.Match(
@@ -879,7 +869,6 @@ namespace Namotion.Reflection
                         referencedTypeName = matches.Groups["FullName"].Value;
                         break;
                 }
-
 
                 if (docAssembly is null && referencedTypeName is not null)
                 {
@@ -890,10 +879,10 @@ namespace Namotion.Reflection
                     {
                         foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
                         {
-                            referencedType = assembly.GetType(referencedTypeName);
                             // limit the Assemblies that are searched by doing a basic name check.
                             if (referencedTypeXmlId.Contains(assembly.GetName().Name))
                             {
+                                referencedType = GetTypeByXmlDocTypeName(referencedTypeName, assembly);
                                 if (referencedType != null)
                                 {
                                     docAssembly = assembly;
@@ -947,26 +936,20 @@ namespace Namotion.Reflection
             }
         }
 
-        private static MemberInfo? ResolveBrokenTypeReference(MemberInfo referencingType, string referencedTypeXmlId)
+        private static Type? GetTypeByXmlDocTypeName(string xmlDocTypeName, Assembly assembly)
         {
-            var matches = Regex.Match(
-                referencedTypeXmlId,
-                @"[A-Z!]:(?<FullName>(?<TypeName>[a-zA-Z]*)\.?(?<MemberName>[a-zA-Z]*)?)");
-            var referencedTypeName = matches.Groups["TypeName"].Value;
-            var referencedMemberName = matches.Groups["MemberName"].Value;
-            var lookupNamespace = referencingType.ReflectedType?.Namespace
-                                  ?? referencingType.DeclaringType?.Namespace
-                                  ?? (referencingType as Type)?.Namespace
-                                  ?? throw new Exception($"failed to lookup namespace on type {referencingType}");
-            var referencedType = referencingType.Module.Assembly.GetType(lookupNamespace + "." + referencedTypeName);
-            if (referencedType is not null)
-            {
-                return !String.IsNullOrEmpty(referencedMemberName)
-                    ? referencedType.GetMember(referencedMemberName).Single()
-                    : referencedType;
-            }
-
-            return null;
+            var assemblyTypeNames = assembly.GetTypes()
+                .Select(type => new KeyValuePair<string, Type>(NormalizeTypeName(type.FullName!), type))
+                .ToDictionary(x => x.Key, x => x.Value);
+            assemblyTypeNames.TryGetValue(NormalizeTypeName(xmlDocTypeName), out var resultType);
+            return resultType;
+        }
+        
+        private static string NormalizeTypeName(string typeName)
+        {
+            return typeName
+                .Replace(".", string.Empty)
+                .Replace("+", string.Empty);
         }
 #endif
 

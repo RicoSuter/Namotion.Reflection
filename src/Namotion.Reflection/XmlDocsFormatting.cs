@@ -10,7 +10,7 @@ namespace Namotion.Reflection
     /// </summary>
     internal static class XmlDocsFormatting
     {
-        private static readonly IReadOnlyDictionary<XmlDocsFormattingMode, Func<StringBuilder, XElement, StringBuilder>> formattingFunctions =
+        private static readonly IDictionary<XmlDocsFormattingMode, Func<StringBuilder, XElement, StringBuilder>> formattingFunctions =
             new Dictionary<XmlDocsFormattingMode, Func<StringBuilder, XElement, StringBuilder>>()
             {
                 { XmlDocsFormattingMode.Unformatted, AppendUnformattedElement },
@@ -46,7 +46,7 @@ namespace Namotion.Reflection
         }
         #endregion
         #region HTML formatting
-        private static readonly IReadOnlyDictionary<string, Func<StringBuilder, XElement, StringBuilder>> htmlTagMap =
+        private static readonly IDictionary<string, Func<StringBuilder, XElement, StringBuilder>> htmlTagMap =
             new Dictionary<string, Func<StringBuilder, XElement, StringBuilder>>()
             {
                 { "c", (sb, e) => AppendSimpleTaggedElement(sb, e, "<pre>", "</pre>") },
@@ -68,7 +68,7 @@ namespace Namotion.Reflection
         #endregion
 
         #region Markdown formatting
-        private static readonly IReadOnlyDictionary<string, Func<StringBuilder, XElement, StringBuilder>> markdownTagMap =
+        private static readonly IDictionary<string, Func<StringBuilder, XElement, StringBuilder>> markdownTagMap =
             new Dictionary<string, Func<StringBuilder, XElement, StringBuilder>>()
             {
                 { "c", (sb, e) => AppendSimpleTaggedElement(sb, e, "`", "`") },
@@ -99,7 +99,7 @@ namespace Namotion.Reflection
         private static StringBuilder AppendMapFormattedElement(
             StringBuilder stringBuilder,
             XElement element,
-            IReadOnlyDictionary<string, Func<StringBuilder, XElement, StringBuilder>> map)
+            IDictionary<string, Func<StringBuilder, XElement, StringBuilder>> map)
         {
             if (map.ContainsKey(element.Name.LocalName))
             {

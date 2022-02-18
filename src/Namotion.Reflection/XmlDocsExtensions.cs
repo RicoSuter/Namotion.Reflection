@@ -52,66 +52,73 @@ namespace Namotion.Reflection
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
         /// <param name="resolveExternalXmlDocs">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
+        /// <param name="formattingMode">Specified how formatting tags should be processed.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsSummary(this CachedType type, bool resolveExternalXmlDocs = true)
+        public static string GetXmlDocsSummary(this CachedType type, bool resolveExternalXmlDocs = true, XmlDocsFormattingMode formattingMode = XmlDocsFormattingMode.Unformatted)
         {
-            return type.Type.GetXmlDocsSummary(resolveExternalXmlDocs);
+            return type.Type.GetXmlDocsSummary(resolveExternalXmlDocs, formattingMode);
         }
 
         /// <summary>Returns the contents of the "remarks" XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
         /// <param name="resolveExternalXmlDocs">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
+        /// <param name="formattingMode">Specified how formatting tags should be processed.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsRemarks(this CachedType type, bool resolveExternalXmlDocs = true)
+        public static string GetXmlDocsRemarks(this CachedType type, bool resolveExternalXmlDocs = true, XmlDocsFormattingMode formattingMode = XmlDocsFormattingMode.Unformatted)
         {
-            return type.Type.GetXmlDocsRemarks(resolveExternalXmlDocs);
+            return type.Type.GetXmlDocsRemarks(resolveExternalXmlDocs, formattingMode);
         }
 
         /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
         /// <param name="tagName">Name of the tag.</param>
         /// <param name="resolveExternalXmlDocs">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
+        /// <param name="formattingMode">Specified how formatting tags should be processed.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsTag(this CachedType type, string tagName, bool resolveExternalXmlDocs = true)
+        public static string GetXmlDocsTag(this CachedType type, string tagName, bool resolveExternalXmlDocs = true, XmlDocsFormattingMode formattingMode = XmlDocsFormattingMode.Unformatted)
         {
-            return type.Type.GetXmlDocsTag(tagName, resolveExternalXmlDocs);
+            return type.Type.GetXmlDocsTag(tagName, resolveExternalXmlDocs, formattingMode);
         }
 
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
         /// <param name="resolveExternalXmlDocs">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
+        /// <param name="formattingMode">Specified how formatting tags should be processed.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsSummary(this ContextualMemberInfo member, bool resolveExternalXmlDocs = true)
+        public static string GetXmlDocsSummary(this ContextualMemberInfo member, bool resolveExternalXmlDocs = true, XmlDocsFormattingMode formattingMode = XmlDocsFormattingMode.Unformatted)
         {
-            return member.MemberInfo.GetXmlDocsSummary(resolveExternalXmlDocs);
+            return member.MemberInfo.GetXmlDocsSummary(resolveExternalXmlDocs, formattingMode);
         }
 
         /// <summary>Returns the contents of the "remarks" XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
         /// <param name="resolveExternalXmlDocs">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
+        /// <param name="formattingMode">Specified how formatting tags should be processed.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsRemarks(this ContextualMemberInfo member, bool resolveExternalXmlDocs = true)
+        public static string GetXmlDocsRemarks(this ContextualMemberInfo member, bool resolveExternalXmlDocs = true, XmlDocsFormattingMode formattingMode = XmlDocsFormattingMode.Unformatted)
         {
-            return member.MemberInfo.GetXmlDocsRemarks(resolveExternalXmlDocs);
+            return member.MemberInfo.GetXmlDocsRemarks(resolveExternalXmlDocs, formattingMode);
         }
 
         /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
         /// <param name="tagName">Name of the tag.</param>
         /// <param name="resolveExternalXmlDocs">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
+        /// <param name="formattingMode">Specified how formatting tags should be processed.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsTag(this ContextualMemberInfo member, string tagName, bool resolveExternalXmlDocs = true)
+        public static string GetXmlDocsTag(this ContextualMemberInfo member, string tagName, bool resolveExternalXmlDocs = true, XmlDocsFormattingMode formattingMode = XmlDocsFormattingMode.Unformatted)
         {
-            return member.MemberInfo.GetXmlDocsTag(tagName, resolveExternalXmlDocs);
+            return member.MemberInfo.GetXmlDocsTag(tagName, resolveExternalXmlDocs, formattingMode);
         }
 
         /// <summary>Returns the contents of the "returns" or "param" XML documentation tag for the specified parameter.</summary>
         /// <param name="parameter">The reflected parameter or return info.</param>
         /// <param name="resolveExternalXmlDocs">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
+        /// <param name="formattingMode">Specified how formatting tags should be processed.</param>
         /// <returns>The contents of the "returns" or "param" tag.</returns>
-        public static string GetXmlDocs(this ContextualParameterInfo parameter, bool resolveExternalXmlDocs = true)
+        public static string GetXmlDocs(this ContextualParameterInfo parameter, bool resolveExternalXmlDocs = true, XmlDocsFormattingMode formattingMode = XmlDocsFormattingMode.Unformatted)
         {
-            return parameter.ParameterInfo.GetXmlDocs(resolveExternalXmlDocs);
+            return parameter.ParameterInfo.GetXmlDocs(resolveExternalXmlDocs, formattingMode);
         }
 
         /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
@@ -128,42 +135,46 @@ namespace Namotion.Reflection
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
         /// <param name="resolveExternalXmlDocs">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
+        /// <param name="formattingMode">Specified how formatting tags should be processed.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsSummary(this Type type, bool resolveExternalXmlDocs = true)
+        public static string GetXmlDocsSummary(this Type type, bool resolveExternalXmlDocs = true, XmlDocsFormattingMode formattingMode = XmlDocsFormattingMode.Unformatted)
         {
-            return GetXmlDocsTag((MemberInfo)type.GetTypeInfo(), "summary", resolveExternalXmlDocs);
+            return GetXmlDocsTag((MemberInfo)type.GetTypeInfo(), XmlDocsKeys.SummaryElement, resolveExternalXmlDocs, formattingMode);
         }
 
         /// <summary>Returns the contents of the "remarks" XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
         /// <param name="resolveExternalXmlDocs">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
+        /// <param name="formattingMode">Specified how formatting tags should be processed.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsRemarks(this Type type, bool resolveExternalXmlDocs = true)
+        public static string GetXmlDocsRemarks(this Type type, bool resolveExternalXmlDocs = true, XmlDocsFormattingMode formattingMode = XmlDocsFormattingMode.Unformatted)
         {
-            return GetXmlDocsTag((MemberInfo)type.GetTypeInfo(), "remarks", resolveExternalXmlDocs);
+            return GetXmlDocsTag((MemberInfo)type.GetTypeInfo(), XmlDocsKeys.RemarksElement, resolveExternalXmlDocs, formattingMode);
         }
 
         /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
         /// <param name="tagName">Name of the tag.</param>
         /// <param name="resolveExternalXmlDocs">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
+        /// <param name="formattingMode">Specified how formatting tags should be processed.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsTag(this Type type, string tagName, bool resolveExternalXmlDocs = true)
+        public static string GetXmlDocsTag(this Type type, string tagName, bool resolveExternalXmlDocs = true, XmlDocsFormattingMode formattingMode = XmlDocsFormattingMode.Unformatted)
         {
-            return GetXmlDocsTag((MemberInfo)type.GetTypeInfo(), tagName, resolveExternalXmlDocs);
+            return GetXmlDocsTag((MemberInfo)type.GetTypeInfo(), tagName, resolveExternalXmlDocs, formattingMode);
         }
 
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
         /// <param name="resolveExternalXmlDocs">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
+        /// <param name="formattingMode">Specified how formatting tags should be processed.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsSummary(this MemberInfo member, bool resolveExternalXmlDocs = true)
+        public static string GetXmlDocsSummary(this MemberInfo member, bool resolveExternalXmlDocs = true, XmlDocsFormattingMode formattingMode = XmlDocsFormattingMode.Unformatted)
         {
-            var docs = GetXmlDocsTag(member, "summary", resolveExternalXmlDocs);
+            var docs = GetXmlDocsTag(member, XmlDocsKeys.SummaryElement, resolveExternalXmlDocs, formattingMode);
 
             if (string.IsNullOrEmpty(docs) && member is PropertyInfo propertyInfo)
             {
-                return propertyInfo.GetXmlDocsRecordPropertySummary(resolveExternalXmlDocs);
+                return propertyInfo.GetXmlDocsRecordPropertySummary(resolveExternalXmlDocs, formattingMode);
             }
 
             return docs;
@@ -172,10 +183,11 @@ namespace Namotion.Reflection
         /// <summary>Returns the contents of the "remarks" XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
         /// <param name="resolveExternalXmlDocs">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
+        /// <param name="formattingMode">Specified how formatting tags should be processed.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsRemarks(this MemberInfo member, bool resolveExternalXmlDocs = true)
+        public static string GetXmlDocsRemarks(this MemberInfo member, bool resolveExternalXmlDocs = true, XmlDocsFormattingMode formattingMode = XmlDocsFormattingMode.Unformatted)
         {
-            return GetXmlDocsTag(member, "remarks", resolveExternalXmlDocs);
+            return GetXmlDocsTag(member, XmlDocsKeys.RemarksElement, resolveExternalXmlDocs, formattingMode);
         }
 
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
@@ -246,8 +258,9 @@ namespace Namotion.Reflection
         /// <param name="member">The reflected member.</param>
         /// <param name="tagName">Name of the tag.</param>
         /// <param name="resolveExternalXmlDocs">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
+        /// <param name="formattingMode">Specified how formatting tags should be processed.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsTag(this MemberInfo member, string tagName, bool resolveExternalXmlDocs = true)
+        public static string GetXmlDocsTag(this MemberInfo member, string tagName, bool resolveExternalXmlDocs = true, XmlDocsFormattingMode formattingMode = XmlDocsFormattingMode.Unformatted)
         {
             if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false || DynamicApis.SupportsPathApis == false)
             {
@@ -265,14 +278,15 @@ namespace Namotion.Reflection
 
             var documentationPath = GetXmlDocsPath(member.Module.Assembly, resolveExternalXmlDocs);
             var element = GetXmlDocsElement(member, documentationPath!, resolveExternalXmlDocs);
-            return ToXmlDocsContent(element?.Element(tagName));
+            return ToXmlDocsContent(element?.Element(tagName), formattingMode);
         }
 
         /// <summary>Returns the property summary of a Record type which is read from the param tag on the type.</summary>
         /// <param name="member">The reflected member.</param>
         /// <param name="resolveExternalXmlDocs">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
+        /// <param name="formattingMode">Specified how formatting tags should be processed.</param>
         /// <returns>The contents of the "param" tag of the Record property.</returns>
-        public static string GetXmlDocsRecordPropertySummary(this PropertyInfo member, bool resolveExternalXmlDocs = true)
+        public static string GetXmlDocsRecordPropertySummary(this PropertyInfo member, bool resolveExternalXmlDocs = true, XmlDocsFormattingMode formattingMode = XmlDocsFormattingMode.Unformatted)
         {
             if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false || DynamicApis.SupportsPathApis == false)
             {
@@ -290,18 +304,19 @@ namespace Namotion.Reflection
             var documentationPath = GetXmlDocsPath(member.Module.Assembly, resolveExternalXmlDocs);
             var parentElement = GetXmlDocsElement(member.DeclaringType.GetTypeInfo(), documentationPath!, resolveExternalXmlDocs);
             var paramElement = parentElement?
-                .Elements("param")?
-                .FirstOrDefault(x => x.Attribute("name")?
+                .Elements(XmlDocsKeys.ParamElement)?
+                .FirstOrDefault(x => x.Attribute(XmlDocsKeys.ParamNameAttribute)?
                 .Value == member.Name);
 
-            return paramElement != null ? ToXmlDocsContent(paramElement) : string.Empty;
+            return paramElement != null ? ToXmlDocsContent(paramElement, formattingMode) : string.Empty;
         }
 
         /// <summary>Returns the contents of the "returns" or "param" XML documentation tag for the specified parameter.</summary>
         /// <param name="parameter">The reflected parameter or return info.</param>
         /// <param name="resolveExternalXmlDocs">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
+        /// <param name="formattingMode">Specified how formatting tags should be processed.</param>
         /// <returns>The contents of the "returns" or "param" tag.</returns>
-        public static string GetXmlDocs(this ParameterInfo parameter, bool resolveExternalXmlDocs = true)
+        public static string GetXmlDocs(this ParameterInfo parameter, bool resolveExternalXmlDocs = true, XmlDocsFormattingMode formattingMode = XmlDocsFormattingMode.Unformatted)
         {
             if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false || DynamicApis.SupportsPathApis == false)
             {
@@ -316,7 +331,7 @@ namespace Namotion.Reflection
 
             var documentationPath = GetXmlDocsPath(parameter.Member.Module.Assembly, resolveExternalXmlDocs);
             var element = GetXmlDocs(parameter, documentationPath, resolveExternalXmlDocs);
-            return ToXmlDocsContent(element);
+            return ToXmlDocsContent(element, formattingMode);
         }
 
         /// <summary>Returns the contents of the "returns" or "param" XML documentation tag for the specified parameter.</summary>
@@ -346,8 +361,9 @@ namespace Namotion.Reflection
 
         /// <summary>Converts the given XML documentation <see cref="XElement"/> to text.</summary>
         /// <param name="element">The XML element.</param>
+        /// <param name="formattingMode">Specified how formatting tags should be processed.</param>
         /// <returns>The text</returns>
-        public static string ToXmlDocsContent(this XElement? element)
+        public static string ToXmlDocsContent(this XElement? element, XmlDocsFormattingMode formattingMode = XmlDocsFormattingMode.Unformatted)
         {
             if (element != null)
             {
@@ -356,9 +372,9 @@ namespace Namotion.Reflection
                 {
                     if (node is XElement e)
                     {
-                        if (e.Name == "see")
+                        if (e.Name == XmlDocsKeys.SeeElement)
                         {
-                            var attribute = e.Attribute("langword");
+                            var attribute = e.Attribute(XmlDocsKeys.SeeLangwordAttribute);
                             if (attribute != null)
                             {
                                 value.Append(attribute.Value);
@@ -371,7 +387,7 @@ namespace Namotion.Reflection
                                 }
                                 else
                                 {
-                                    attribute = e.Attribute("cref");
+                                    attribute = e.Attribute(XmlDocsKeys.SeeCrefAttribute);
                                     if (attribute != null)
                                     {
                                         var trimmed = attribute.Value.Trim(ToXmlDocsContentTrimChars).Trim();
@@ -381,7 +397,7 @@ namespace Namotion.Reflection
                                     }
                                     else
                                     {
-                                        attribute = e.Attribute("href");
+                                        attribute = e.Attribute(XmlDocsKeys.SeeHrefAttribute);
                                         if (attribute != null)
                                         {
                                             value.Append(attribute.Value);
@@ -390,14 +406,14 @@ namespace Namotion.Reflection
                                 }
                             }
                         }
-                        else if (e.Name == "paramref")
+                        else if (e.Name == XmlDocsKeys.ParamRefElement)
                         {
-                            var nameAttribute = e.Attribute("name");
+                            var nameAttribute = e.Attribute(XmlDocsKeys.ParamRefNameAttribute);
                             value.Append(nameAttribute?.Value ?? e.Value);
                         }
                         else
                         {
-                            value.Append(e.Value);
+                            value.AppendFormattedElement(e, formattingMode);
                         }
                     }
                     else if (node is XText text)
@@ -411,7 +427,7 @@ namespace Namotion.Reflection
                     }
                 }
 
-                return RemoveLineBreakWhiteSpaces(value.ToString());
+                return RemoveLineBreakWhiteSpaces(value.ToString(), formattingMode);
             }
 
             return string.Empty;
@@ -492,11 +508,11 @@ namespace Namotion.Reflection
                 IEnumerable result;
                 if (parameter.IsRetval || string.IsNullOrEmpty(parameter.Name))
                 {
-                    result = element.Elements("returns");
+                    result = element.Elements(XmlDocsKeys.ReturnsElement);
                 }
                 else
                 {
-                    result = element.Elements("param").Where(x => x.Attribute("name")?.Value == parameter.Name);
+                    result = element.Elements(XmlDocsKeys.ParamElement).Where(x => x.Attribute(XmlDocsKeys.ParamNameAttribute)?.Value == parameter.Name);
                 }
 
                 return result.OfType<XElement>().FirstOrDefault();
@@ -519,7 +535,7 @@ namespace Namotion.Reflection
             var children = element.Nodes().ToList();
             foreach (var child in children.OfType<XElement>())
             {
-                if (child.Name.LocalName.ToLowerInvariant() == "inheritdoc")
+                if (child.Name.LocalName.ToLowerInvariant() == XmlDocsKeys.InheritDocElement)
                 {
 #if !NETSTANDARD1_0
                     // if this a class/type
@@ -578,7 +594,7 @@ namespace Namotion.Reflection
         private static readonly char[] RemoveLineBreakWhiteSpacesTrimChars = { '\n' };
         private static readonly Regex LineBreakRegex = new("(\\n[ \\t]*)", (RegexOptions)8); // Compiled
 
-        private static string RemoveLineBreakWhiteSpaces(string? documentation)
+        private static string RemoveLineBreakWhiteSpaces(string? documentation, XmlDocsFormattingMode formattingMode)
         {
             if (string.IsNullOrEmpty(documentation))
             {

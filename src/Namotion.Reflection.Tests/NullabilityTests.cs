@@ -1,4 +1,6 @@
+#if NET6_0_OR_GREATER
 using Microsoft.AspNetCore.OData.Query;
+#endif
 using Namotion.Reflection.Tests.FullAssembly;
 using System;
 using System.Collections;
@@ -428,6 +430,7 @@ namespace Namotion.Reflection.Tests
             }
         }
 
+#if NET6_0_OR_GREATER
         public class MyEntity { }
 
         [Fact]
@@ -439,5 +442,6 @@ namespace Namotion.Reflection.Tests
             // Assert
             Assert.Contains(properties, p => p.Name == "IfMatch");
         }
+#endif
     }
 }

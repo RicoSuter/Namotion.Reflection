@@ -301,11 +301,7 @@ namespace Namotion.Reflection
                     {
                         if (_methods == null)
                         {
-#if !NET40
                             _methods = Type.GetRuntimeMethods().Select(method =>
-#else
-                            _methods = Type.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).Select(method =>
-#endif
                             {
                                 // TODO: Correctly implement generics here
 
@@ -510,11 +506,7 @@ namespace Namotion.Reflection
 
         private byte[] GetFlagsFromNullableAttribute(Attribute nullableAttribute)
         {
-#if NET40
-            return (byte[]?)nullableAttribute?.GetType().GetField("NullableFlags")?.GetValue(nullableAttribute) ?? _emptyNullableFlags;
-#else
             return (byte[]?)nullableAttribute?.GetType().GetRuntimeField("NullableFlags")?.GetValue(nullableAttribute) ?? _emptyNullableFlags;
-#endif
         }
 
         private static byte[]? GetFlagsFromCustomAttributeProviders(NullableFlagsSource[] customAttributeProviders)

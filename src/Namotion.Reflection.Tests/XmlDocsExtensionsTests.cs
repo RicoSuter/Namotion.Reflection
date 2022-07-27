@@ -258,7 +258,11 @@ namespace Namotion.Reflection.Tests
             XmlDocs.ClearCache();
 
             //// Act
-            var summary = typeof(WithGenericTagsInXmlDoc).GetProperty("Foo").GetXmlDocsSummary(formattingMode: XmlDocsFormattingMode.Html);
+            XmlDocOptions options = new XmlDocOptions()
+            {
+                FormattingMode = XmlDocsFormattingMode.Html
+            };
+            var summary = typeof(WithGenericTagsInXmlDoc).GetProperty("Foo").GetXmlDocsSummary(options);
 
             //// Assert
             Assert.Equal("This <pre>are</pre> <strong>some</strong> tags.", summary);
@@ -271,7 +275,11 @@ namespace Namotion.Reflection.Tests
             XmlDocs.ClearCache();
 
             //// Act
-            var summary = typeof(WithGenericTagsInXmlDoc).GetProperty("Foo").GetXmlDocsSummary(formattingMode: XmlDocsFormattingMode.Markdown);
+            XmlDocOptions options = new XmlDocOptions()
+            {
+                FormattingMode = XmlDocsFormattingMode.Markdown
+            };
+            var summary = typeof(WithGenericTagsInXmlDoc).GetProperty("Foo").GetXmlDocsSummary(options);
 
             //// Assert
             Assert.Equal("This `are` **some** tags.", summary);

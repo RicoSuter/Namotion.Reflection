@@ -13,7 +13,7 @@
         /// <summary>
         /// Specifies how formatting tags should be processed.
         /// </summary>
-        public XmlDocsFormattingMode FormattingMode { get; set; } = XmlDocsFormattingMode.Unformatted;
+        public XmlDocsFormattingMode FormattingMode { get; set; } = XmlDocsFormattingMode.None;
 
         /// <summary>
         /// Creates and initializes an instance of <see cref="XmlDocOptions"/> based on the flag <see cref="ResolveExternalXmlDocs"/>.

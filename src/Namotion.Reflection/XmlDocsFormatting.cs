@@ -14,7 +14,7 @@ namespace Namotion.Reflection
         private static readonly Dictionary<XmlDocsFormattingMode, Func<StringBuilder, XElement, StringBuilder>> formattingFunctions =
             new Dictionary<XmlDocsFormattingMode, Func<StringBuilder, XElement, StringBuilder>>()
             {
-                { XmlDocsFormattingMode.Unformatted, AppendUnformattedElement },
+                { XmlDocsFormattingMode.None, AppendUnformattedElement },
                 { XmlDocsFormattingMode.Html, AppendHtmlFormattedElement },
                 { XmlDocsFormattingMode.Markdown, AppendMarkdownFormattedElement }
             };
@@ -97,11 +97,11 @@ namespace Namotion.Reflection
         private static StringBuilder AppendMapFormattedElement(
             StringBuilder stringBuilder,
             XElement element,
-            IDictionary<string, Func<StringBuilder, XElement, StringBuilder>> map)
+            Dictionary<string, Func<StringBuilder, XElement, StringBuilder>> map)
         {
-            if (map.ContainsKey(element.Name.LocalName))
+            if (map.TryGetValue(element.Name.LocalName, out Func<StringBuilder, XElement, StringBuilder> formattingFunction))
             {
-                return map[element.Name.LocalName](stringBuilder, element);
+                return formattingFunction(stringBuilder, element);
             }
             else
             {

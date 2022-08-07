@@ -8,7 +8,7 @@
         /// <summary>
         /// Doesn't use any formatting.
         /// </summary>
-        Unformatted,
+        None,
 
         /// <summary>
         /// Maintains formatting through HTML-tags.

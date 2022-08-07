@@ -10,7 +10,8 @@ namespace Namotion.Reflection
     /// </summary>
     internal static class XmlDocsFormatting
     {
-        private static readonly IDictionary<XmlDocsFormattingMode, Func<StringBuilder, XElement, StringBuilder>> formattingFunctions =
+        // List of methods to use for requested XML-Docs-Formatting.
+        private static readonly Dictionary<XmlDocsFormattingMode, Func<StringBuilder, XElement, StringBuilder>> formattingFunctions =
             new Dictionary<XmlDocsFormattingMode, Func<StringBuilder, XElement, StringBuilder>>()
             {
                 { XmlDocsFormattingMode.Unformatted, AppendUnformattedElement },
@@ -32,7 +33,6 @@ namespace Namotion.Reflection
             return formattingFunctions[formattingMode](stringBuilder, element);
         }
 
-        #region No formatting
         /// <summary>
         /// Appends the value of <paramref name="element"/> without any formatting information.
         /// </summary>
@@ -44,9 +44,9 @@ namespace Namotion.Reflection
             stringBuilder.Append(element.Value);
             return stringBuilder;
         }
-        #endregion
-        #region HTML formatting
-        private static readonly IDictionary<string, Func<StringBuilder, XElement, StringBuilder>> htmlTagMap =
+
+        // Map XML-Docs-Tags to HTML-Tags
+        private static readonly Dictionary<string, Func<StringBuilder, XElement, StringBuilder>> htmlTagMap =
             new Dictionary<string, Func<StringBuilder, XElement, StringBuilder>>()
             {
                 { "c", (sb, e) => AppendSimpleTaggedElement(sb, e, "<pre>", "</pre>") },
@@ -65,10 +65,9 @@ namespace Namotion.Reflection
         {
             return AppendMapFormattedElement(stringBuilder, element, htmlTagMap);
         }
-        #endregion
 
-        #region Markdown formatting
-        private static readonly IDictionary<string, Func<StringBuilder, XElement, StringBuilder>> markdownTagMap =
+        // Map XML-Docs-Tags to Markdown-Codes
+        private static readonly Dictionary<string, Func<StringBuilder, XElement, StringBuilder>> markdownTagMap =
             new Dictionary<string, Func<StringBuilder, XElement, StringBuilder>>()
             {
                 { "c", (sb, e) => AppendSimpleTaggedElement(sb, e, "`", "`") },
@@ -87,7 +86,6 @@ namespace Namotion.Reflection
         {
             return AppendMapFormattedElement(stringBuilder, element, markdownTagMap);
         }
-        #endregion
 
         /// <summary>
         /// Appends the value of <paramref name="element"/> surrounded by the tags specified in <paramref name="map"/> (if supported).

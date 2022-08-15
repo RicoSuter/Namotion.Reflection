@@ -443,7 +443,9 @@ namespace Namotion.Reflection
 
         private static CachingXDocument? TryGetXmlDocsDocument(AssemblyName assemblyName, string? pathToXmlFile, bool resolveExternalXmlDocs)
         {
-            if (Cache.TryGetValue(GetCacheKey(assemblyName.FullName, resolveExternalXmlDocs), out var document))
+            var cacheKey = GetCacheKey(assemblyName.FullName, resolveExternalXmlDocs);
+
+            if (Cache.TryGetValue(cacheKey, out var document))
             {
                 return document;
             }
@@ -455,12 +457,12 @@ namespace Namotion.Reflection
 
             if (DynamicApis.FileExists(pathToXmlFile) == false)
             {
-                Cache[GetCacheKey(assemblyName.FullName, resolveExternalXmlDocs)] = null;
+                Cache[cacheKey] = null;
                 return null;
             }
 
             document = new CachingXDocument(pathToXmlFile);
-            Cache[GetCacheKey(assemblyName.FullName, resolveExternalXmlDocs)] = document;
+            Cache[cacheKey] = document;
 
             return document;
         }
@@ -742,8 +744,9 @@ namespace Namotion.Reflection
                     return null;
                 }
 
-                var assemblyFullName = assemblyName.FullName;
-                if (Cache.ContainsKey(GetCacheKey(assemblyFullName, resolveExternalXmlDocs)))
+                var cacheKey = GetCacheKey(assemblyName.FullName, resolveExternalXmlDocs);
+
+                if (Cache.ContainsKey(cacheKey))
                 {
                     // Path not needed as document already in cache
                     return null;
@@ -828,12 +831,12 @@ namespace Namotion.Reflection
                         }
                     }
 
-                    Cache[GetCacheKey(assemblyFullName, resolveExternalXmlDocs)] = null;
+                    Cache[cacheKey] = null;
                     return null;
                 }
                 catch
                 {
-                    Cache[GetCacheKey(assemblyFullName, resolveExternalXmlDocs)] = null;
+                    Cache[cacheKey] = null;
                     return null;
                 }
             }

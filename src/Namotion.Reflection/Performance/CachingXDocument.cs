@@ -8,14 +8,13 @@ namespace Namotion.Reflection
     /// </summary>
     internal sealed class CachingXDocument
     {
-        private static readonly object Lock = new();
-        private static readonly Dictionary<string, XElement?> ElementByNameCache = new();
-
         private static readonly XName XNameDoc = "doc";
         private static readonly XName XNameMembers = "members";
         private static readonly XName XNameMember = "member";
         private static readonly XName XNameName = "name";
 
+        private readonly object _lock = new();
+        private readonly Dictionary<string, XElement?> _elementByNameCache = new();
         private readonly XDocument _document;
 
         internal CachingXDocument(string? pathToXmlFile)
@@ -27,13 +26,13 @@ namespace Namotion.Reflection
 
         internal XElement? GetXmlDocsElement(string name)
         {
-            lock (Lock)
+            lock (_lock)
             {
-                if (!ElementByNameCache.TryGetValue(name, out var element))
+                if (!_elementByNameCache.TryGetValue(name, out var element))
                 {
                     element = GetXmlDocsElement(_document, name);
 
-                    ElementByNameCache[name] = element;
+                    _elementByNameCache[name] = element;
                 }
                 return element;
             }

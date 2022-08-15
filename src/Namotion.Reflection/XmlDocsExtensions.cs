@@ -1004,7 +1004,7 @@ namespace Namotion.Reflection
 
         private static string? GetXmlDocsPathFromNuGetCacheOrDotNetSdk(string assemblyDirectory, AssemblyName assemblyName)
         {
-            var configs = DynamicApis.DirectoryGetAllFiles(assemblyDirectory, "*.runtimeconfig.dev.json");
+            var configs = DynamicApis.DirectoryGetFiles(assemblyDirectory, "*.runtimeconfig.dev.json");
             if (configs.Any())
             {
                 try

@@ -976,7 +976,7 @@ namespace Namotion.Reflection
                 var truncatedVersion = $"{version.Major}.{version.Minor}.{version.Build}";
                 // Path is like /Users/usernamehere/.nuget/packages/Microsoft.AspNetCore.Mvc.Core/2.2.1
                 var macOsPath = Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.Personal),
+                    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
                     ".nuget",
                     "packages",
                     assemblyName.Name,

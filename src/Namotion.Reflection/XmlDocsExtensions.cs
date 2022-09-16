@@ -51,7 +51,7 @@ namespace Namotion.Reflection
 
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
-        /// <param name="options">Options to control formatting of the XML-docs.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static string GetXmlDocsSummary(this CachedType type, XmlDocsOptions? options = null)
         {
@@ -60,7 +60,7 @@ namespace Namotion.Reflection
 
         /// <summary>Returns the contents of the "remarks" XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
-        /// <param name="options">Options to control formatting of the XML-docs.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static string GetXmlDocsRemarks(this CachedType type, XmlDocsOptions? options = null)
         {
@@ -70,7 +70,7 @@ namespace Namotion.Reflection
         /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
         /// <param name="tagName">Name of the tag.</param>
-        /// <param name="options">Options to control formatting of the XML-docs.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static string GetXmlDocsTag(this CachedType type, string tagName, XmlDocsOptions? options = null)
         {
@@ -79,7 +79,7 @@ namespace Namotion.Reflection
 
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
-        /// <param name="options">Options to control formatting of the XML-docs.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static string GetXmlDocsSummary(this ContextualMemberInfo member, XmlDocsOptions? options = null)
         {
@@ -88,7 +88,7 @@ namespace Namotion.Reflection
 
         /// <summary>Returns the contents of the "remarks" XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
-        /// <param name="options">Options to control formatting of the XML-docs.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static string GetXmlDocsRemarks(this ContextualMemberInfo member, XmlDocsOptions? options = null)
         {
@@ -98,7 +98,7 @@ namespace Namotion.Reflection
         /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
         /// <param name="tagName">Name of the tag.</param>
-        /// <param name="options">Options to control formatting of the XML-docs.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static string GetXmlDocsTag(this ContextualMemberInfo member, string tagName, XmlDocsOptions? options = null)
         {
@@ -107,7 +107,7 @@ namespace Namotion.Reflection
 
         /// <summary>Returns the contents of the "returns" or "param" XML documentation tag for the specified parameter.</summary>
         /// <param name="parameter">The reflected parameter or return info.</param>
-        /// <param name="options">Options to control formatting of the XML-docs.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "returns" or "param" tag.</returns>
         public static string GetXmlDocs(this ContextualParameterInfo parameter, XmlDocsOptions? options = null)
         {
@@ -118,7 +118,7 @@ namespace Namotion.Reflection
 
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
-        /// <param name="options">Options to control formatting of the XML-docs.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static string GetXmlDocsSummary(this Type type, XmlDocsOptions? options = null)
         {
@@ -127,7 +127,7 @@ namespace Namotion.Reflection
 
         /// <summary>Returns the contents of the "remarks" XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
-        /// <param name="options">Options to control formatting of the XML-docs.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static string GetXmlDocsRemarks(this Type type, XmlDocsOptions? options = null)
         {
@@ -137,7 +137,7 @@ namespace Namotion.Reflection
         /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
         /// <param name="tagName">Name of the tag.</param>
-        /// <param name="options">Options to control formatting of the XML-docs.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static string GetXmlDocsTag(this Type type, string tagName, XmlDocsOptions? options = null)
         {
@@ -146,7 +146,7 @@ namespace Namotion.Reflection
 
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
-        /// <param name="options">Options to control formatting of the XML-docs.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static string GetXmlDocsSummary(this MemberInfo member, XmlDocsOptions? options = null)
         {
@@ -162,7 +162,7 @@ namespace Namotion.Reflection
 
         /// <summary>Returns the contents of the "remarks" XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
-        /// <param name="options">Options to control formatting of the XML-docs.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static string GetXmlDocsRemarks(this MemberInfo member, XmlDocsOptions? options = null)
         {
@@ -171,7 +171,7 @@ namespace Namotion.Reflection
 
         /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
-        /// <param name="options">Options to control formatting of the XML-docs.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static XElement? GetXmlDocsElement(this MemberInfo member, XmlDocsOptions? options = null)
         {
@@ -195,7 +195,7 @@ namespace Namotion.Reflection
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
         /// <param name="pathToXmlFile">The path to the XML documentation file.</param>
-        /// <param name="options">Options to control formatting of the XML-docs.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static XElement? GetXmlDocsElement(this MemberInfo member, string pathToXmlFile, XmlDocsOptions? options = null)
         {
@@ -230,7 +230,7 @@ namespace Namotion.Reflection
         /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
         /// <param name="tagName">Name of the tag.</param>
-        /// <param name="options">Options to control formatting of the XML-docs.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static string GetXmlDocsTag(this MemberInfo member, string tagName, XmlDocsOptions? options = null)
         {
@@ -257,7 +257,7 @@ namespace Namotion.Reflection
 
         /// <summary>Returns the property summary of a Record type which is read from the param tag on the type.</summary>
         /// <param name="member">The reflected member.</param>
-        /// <param name="options">Options to control formatting of the XML-docs.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "param" tag of the Record property.</returns>
         public static string GetXmlDocsRecordPropertySummary(this PropertyInfo member, XmlDocsOptions? options = null)
         {
@@ -288,7 +288,7 @@ namespace Namotion.Reflection
 
         /// <summary>Returns the contents of the "returns" or "param" XML documentation tag for the specified parameter.</summary>
         /// <param name="parameter">The reflected parameter or return info.</param>
-        /// <param name="options">Options to control formatting of the XML-docs.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "returns" or "param" tag.</returns>
         public static string GetXmlDocs(this ParameterInfo parameter, XmlDocsOptions? options = null)
         {
@@ -313,7 +313,7 @@ namespace Namotion.Reflection
         /// <summary>Returns the contents of the "returns" or "param" XML documentation tag for the specified parameter.</summary>
         /// <param name="parameter">The reflected parameter or return info.</param>
         /// <param name="pathToXmlFile">The path to the XML documentation file.</param>
-        /// <param name="options">Options to control formatting of the XML-docs.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "returns" or "param" tag.</returns>
         public static XElement? GetXmlDocsElement(this ParameterInfo parameter, string pathToXmlFile, XmlDocsOptions? options = null)
         {
@@ -346,7 +346,7 @@ namespace Namotion.Reflection
 
         /// <summary>Converts the given XML documentation <see cref="XElement"/> to text.</summary>
         /// <param name="element">The XML element.</param>
-        /// <param name="options">Options to control formatting of the XML-docs.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The text</returns>
         public static string ToXmlDocsContent(this XElement? element, XmlDocsOptions? options = null)
         {
@@ -721,7 +721,7 @@ namespace Namotion.Reflection
         /// Gets the file path to the XML docs for the given assembly.
         /// </summary>
         /// <param name="assembly">The assembly.</param>
-        /// <param name="options">Options to control formatting of the XML-docs.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The file path or null if not found.</returns>
 #if NETSTANDARD1_0
         // ReSharper disable once MemberCanBePrivate.Global

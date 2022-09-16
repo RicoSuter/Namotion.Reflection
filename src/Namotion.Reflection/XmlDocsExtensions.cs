@@ -51,119 +51,110 @@ namespace Namotion.Reflection
 
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
-        /// <param name="resolveExternalXmlDocs">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsSummary(this CachedType type, bool resolveExternalXmlDocs = true)
+        public static string GetXmlDocsSummary(this CachedType type, XmlDocsOptions? options = null)
         {
-            return type.Type.GetXmlDocsSummary(resolveExternalXmlDocs);
+            return type.Type.GetXmlDocsSummary(options);
         }
 
         /// <summary>Returns the contents of the "remarks" XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
-        /// <param name="resolveExternalXmlDocs">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsRemarks(this CachedType type, bool resolveExternalXmlDocs = true)
+        public static string GetXmlDocsRemarks(this CachedType type, XmlDocsOptions? options = null)
         {
-            return type.Type.GetXmlDocsRemarks(resolveExternalXmlDocs);
+            return type.Type.GetXmlDocsRemarks(options);
         }
 
         /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
         /// <param name="tagName">Name of the tag.</param>
-        /// <param name="resolveExternalXmlDocs">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsTag(this CachedType type, string tagName, bool resolveExternalXmlDocs = true)
+        public static string GetXmlDocsTag(this CachedType type, string tagName, XmlDocsOptions? options = null)
         {
-            return type.Type.GetXmlDocsTag(tagName, resolveExternalXmlDocs);
+            return type.Type.GetXmlDocsTag(tagName, options);
         }
 
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
-        /// <param name="resolveExternalXmlDocs">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsSummary(this ContextualMemberInfo member, bool resolveExternalXmlDocs = true)
+        public static string GetXmlDocsSummary(this ContextualMemberInfo member, XmlDocsOptions? options = null)
         {
-            return member.MemberInfo.GetXmlDocsSummary(resolveExternalXmlDocs);
+            return member.MemberInfo.GetXmlDocsSummary(options);
         }
 
         /// <summary>Returns the contents of the "remarks" XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
-        /// <param name="resolveExternalXmlDocs">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsRemarks(this ContextualMemberInfo member, bool resolveExternalXmlDocs = true)
+        public static string GetXmlDocsRemarks(this ContextualMemberInfo member, XmlDocsOptions? options = null)
         {
-            return member.MemberInfo.GetXmlDocsRemarks(resolveExternalXmlDocs);
+            return member.MemberInfo.GetXmlDocsRemarks(options);
         }
 
         /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
         /// <param name="tagName">Name of the tag.</param>
-        /// <param name="resolveExternalXmlDocs">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsTag(this ContextualMemberInfo member, string tagName, bool resolveExternalXmlDocs = true)
+        public static string GetXmlDocsTag(this ContextualMemberInfo member, string tagName, XmlDocsOptions? options = null)
         {
-            return member.MemberInfo.GetXmlDocsTag(tagName, resolveExternalXmlDocs);
+            return member.MemberInfo.GetXmlDocsTag(tagName, options);
         }
 
         /// <summary>Returns the contents of the "returns" or "param" XML documentation tag for the specified parameter.</summary>
         /// <param name="parameter">The reflected parameter or return info.</param>
-        /// <param name="resolveExternalXmlDocs">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "returns" or "param" tag.</returns>
-        public static string GetXmlDocs(this ContextualParameterInfo parameter, bool resolveExternalXmlDocs = true)
+        public static string GetXmlDocs(this ContextualParameterInfo parameter, XmlDocsOptions? options = null)
         {
-            return parameter.ParameterInfo.GetXmlDocs(resolveExternalXmlDocs);
-        }
-
-        /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
-        /// <param name="member">The reflected member.</param>
-        /// <param name="resolveExternalXmlDocs">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
-        /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static XElement? GetXmlDocsElement(this ContextualMemberInfo member, bool resolveExternalXmlDocs = true)
-        {
-            return member.MemberInfo.GetXmlDocsElement(resolveExternalXmlDocs);
+            return parameter.ParameterInfo.GetXmlDocs(options);
         }
 
         #endregion
 
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
-        /// <param name="resolveExternalXmlDocs">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsSummary(this Type type, bool resolveExternalXmlDocs = true)
+        public static string GetXmlDocsSummary(this Type type, XmlDocsOptions? options = null)
         {
-            return GetXmlDocsTag((MemberInfo)type.GetTypeInfo(), "summary", resolveExternalXmlDocs);
+            return GetXmlDocsTag((MemberInfo)type.GetTypeInfo(), XmlDocsKeys.SummaryElement, options);
         }
 
         /// <summary>Returns the contents of the "remarks" XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
-        /// <param name="resolveExternalXmlDocs">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsRemarks(this Type type, bool resolveExternalXmlDocs = true)
+        public static string GetXmlDocsRemarks(this Type type, XmlDocsOptions? options = null)
         {
-            return GetXmlDocsTag((MemberInfo)type.GetTypeInfo(), "remarks", resolveExternalXmlDocs);
+            return GetXmlDocsTag((MemberInfo)type.GetTypeInfo(), XmlDocsKeys.RemarksElement, options);
         }
 
         /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
         /// <param name="tagName">Name of the tag.</param>
-        /// <param name="resolveExternalXmlDocs">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsTag(this Type type, string tagName, bool resolveExternalXmlDocs = true)
+        public static string GetXmlDocsTag(this Type type, string tagName, XmlDocsOptions? options = null)
         {
-            return GetXmlDocsTag((MemberInfo)type.GetTypeInfo(), tagName, resolveExternalXmlDocs);
+            return GetXmlDocsTag((MemberInfo)type.GetTypeInfo(), tagName, options);
         }
 
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
-        /// <param name="resolveExternalXmlDocs">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsSummary(this MemberInfo member, bool resolveExternalXmlDocs = true)
+        public static string GetXmlDocsSummary(this MemberInfo member, XmlDocsOptions? options = null)
         {
-            var docs = GetXmlDocsTag(member, "summary", resolveExternalXmlDocs);
+            var docs = GetXmlDocsTag(member, XmlDocsKeys.SummaryElement, options);
 
             if (string.IsNullOrEmpty(docs) && member is PropertyInfo propertyInfo)
             {
-                return propertyInfo.GetXmlDocsRecordPropertySummary(resolveExternalXmlDocs);
+                return propertyInfo.GetXmlDocsRecordPropertySummary(options);
             }
 
             return docs;
@@ -171,53 +162,47 @@ namespace Namotion.Reflection
 
         /// <summary>Returns the contents of the "remarks" XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
-        /// <param name="resolveExternalXmlDocs">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsRemarks(this MemberInfo member, bool resolveExternalXmlDocs = true)
+        public static string GetXmlDocsRemarks(this MemberInfo member, XmlDocsOptions? options = null)
         {
-            return GetXmlDocsTag(member, "remarks", resolveExternalXmlDocs);
-        }
-
-        /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
-        /// <param name="type">The type.</param>
-        /// <param name="pathToXmlFile">The path to the XML documentation file.</param>
-        /// <param name="resolveExternalXmlDocs">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
-        /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static XElement? GetXmlDocsElement(this Type type, string pathToXmlFile, bool resolveExternalXmlDocs = true)
-        {
-            return ((MemberInfo)type.GetTypeInfo()).GetXmlDocsElement(pathToXmlFile, resolveExternalXmlDocs);
+            return GetXmlDocsTag(member, XmlDocsKeys.RemarksElement, options);
         }
 
         /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
-        /// <param name="resolveExternalXmlDocs">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static XElement? GetXmlDocsElement(this MemberInfo member, bool resolveExternalXmlDocs = true)
+        public static XElement? GetXmlDocsElement(this MemberInfo member, XmlDocsOptions? options = null)
         {
+            options = options ?? XmlDocsOptions.Default;
+
             if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false || DynamicApis.SupportsPathApis == false)
             {
                 return null;
             }
 
             var assemblyName = member.Module.Assembly.GetName();
-            if (IsAssemblyIgnored(assemblyName, resolveExternalXmlDocs))
+            if (IsAssemblyIgnored(assemblyName, options.ResolveExternalXmlDocs))
             {
                 return null;
             }
 
-            var documentationPath = GetXmlDocsPath(member.Module.Assembly, resolveExternalXmlDocs);
-            return GetXmlDocsElement(member, documentationPath!, resolveExternalXmlDocs);
+            var documentationPath = GetXmlDocsPath(member.Module.Assembly, options);
+            return GetXmlDocsElement(member, documentationPath!, options);
         }
 
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
         /// <param name="pathToXmlFile">The path to the XML documentation file.</param>
-        /// <param name="resolveExternalXmlDocs">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static XElement? GetXmlDocsElement(this MemberInfo member, string pathToXmlFile, bool resolveExternalXmlDocs = true)
+        public static XElement? GetXmlDocsElement(this MemberInfo member, string pathToXmlFile, XmlDocsOptions? options = null)
         {
             try
             {
+                options = options ?? XmlDocsOptions.Default;
+
                 if (DynamicApis.SupportsXPathApis == false
                     || DynamicApis.SupportsFileApis == false
                     || DynamicApis.SupportsPathApis == false)
@@ -226,14 +211,14 @@ namespace Namotion.Reflection
                 }
 
                 var assemblyName = member.Module.Assembly.GetName();
-                var document = TryGetXmlDocsDocument(assemblyName, pathToXmlFile, resolveExternalXmlDocs);
+                var document = TryGetXmlDocsDocument(assemblyName, pathToXmlFile, options.ResolveExternalXmlDocs);
                 if (document == null)
                 {
                     return null;
                 }
 
                 var element = GetXmlDocsElement(member, document);
-                ReplaceInheritdocElements(member, element, resolveExternalXmlDocs);
+                ReplaceInheritdocElements(member, element, options);
                 return element;
             }
             catch
@@ -245,10 +230,12 @@ namespace Namotion.Reflection
         /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
         /// <param name="tagName">Name of the tag.</param>
-        /// <param name="resolveExternalXmlDocs">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocsTag(this MemberInfo member, string tagName, bool resolveExternalXmlDocs = true)
+        public static string GetXmlDocsTag(this MemberInfo member, string tagName, XmlDocsOptions? options = null)
         {
+            options = options ?? XmlDocsOptions.Default;
+
             if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false || DynamicApis.SupportsPathApis == false)
             {
                 return string.Empty;
@@ -258,22 +245,24 @@ namespace Namotion.Reflection
             _ = tagName ?? throw new ArgumentNullException(nameof(tagName));
 
             var assemblyName = member.Module.Assembly.GetName();
-            if (IsAssemblyIgnored(assemblyName, resolveExternalXmlDocs))
+            if (IsAssemblyIgnored(assemblyName, options.ResolveExternalXmlDocs))
             {
                 return string.Empty;
             }
 
-            var documentationPath = GetXmlDocsPath(member.Module.Assembly, resolveExternalXmlDocs);
-            var element = GetXmlDocsElement(member, documentationPath!, resolveExternalXmlDocs);
-            return ToXmlDocsContent(element?.Element(tagName));
+            var documentationPath = GetXmlDocsPath(member.Module.Assembly, options);
+            var element = GetXmlDocsElement(member, documentationPath!, options);
+            return ToXmlDocsContent(element?.Element(tagName), options);
         }
 
         /// <summary>Returns the property summary of a Record type which is read from the param tag on the type.</summary>
         /// <param name="member">The reflected member.</param>
-        /// <param name="resolveExternalXmlDocs">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "param" tag of the Record property.</returns>
-        public static string GetXmlDocsRecordPropertySummary(this PropertyInfo member, bool resolveExternalXmlDocs = true)
+        public static string GetXmlDocsRecordPropertySummary(this PropertyInfo member, XmlDocsOptions? options = null)
         {
+            options = options ?? XmlDocsOptions.Default;
+
             if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false || DynamicApis.SupportsPathApis == false)
             {
                 return string.Empty;
@@ -282,49 +271,51 @@ namespace Namotion.Reflection
             _ = member ?? throw new ArgumentNullException(nameof(member));
 
             var assemblyName = member.Module.Assembly.GetName();
-            if (IsAssemblyIgnored(assemblyName, resolveExternalXmlDocs))
+            if (IsAssemblyIgnored(assemblyName, options.ResolveExternalXmlDocs))
             {
                 return string.Empty;
             }
 
-            var documentationPath = GetXmlDocsPath(member.Module.Assembly, resolveExternalXmlDocs);
-            var parentElement = GetXmlDocsElement(member.DeclaringType.GetTypeInfo(), documentationPath!, resolveExternalXmlDocs);
+            var documentationPath = GetXmlDocsPath(member.Module.Assembly, options);
+            var parentElement = GetXmlDocsElement(member.DeclaringType.GetTypeInfo(), documentationPath!, options);
             var paramElement = parentElement?
-                .Elements("param")?
-                .FirstOrDefault(x => x.Attribute("name")?
+                .Elements(XmlDocsKeys.ParamElement)?
+                .FirstOrDefault(x => x.Attribute(XmlDocsKeys.ParamNameAttribute)?
                 .Value == member.Name);
 
-            return paramElement != null ? ToXmlDocsContent(paramElement) : string.Empty;
+            return paramElement != null ? ToXmlDocsContent(paramElement, options) : string.Empty;
         }
 
         /// <summary>Returns the contents of the "returns" or "param" XML documentation tag for the specified parameter.</summary>
         /// <param name="parameter">The reflected parameter or return info.</param>
-        /// <param name="resolveExternalXmlDocs">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "returns" or "param" tag.</returns>
-        public static string GetXmlDocs(this ParameterInfo parameter, bool resolveExternalXmlDocs = true)
+        public static string GetXmlDocs(this ParameterInfo parameter, XmlDocsOptions? options = null)
         {
+            options = options ?? XmlDocsOptions.Default;
+
             if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false || DynamicApis.SupportsPathApis == false)
             {
                 return string.Empty;
             }
 
             var assemblyName = parameter.Member.Module.Assembly.GetName();
-            if (IsAssemblyIgnored(assemblyName, resolveExternalXmlDocs))
+            if (IsAssemblyIgnored(assemblyName, options.ResolveExternalXmlDocs))
             {
                 return string.Empty;
             }
 
-            var documentationPath = GetXmlDocsPath(parameter.Member.Module.Assembly, resolveExternalXmlDocs);
-            var element = GetXmlDocs(parameter, documentationPath, resolveExternalXmlDocs);
-            return ToXmlDocsContent(element);
+            var documentationPath = GetXmlDocsPath(parameter.Member.Module.Assembly, options);
+            var element = GetXmlDocs(parameter, documentationPath, options);
+            return ToXmlDocsContent(element, options);
         }
 
         /// <summary>Returns the contents of the "returns" or "param" XML documentation tag for the specified parameter.</summary>
         /// <param name="parameter">The reflected parameter or return info.</param>
         /// <param name="pathToXmlFile">The path to the XML documentation file.</param>
-        /// <param name="resolveExternalXmlDocs">Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "returns" or "param" tag.</returns>
-        public static XElement? GetXmlDocsElement(this ParameterInfo parameter, string pathToXmlFile, bool resolveExternalXmlDocs = true)
+        public static XElement? GetXmlDocsElement(this ParameterInfo parameter, string pathToXmlFile, XmlDocsOptions? options = null)
         {
             try
             {
@@ -333,7 +324,7 @@ namespace Namotion.Reflection
                     return null;
                 }
 
-                return GetXmlDocs(parameter, pathToXmlFile, resolveExternalXmlDocs);
+                return GetXmlDocs(parameter, pathToXmlFile, options ?? XmlDocsOptions.Default);
             }
             catch
             {
@@ -349,6 +340,18 @@ namespace Namotion.Reflection
         /// <returns>The text</returns>
         public static string ToXmlDocsContent(this XElement? element)
         {
+            XmlDocsOptions options = new XmlDocsOptions();
+            return ToXmlDocsContent(element, options);
+        }
+
+        /// <summary>Converts the given XML documentation <see cref="XElement"/> to text.</summary>
+        /// <param name="element">The XML element.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
+        /// <returns>The text</returns>
+        public static string ToXmlDocsContent(this XElement? element, XmlDocsOptions? options = null)
+        {
+            _ = options ?? throw new ArgumentNullException(nameof(options));
+
             if (element != null)
             {
                 var value = new StringBuilder();
@@ -356,9 +359,9 @@ namespace Namotion.Reflection
                 {
                     if (node is XElement e)
                     {
-                        if (e.Name == "see")
+                        if (e.Name == XmlDocsKeys.SeeElement)
                         {
-                            var attribute = e.Attribute("langword");
+                            var attribute = e.Attribute(XmlDocsKeys.SeeLangwordAttribute);
                             if (attribute != null)
                             {
                                 value.Append(attribute.Value);
@@ -371,7 +374,7 @@ namespace Namotion.Reflection
                                 }
                                 else
                                 {
-                                    attribute = e.Attribute("cref");
+                                    attribute = e.Attribute(XmlDocsKeys.SeeCrefAttribute);
                                     if (attribute != null)
                                     {
                                         var trimmed = attribute.Value.Trim(ToXmlDocsContentTrimChars).Trim();
@@ -381,7 +384,7 @@ namespace Namotion.Reflection
                                     }
                                     else
                                     {
-                                        attribute = e.Attribute("href");
+                                        attribute = e.Attribute(XmlDocsKeys.SeeHrefAttribute);
                                         if (attribute != null)
                                         {
                                             value.Append(attribute.Value);
@@ -390,14 +393,14 @@ namespace Namotion.Reflection
                                 }
                             }
                         }
-                        else if (e.Name == "paramref")
+                        else if (e.Name == XmlDocsKeys.ParamRefElement)
                         {
-                            var nameAttribute = e.Attribute("name");
+                            var nameAttribute = e.Attribute(XmlDocsKeys.ParamRefNameAttribute);
                             value.Append(nameAttribute?.Value ?? e.Value);
                         }
                         else
                         {
-                            value.Append(e.Value);
+                            value.AppendFormattedElement(e, options.FormattingMode);
                         }
                     }
                     else if (node is XText text)
@@ -417,7 +420,7 @@ namespace Namotion.Reflection
             return string.Empty;
         }
 
-        private static XElement? GetXmlDocs(this ParameterInfo parameter, string? pathToXmlFile, bool resolveExternalXmlDocs = true)
+        private static XElement? GetXmlDocs(this ParameterInfo parameter, string? pathToXmlFile, XmlDocsOptions options)
         {
             try
             {
@@ -427,13 +430,13 @@ namespace Namotion.Reflection
                 }
 
                 var assemblyName = parameter.Member.Module.Assembly.GetName();
-                var document = TryGetXmlDocsDocument(assemblyName, pathToXmlFile, resolveExternalXmlDocs);
+                var document = TryGetXmlDocsDocument(assemblyName, pathToXmlFile, options.ResolveExternalXmlDocs);
                 if (document == null)
                 {
                     return null;
                 }
 
-                return GetXmlDocsElement(parameter, document, resolveExternalXmlDocs);
+                return GetXmlDocsElement(parameter, document, options);
             }
             catch
             {
@@ -443,7 +446,9 @@ namespace Namotion.Reflection
 
         private static CachingXDocument? TryGetXmlDocsDocument(AssemblyName assemblyName, string? pathToXmlFile, bool resolveExternalXmlDocs)
         {
-            if (Cache.TryGetValue(GetCacheKey(assemblyName.FullName, resolveExternalXmlDocs), out var document))
+            var cacheKey = GetCacheKey(assemblyName.FullName, resolveExternalXmlDocs);
+
+            if (Cache.TryGetValue(cacheKey, out var document))
             {
                 return document;
             }
@@ -455,12 +460,12 @@ namespace Namotion.Reflection
 
             if (DynamicApis.FileExists(pathToXmlFile) == false)
             {
-                Cache[GetCacheKey(assemblyName.FullName, resolveExternalXmlDocs)] = null;
+                Cache[cacheKey] = null;
                 return null;
             }
 
             document = new CachingXDocument(pathToXmlFile);
-            Cache[GetCacheKey(assemblyName.FullName, resolveExternalXmlDocs)] = document;
+            Cache[cacheKey] = document;
 
             return document;
         }
@@ -481,22 +486,22 @@ namespace Namotion.Reflection
             return CachingXDocument.GetXmlDocsElement(xml, name);
         }
 
-        private static XElement? GetXmlDocsElement(this ParameterInfo parameter, CachingXDocument xml, bool resolveExternalXmlDocs = true)
+        private static XElement? GetXmlDocsElement(this ParameterInfo parameter, CachingXDocument xml, XmlDocsOptions options)
         {
             var name = GetMemberElementName(parameter.Member);
             var element = xml.GetXmlDocsElement(name);
             if (element != null)
             {
-                ReplaceInheritdocElements(parameter.Member, element, resolveExternalXmlDocs);
+                ReplaceInheritdocElements(parameter.Member, element, options);
 
                 IEnumerable result;
                 if (parameter.IsRetval || string.IsNullOrEmpty(parameter.Name))
                 {
-                    result = element.Elements("returns");
+                    result = element.Elements(XmlDocsKeys.ReturnsElement);
                 }
                 else
                 {
-                    result = element.Elements("param").Where(x => x.Attribute("name")?.Value == parameter.Name);
+                    result = element.Elements(XmlDocsKeys.ParamElement).Where(x => x.Attribute(XmlDocsKeys.ParamNameAttribute)?.Value == parameter.Name);
                 }
 
                 return result.OfType<XElement>().FirstOrDefault();
@@ -505,10 +510,7 @@ namespace Namotion.Reflection
             return null;
         }
 
-        private static void ReplaceInheritdocElements(
-            this MemberInfo member,
-            XElement? element,
-            bool resolveExternalXmlDocs = true)
+        private static void ReplaceInheritdocElements(this MemberInfo member, XElement? element, XmlDocsOptions options)
         {
 #if !NET40
             if (element == null)
@@ -519,13 +521,13 @@ namespace Namotion.Reflection
             var children = element.Nodes().ToList();
             foreach (var child in children.OfType<XElement>())
             {
-                if (child.Name.LocalName.ToLowerInvariant() == "inheritdoc")
+                if (child.Name.LocalName.ToLowerInvariant() == XmlDocsKeys.InheritDocElement)
                 {
 #if !NETSTANDARD1_0
                     // if this a class/type
                     if (child.HasAttributes && (member.MemberType is MemberTypes.TypeInfo or MemberTypes.Property))
                     {
-                        ProcessInheritDocTypeElements(member, child);
+                        ProcessInheritDocTypeElements(member, child, options);
                         continue;
                     }
 #endif
@@ -533,7 +535,7 @@ namespace Namotion.Reflection
                     var baseMember = baseType?.GetTypeInfo().DeclaredMembers.SingleOrDefault(m => m.Name == member.Name);
                     if (baseMember != null)
                     {
-                        var baseDoc = baseMember.GetXmlDocsElement(resolveExternalXmlDocs);
+                        var baseDoc = baseMember.GetXmlDocsElement(options);
                         if (baseDoc != null)
                         {
                             var nodes = baseDoc.Nodes().OfType<object>().ToArray();
@@ -541,18 +543,18 @@ namespace Namotion.Reflection
                         }
                         else
                         {
-                            ProcessInheritdocInterfaceElements(member, child, resolveExternalXmlDocs);
+                            ProcessInheritdocInterfaceElements(member, child, options);
                         }
                     }
                     else
                     {
-                        ProcessInheritdocInterfaceElements(member, child, resolveExternalXmlDocs);
+                        ProcessInheritdocInterfaceElements(member, child, options);
                     }
                 }
             }
         }
 
-        private static void ProcessInheritdocInterfaceElements(this MemberInfo member, XElement child, bool resolveExternalXmlDocs = true)
+        private static void ProcessInheritdocInterfaceElements(this MemberInfo member, XElement child, XmlDocsOptions options)
         {
             if (member.DeclaringType.GetTypeInfo().ImplementedInterfaces == null)
             {
@@ -564,7 +566,7 @@ namespace Namotion.Reflection
                 var baseMember = baseInterface?.GetTypeInfo().DeclaredMembers.SingleOrDefault(m => m.Name == member.Name);
                 if (baseMember != null)
                 {
-                    var baseDoc = baseMember.GetXmlDocsElement(resolveExternalXmlDocs);
+                    var baseDoc = baseMember.GetXmlDocsElement(options);
                     if (baseDoc != null)
                     {
                         var nodes = baseDoc.Nodes().OfType<object>().ToArray();
@@ -719,14 +721,14 @@ namespace Namotion.Reflection
         /// Gets the file path to the XML docs for the given assembly.
         /// </summary>
         /// <param name="assembly">The assembly.</param>
-        /// <param name="resolveExternalXmlDocs">Specifies whether to resolve external XML docs.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The file path or null if not found.</returns>
 #if NETSTANDARD1_0
         // ReSharper disable once MemberCanBePrivate.Global
-        public static string? GetXmlDocsPath(dynamic? assembly, bool resolveExternalXmlDocs = true)
+        public static string? GetXmlDocsPath(dynamic? assembly, XmlDocsOptions options)
         {
 #else
-        public static string? GetXmlDocsPath(Assembly? assembly, bool resolveExternalXmlDocs = true)
+        public static string? GetXmlDocsPath(Assembly? assembly, XmlDocsOptions options)
         {
 #endif
             try
@@ -742,8 +744,9 @@ namespace Namotion.Reflection
                     return null;
                 }
 
-                var assemblyFullName = assemblyName.FullName;
-                if (Cache.ContainsKey(GetCacheKey(assemblyFullName, resolveExternalXmlDocs)))
+                var cacheKey = GetCacheKey(assemblyName.FullName, options.ResolveExternalXmlDocs);
+
+                if (Cache.ContainsKey(cacheKey))
                 {
                     // Path not needed as document already in cache
                     return null;
@@ -811,7 +814,7 @@ namespace Namotion.Reflection
                         return path;
                     }
 
-                    if (resolveExternalXmlDocs)
+                    if (options.ResolveExternalXmlDocs)
                     {
                         dynamic? executingAssembly = typeof(Assembly)
                             .GetRuntimeMethod("GetExecutingAssembly", new Type[0])?
@@ -828,12 +831,12 @@ namespace Namotion.Reflection
                         }
                     }
 
-                    Cache[GetCacheKey(assemblyFullName, resolveExternalXmlDocs)] = null;
+                    Cache[cacheKey] = null;
                     return null;
                 }
                 catch
                 {
-                    Cache[GetCacheKey(assemblyFullName, resolveExternalXmlDocs)] = null;
+                    Cache[cacheKey] = null;
                     return null;
                 }
             }
@@ -848,7 +851,7 @@ namespace Namotion.Reflection
         /// <summary>
         /// Get Type from a referencing string such as <c>!:MyType</c> or <c>!:MyType.MyProperty</c>
         /// </summary>
-        private static void ProcessInheritDocTypeElements(this MemberInfo member, XElement child)
+        private static void ProcessInheritDocTypeElements(this MemberInfo member, XElement child, XmlDocsOptions options)
         {
             var referencedTypeXmlId = child.Attribute("cref")?.Value;
             if (referencedTypeXmlId is not null)
@@ -905,7 +908,7 @@ namespace Namotion.Reflection
 
                 var referencedDocs = TryGetXmlDocsDocument(
                     docAssembly.GetName(),
-                    GetXmlDocsPath(docAssembly),
+                    GetXmlDocsPath(docAssembly, options),
                     true)?.GetXmlDocsElement(referencedTypeXmlId);
 
                 /* for Record types ( as opposed to Class types ) the above lookup will fail for parameters defined in
@@ -915,7 +918,7 @@ namespace Namotion.Reflection
                 */
                 if (referencedDocs is null && referencedType.MemberType == MemberTypes.Property)
                 {
-                    var documentationPath = GetXmlDocsPath(member.Module.Assembly);
+                    var documentationPath = GetXmlDocsPath(member.Module.Assembly, options);
                     if (documentationPath is null)
                     {
                         return;
@@ -923,7 +926,8 @@ namespace Namotion.Reflection
 
                     var parentElement = GetXmlDocsElement(
                         referencedType.DeclaringType.GetTypeInfo(),
-                        documentationPath);
+                        documentationPath,
+                        options);
 
                     referencedDocs = parentElement?
                         .Elements("param")?
@@ -973,7 +977,7 @@ namespace Namotion.Reflection
                 var truncatedVersion = $"{version.Major}.{version.Minor}.{version.Build}";
                 // Path is like /Users/usernamehere/.nuget/packages/Microsoft.AspNetCore.Mvc.Core/2.2.1
                 var macOsPath = Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.Personal),
+                    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
                     ".nuget",
                     "packages",
                     assemblyName.Name,
@@ -1001,7 +1005,7 @@ namespace Namotion.Reflection
 
         private static string? GetXmlDocsPathFromNuGetCacheOrDotNetSdk(string assemblyDirectory, AssemblyName assemblyName)
         {
-            var configs = DynamicApis.DirectoryGetAllFiles(assemblyDirectory, "*.runtimeconfig.dev.json");
+            var configs = DynamicApis.DirectoryGetFiles(assemblyDirectory, "*.runtimeconfig.dev.json");
             if (configs.Any())
             {
                 try

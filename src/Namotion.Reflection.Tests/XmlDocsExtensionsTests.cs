@@ -251,6 +251,40 @@ namespace Namotion.Reflection.Tests
             Assert.Equal("This are some tags.", summary);
         }
 
+        [Fact]
+        public void When_summary_has_generic_tags_then_it_is_converted_to_html()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            XmlDocsOptions options = new XmlDocsOptions()
+            {
+                FormattingMode = XmlDocsFormattingMode.Html
+            };
+            var summary = typeof(WithGenericTagsInXmlDoc).GetProperty("Foo").GetXmlDocsSummary(options);
+
+            //// Assert
+            Assert.Equal("This <pre>are</pre> <strong>some</strong> tags.", summary);
+        }
+
+        [Fact]
+        public void When_summary_has_generic_tags_then_it_is_converted_to_markdown()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            XmlDocsOptions options = new XmlDocsOptions()
+            {
+                FormattingMode = XmlDocsFormattingMode.Markdown
+            };
+            var summary = typeof(WithGenericTagsInXmlDoc).GetProperty("Foo").GetXmlDocsSummary(options);
+
+            //// Assert
+            Assert.Equal("This `are` **some** tags.", summary);
+        }
+
         public abstract class BaseBaseClass
         {
             /// <summary>Foo.</summary>

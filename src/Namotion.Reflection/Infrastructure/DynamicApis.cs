@@ -138,7 +138,7 @@ namespace Namotion.Reflection.Infrastructure
 #endif
         }
 
-        /// <summary>Gets all files of directory.</summary>
+        /// <summary>Gets all files of directory and its sub-directories.</summary>
         /// <param name="path">The directory path.</param>
         /// <param name="searchPattern">The search pattern.</param>
         /// <returns>true or false</returns>
@@ -154,6 +154,25 @@ namespace Namotion.Reflection.Infrastructure
                 .Invoke(null, new object[] { path, searchPattern, 1 });
 #else
             return Directory.GetFiles(path, searchPattern, SearchOption.AllDirectories);
+#endif
+        }
+
+        /// <summary>Gets all files of directory.</summary>
+        /// <param name="path">The directory path.</param>
+        /// <param name="searchPattern">The search pattern.</param>
+        /// <returns>true or false</returns>
+        /// <exception cref="NotSupportedException">The System.IO.Directory API is not available on this platform.</exception>
+        public static string[] DirectoryGetFiles(string path, string searchPattern)
+        {
+#if NETSTANDARD1_0
+            if (!SupportsDirectoryApis)
+                throw new NotSupportedException("The System.IO.Directory API is not available on this platform.");
+
+            return (string[])DirectoryType!.GetRuntimeMethods()
+                .First(m => m.Name == "GetFiles" && m.GetParameters().Length == 2)
+                .Invoke(null, new object[] { path, searchPattern });
+#else
+            return Directory.GetFiles(path, searchPattern);
 #endif
         }
 

@@ -3,12 +3,12 @@
     /// <summary>
     /// Contains all options to control generation of XML-docs.
     /// </summary>
-    public class XmlDocOptions
+    public class XmlDocsOptions
     {
         /// <summary>
         /// The default options.
         /// </summary>
-        public static XmlDocOptions Default { get; } = new XmlDocOptions { };
+        public static XmlDocsOptions Default { get; } = new XmlDocsOptions { };
 
         /// <summary>
         /// Specifies whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory.

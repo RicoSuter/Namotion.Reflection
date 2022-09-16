@@ -258,7 +258,7 @@ namespace Namotion.Reflection.Tests
             XmlDocs.ClearCache();
 
             //// Act
-            XmlDocOptions options = new XmlDocOptions()
+            XmlDocsOptions options = new XmlDocsOptions()
             {
                 FormattingMode = XmlDocsFormattingMode.Html
             };
@@ -275,7 +275,7 @@ namespace Namotion.Reflection.Tests
             XmlDocs.ClearCache();
 
             //// Act
-            XmlDocOptions options = new XmlDocOptions()
+            XmlDocsOptions options = new XmlDocsOptions()
             {
                 FormattingMode = XmlDocsFormattingMode.Markdown
             };

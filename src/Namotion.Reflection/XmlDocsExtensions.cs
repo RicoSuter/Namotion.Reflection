@@ -337,20 +337,11 @@ namespace Namotion.Reflection
 
         /// <summary>Converts the given XML documentation <see cref="XElement"/> to text.</summary>
         /// <param name="element">The XML element.</param>
-        /// <returns>The text</returns>
-        public static string ToXmlDocsContent(this XElement? element)
-        {
-            XmlDocsOptions options = new XmlDocsOptions();
-            return ToXmlDocsContent(element, options);
-        }
-
-        /// <summary>Converts the given XML documentation <see cref="XElement"/> to text.</summary>
-        /// <param name="element">The XML element.</param>
         /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The text</returns>
         public static string ToXmlDocsContent(this XElement? element, XmlDocsOptions? options = null)
         {
-            _ = options ?? throw new ArgumentNullException(nameof(options));
+            options ??= XmlDocsOptions.Default;
 
             if (element != null)
             {

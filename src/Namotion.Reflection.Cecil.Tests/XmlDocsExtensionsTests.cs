@@ -51,12 +51,12 @@ namespace Namotion.Reflection.Cecil.Tests
             var document = XmlDocs.LoadDocument(xmlPath);
 
             // Act
-            var typeSummary = type.GetXmlDocsTag("summary", document);
-            var constructorSummary = type.Methods.First(m => m.IsConstructor).GetXmlDocsTag("summary", document);
-            var property = type.Properties.First().GetXmlDocsSummary(document);
-            var methodSummary = method.GetXmlDocsTag("summary", document);
-            var parameter = method.Parameters.Last().GetXmlDocs(document);
-            var returnParameter = method.MethodReturnType.GetXmlDocs(document);
+            var typeSummary = type.GetXmlDocsTag("summary", document, XmlDocsOptions.Default);
+            var constructorSummary = type.Methods.First(m => m.IsConstructor).GetXmlDocsTag("summary", document, XmlDocsOptions.Default);
+            var property = type.Properties.First().GetXmlDocsSummary(document, XmlDocsOptions.Default);
+            var methodSummary = method.GetXmlDocsTag("summary", document, XmlDocsOptions.Default);
+            var parameter = method.Parameters.Last().GetXmlDocs(document, XmlDocsOptions.Default);
+            var returnParameter = method.MethodReturnType.GetXmlDocs(document, XmlDocsOptions.Default);
 
             // Assert
             Assert.Equal("My class.", typeSummary);
@@ -108,9 +108,9 @@ namespace Namotion.Reflection.Cecil.Tests
             var document = XmlDocs.LoadDocument(xmlPath);
 
             //// Act
-            var summaryMethod = method.GetXmlDocsTag("summary", document);
-            var summaryMethod2 = method2.GetXmlDocsTag("summary", document);
-            var summaryProperty = type.Properties.First().GetXmlDocsSummary(document);
+            var summaryMethod = method.GetXmlDocsTag("summary", document, XmlDocsOptions.Default);
+            var summaryMethod2 = method2.GetXmlDocsTag("summary", document, XmlDocsOptions.Default);
+            var summaryProperty = type.Properties.First().GetXmlDocsSummary(document, XmlDocsOptions.Default);
 
             //// Assert
             Assert.Equal("SingleAsync", summaryMethod);

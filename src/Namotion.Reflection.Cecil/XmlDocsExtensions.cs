@@ -36,27 +36,30 @@ namespace Namotion.Reflection.Cecil
         /// <summary>Returns the contents of an XML documentation summary for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
         /// <param name="document">The document.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string? GetXmlDocsSummary(this IMemberDefinition member, XDocument document)
+        public static string? GetXmlDocsSummary(this IMemberDefinition member, XDocument document, XmlDocsOptions? options = null)
         {
-            return member.GetXmlDocsTag("summary", document);
+            return member.GetXmlDocsTag("summary", document, options);
         }
 
         /// <summary>Returns the contents of an XML documentation remarks for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
         /// <param name="document">The document.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string? GetXmlDocsRemarks(this IMemberDefinition member, XDocument document)
+        public static string? GetXmlDocsRemarks(this IMemberDefinition member, XDocument document, XmlDocsOptions? options = null)
         {
-            return member.GetXmlDocsTag("remarks", document);
+            return member.GetXmlDocsTag("remarks", document, options);
         }
 
         /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
         /// <param name="tagName">Name of the tag.</param>
         /// <param name="document">The document.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string? GetXmlDocsTag(this IMemberDefinition member, string tagName, XDocument document)
+        public static string? GetXmlDocsTag(this IMemberDefinition member, string tagName, XDocument document, XmlDocsOptions? options = null)
         {
             if (DynamicApis.SupportsXPathApis == false)
             {
@@ -65,7 +68,7 @@ namespace Namotion.Reflection.Cecil
 
             var name = GetMemberElementName(member);
             var element = document.GetXmlDocsElement(name);
-            return element?.Element(tagName).ToXmlDocsContent();
+            return element?.Element(tagName).ToXmlDocsContent(options);
         }
 
         /// <summary>Returns the contents of an XML documentation for the specified member.</summary>
@@ -86,8 +89,9 @@ namespace Namotion.Reflection.Cecil
         /// <summary>Returns the contents of an XML documentation for the specified member.</summary>
         /// <param name="parameter">The reflected member.</param>
         /// <param name="document">The document.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocs(this ParameterDefinition parameter, XDocument document)
+        public static string GetXmlDocs(this ParameterDefinition parameter, XDocument document, XmlDocsOptions? options = null)
         {
             if (DynamicApis.SupportsXPathApis == false)
             {
@@ -95,14 +99,14 @@ namespace Namotion.Reflection.Cecil
             }
 
             var element = parameter.GetXmlDocsElement(document);
-            return element.ToXmlDocsContent();
+            return element.ToXmlDocsContent(options);
         }
 
         /// <summary>Returns the contents of an XML documentation for the specified member.</summary>
         /// <param name="methodReturnType">The reflected member.</param>
         /// <param name="document">The document.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocs(this MethodReturnType methodReturnType, XDocument document)
+        public static string GetXmlDocs(this MethodReturnType methodReturnType, XDocument document, XmlDocsOptions? options = null)
         {
             if (DynamicApis.SupportsXPathApis == false)
             {
@@ -110,7 +114,7 @@ namespace Namotion.Reflection.Cecil
             }
 
             var element = methodReturnType.GetXmlDocsElement(document);
-            return element.ToXmlDocsContent();
+            return element.ToXmlDocsContent(options);
         }
 
         private static XElement? GetXmlDocsElement(this MethodReturnType parameter, XDocument xml)

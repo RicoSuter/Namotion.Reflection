@@ -11,6 +11,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace Namotion.Reflection
 {
@@ -134,7 +135,7 @@ namespace Namotion.Reflection
                 for (int i = 0; i < properties.Length; i++)
                 {
                     var property = properties[i];
-                    if (!property.PropertyType.IsValueType && property.CanRead)
+                    if (!property.PropertyType.IsValueType && property.CanRead && property.GetContextAttribute<CompilerGeneratedAttribute>() is null)
                     {
                         var value = property.GetValue(obj);
                         if (value == null)

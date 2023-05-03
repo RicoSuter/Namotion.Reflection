@@ -5,7 +5,7 @@
 [![Azure DevOps](https://img.shields.io/azure-devops/build/rsuter/Namotion/16/master.svg)](https://dev.azure.com/rsuter/Namotion/_build?definitionId=16)
 [![Azure DevOps](https://img.shields.io/azure-devops/coverage/rsuter/Namotion/16/master.svg)](https://dev.azure.com/rsuter/Namotion/_build?definitionId=16)
 [![Nuget](https://img.shields.io/nuget/v/Namotion.Reflection.svg)](https://apimundo.com/organizations/nuget-org/nuget-feeds/public/packages/Namotion.Reflection/versions/latest)
-[![MyGet](https://img.shields.io/myget/namotion-reflection/v/Namotion.Reflection.svg?label=preview%20nuget)](https://www.myget.org/feed/Packages/namotion-reflection)
+[![Discord](https://img.shields.io/badge/Discord-join%20chat-1dce73.svg)](https://discord.gg/BxQNy25WF6)
 
 <img align="left" src="https://raw.githubusercontent.com/RicoSuter/Namotion.Reflection/master/assets/Icon.png" width="48px" height="48px">
 

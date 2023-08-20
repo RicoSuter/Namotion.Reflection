@@ -503,7 +503,6 @@ namespace Namotion.Reflection
 
         private static void ReplaceInheritdocElements(this MemberInfo member, XElement? element, XmlDocsOptions options)
         {
-#if !NET40
             if (element == null)
             {
                 return;
@@ -514,14 +513,13 @@ namespace Namotion.Reflection
             {
                 if (child.Name.LocalName.ToLowerInvariant() == XmlDocsKeys.InheritDocElement)
                 {
-#if !NETSTANDARD1_0
                     // if this a class/type
                     if (child.HasAttributes && (member.MemberType is MemberTypes.TypeInfo or MemberTypes.Property))
                     {
                         ProcessInheritDocTypeElements(member, child, options);
                         continue;
                     }
-#endif
+
                     var baseType = member.DeclaringType.GetTypeInfo().BaseType;
                     var baseMember = baseType?.GetTypeInfo().DeclaredMembers.SingleOrDefault(m => m.Name == member.Name);
                     if (baseMember != null)
@@ -565,7 +563,6 @@ namespace Namotion.Reflection
                     }
                 }
             }
-#endif
         }
 
         private static readonly char[] RemoveLineBreakWhiteSpacesTrimChars = { '\n' };
@@ -714,14 +711,8 @@ namespace Namotion.Reflection
         /// <param name="assembly">The assembly.</param>
         /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The file path or null if not found.</returns>
-#if NETSTANDARD1_0
-        // ReSharper disable once MemberCanBePrivate.Global
-        public static string? GetXmlDocsPath(dynamic? assembly, XmlDocsOptions options)
-        {
-#else
         public static string? GetXmlDocsPath(Assembly? assembly, XmlDocsOptions options)
         {
-#endif
             try
             {
                 if (assembly == null)
@@ -837,8 +828,6 @@ namespace Namotion.Reflection
             }
         }
 
-#if !NETSTANDARD1_0
-
         /// <summary>
         /// Get Type from a referencing string such as <c>!:MyType</c> or <c>!:MyType.MyProperty</c>
         /// </summary>
@@ -952,11 +941,10 @@ namespace Namotion.Reflection
                 .Replace(".", string.Empty)
                 .Replace("+", string.Empty);
         }
-#endif
 
         private static string? GetPathByOs(dynamic? assembly, AssemblyName assemblyName)
         {
-#if NETSTANDARD2_0
+#if NETSTANDARD2_0_OR_GREATER
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
                 var fullAssemblyVersion = (assembly as Assembly)?.GetCustomAttribute<AssemblyFileVersionAttribute>()?.Version;

@@ -68,18 +68,15 @@ namespace Namotion.Reflection
         /// <summary>
         /// Gets the type name.
         /// </summary>
-        public string TypeName => _typeName ?? (_typeName = Type.Name);
+        public string TypeName => _typeName ??= Type.Name;
 
         /// <summary>
         /// Gest the original's type info.
         /// </summary>
-#if !NET40
-        public TypeInfo TypeInfo => _typeInfo ?? (_typeInfo = Type.GetTypeInfo());
+        public TypeInfo TypeInfo => _typeInfo ??= Type.GetTypeInfo();
 
         private TypeInfo? _typeInfo;
-#else
-        public Type TypeInfo => Type;
-#endif
+
         /// <summary>
         /// Gets the type's associated attributes of the type (inherited).
         /// </summary>
@@ -213,9 +210,7 @@ namespace Namotion.Reflection
         /// <summary>
         /// Updates the original generic arguments.
         /// </summary>
-#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         protected void UpdateOriginalGenericArguments()
         {
             var nullableFlagsIndex = 0;
@@ -225,9 +220,7 @@ namespace Namotion.Reflection
         /// <summary>
         /// Updates the original generic arguments.
         /// </summary>
-#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         protected void UpdateOriginalGenericArguments(ref int nullableFlagsIndex)
         {
             if (_originalGenericArguments == null)
@@ -237,11 +230,7 @@ namespace Namotion.Reflection
                     if (_originalGenericArguments == null)
                     {
                         var arguments = new List<CachedType>();
-#if NET40
-                        foreach (var type in OriginalType.GetGenericArguments())
-#else
                         foreach (var type in OriginalType.GenericTypeArguments)
-#endif
                         {
                             arguments.Add(GetCachedType(type, ref nullableFlagsIndex));
                         }

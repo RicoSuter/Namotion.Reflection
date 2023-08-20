@@ -47,11 +47,7 @@ namespace Namotion.Reflection
                 return true;
             }
 
-#if NETSTANDARD1_0
-            var interfaces = type.GetTypeInfo().ImplementedInterfaces;
-#else
             var interfaces = type.GetInterfaces();
-#endif
             foreach (var i in interfaces)
             {
                 if (typeNameStyle == TypeNameStyle.Name && i.Name == typeName
@@ -117,8 +113,6 @@ namespace Namotion.Reflection
         /// <returns>The type arguments.</returns>
         private static Type[] GetGenericTypeArgumentsOfTypeOrBaseTypes(this Type type)
         {
-#if !NET40
-
             var genericTypeArguments = type.GenericTypeArguments;
             while (type != null && type != typeof(object) && genericTypeArguments.Length == 0)
             {
@@ -130,22 +124,6 @@ namespace Namotion.Reflection
             }
 
             return genericTypeArguments;
-
-#else
-
-            var genericTypeArguments = type.GetGenericArguments();
-            while (type != null && type != typeof(object) && genericTypeArguments.Length == 0)
-            {
-                type = type.GetTypeInfo().BaseType;
-                if (type != null)
-                {
-                    genericTypeArguments = type.GetGenericArguments();
-                }
-            }
-
-            return genericTypeArguments;
-
-#endif
         }
 
         /// <summary>Gets a human readable type name (e.g. DictionaryOfStringAndObject).</summary>
@@ -154,12 +132,7 @@ namespace Namotion.Reflection
         public static string GetDisplayName(this Type type)
         {
             var nType = type.ToCachedType();
-
-#if !NET40
             if (nType.Type.IsConstructedGenericType)
-#else
-            if (nType.Type.IsGenericType)
-#endif
             {
                 return GetName(nType).FirstToken('`') + "Of" +
                        string.Join("And", nType.GenericArguments

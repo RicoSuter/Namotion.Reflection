@@ -1104,9 +1104,7 @@ namespace Namotion.Reflection
             }
         }
 
-#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         private static string GetCacheKey(string assemblyFullName, bool resolveExternalXmlDocs)
         {
             return $"{assemblyFullName}:{resolveExternalXmlDocs}";

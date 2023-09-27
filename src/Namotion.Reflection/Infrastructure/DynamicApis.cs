@@ -86,16 +86,7 @@ namespace Namotion.Reflection.Infrastructure
         /// <exception cref="NotSupportedException">The System.IO.Directory API is not available on this platform.</exception>
         public static string[] DirectoryGetFiles(string path, string searchPattern)
         {
-#if NETSTANDARD1_0
-            if (!SupportsDirectoryApis)
-                throw new NotSupportedException("The System.IO.Directory API is not available on this platform.");
-
-            return (string[])DirectoryType!.GetRuntimeMethods()
-                .First(m => m.Name == "GetFiles" && m.GetParameters().Length == 2)
-                .Invoke(null, new object[] { path, searchPattern });
-#else
             return Directory.GetFiles(path, searchPattern);
-#endif
         }
 
         /// <summary>Combines two paths.</summary>

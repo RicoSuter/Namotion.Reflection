@@ -42,12 +42,10 @@ namespace Namotion.Reflection
             try
             {
                 var attributes = parameterInfo.GetCustomAttributes(true);
-#if !NETSTANDARD1_0
                 if (attributes.Length == 0)
                 {
                     return ArrayExt.Empty<Attribute>();
                 }
-#endif
                 return attributes.OfType<Attribute>().ToArray();
             }
             catch

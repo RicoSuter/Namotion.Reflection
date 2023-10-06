@@ -57,7 +57,6 @@ namespace Namotion.Reflection
             NullableFlags = GetNullableFlags(memberInfo);
         }
 
-#if !NETSTANDARD1_0 && !NET40
         private static byte[]? GetNullableFlags<T>(T provider) where T : ICustomAttributeProvider
         {
             var attributes = provider.GetCustomAttributes(false);
@@ -66,36 +65,11 @@ namespace Namotion.Reflection
                 var type = attribute.GetType();
                 if (type.Name == "NullableContextAttribute" && type.Namespace == "System.Runtime.CompilerServices")
                 {
-#if NET40
-                    return new byte[] { (byte) type.GetField("Flag").GetValue(attribute) };
-#else
                     return new byte[] { (byte) type.GetRuntimeField("Flag").GetValue(attribute) };
-#endif
                 }
             }
 
             return null;
         }
-#else
-        private static byte[]? GetNullableFlags(object provider)
-        {
-            var attributes = (IEnumerable<Attribute>) ((dynamic) provider).GetCustomAttributes(false);
-            foreach (var attribute in attributes)
-            {
-                var type = attribute.GetType();
-                if (type.Name == "NullableContextAttribute" && type.Namespace == "System.Runtime.CompilerServices")
-                {
-#if NET40
-                    return new byte[] { (byte) type.GetField("Flag").GetValue(attribute) };
-#else
-                    return new byte[] { (byte) type.GetRuntimeField("Flag").GetValue(attribute) };
-#endif
-                }
-            }
-
-            return null;
-        }
-#endif
-
     }
 }

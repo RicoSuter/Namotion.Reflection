@@ -18,35 +18,23 @@ namespace Namotion.Reflection
     internal sealed class PropertyReader<TObject, TValue> : IPropertyReader
     {
         private readonly PropertyInfo _propertyInfo;
-#if !NET40 && !NETSTANDARD1_0
         private Func<TObject?, TValue?>? _getter;
-#endif
 
         public PropertyReader(PropertyInfo propertyInfo)
         {
             _propertyInfo = propertyInfo;
 
-#if !NET40 && !NETSTANDARD1_0
             var method = propertyInfo.GetMethod;
             _getter = method != null ? (Func<TObject?, TValue?>)Delegate.CreateDelegate(typeof(Func<TObject?, TValue?>), null, method) : null;
-#endif
         }
 
-#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public TValue? GetValue(TObject? obj)
         {
-#if !NET40 && !NETSTANDARD1_0
             return _getter != null ? _getter(obj) : (TValue)_propertyInfo.GetValue(obj);
-#else
-            return (TValue?)_propertyInfo.GetValue(obj);
-#endif
         }
 
-#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         object? IPropertyReader.GetValue(object? obj)
         {
             return GetValue((TObject?)obj);

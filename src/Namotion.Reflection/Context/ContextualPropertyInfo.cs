@@ -69,9 +69,7 @@ namespace Namotion.Reflection
         /// </summary>
         /// <param name="obj">The object.</param>
         /// <returns>The value.</returns>
-#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public override object? GetValue(object? obj)
         {
             if (_propertyReader == null)
@@ -95,9 +93,7 @@ namespace Namotion.Reflection
         /// </summary>
         /// <param name="obj">The object.</param>
         /// <param name="value">The value.</param>
-#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public override void SetValue(object? obj, object? value)
         {
             if (_propertyWriter == null)

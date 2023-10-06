@@ -137,34 +137,41 @@ namespace Namotion.Reflection
         {
             get
             {
-                var elementType = ElementType;
-                if (elementType != null)
+                try
                 {
-                    return elementType;
-                }
+                    var elementType = ElementType;
+                    if (elementType != null)
+                    {
+                        return elementType;
+                    }
 
-                var getEnumeratorMethod = Methods.SingleOrDefault(m => m.Name == "GetEnumerator");
-                if (getEnumeratorMethod != null)
+                    var getEnumeratorMethod = Methods.SingleOrDefault(m => m.Name == "GetEnumerator");
+                    if (getEnumeratorMethod != null)
+                    {
+                        if (GenericArguments?.Length == 1)
+                        {
+                            return GenericArguments[0];
+                        }
+
+                        if (_enumerableItemType != null)
+                        {
+                            return _enumerableItemType;
+                        }
+
+                        var returnParam = getEnumeratorMethod.ReturnParameter;
+                        if (returnParam?.GenericArguments.Length == 1)
+                        {
+                            _enumerableItemType = returnParam.GenericArguments[0];
+                            return _enumerableItemType;
+                        }
+                    }
+
+                    return null;
+                }
+                catch (Exception exception)
                 {
-                    if (GenericArguments?.Length == 1)
-                    {
-                        return GenericArguments[0];
-                    }
-
-                    if (_enumerableItemType != null)
-                    {
-                        return _enumerableItemType;
-                    }
-
-                    var returnParam = getEnumeratorMethod.ReturnParameter;
-                    if (returnParam?.GenericArguments.Length == 1)
-                    {
-                        _enumerableItemType = returnParam.GenericArguments[0];
-                        return _enumerableItemType;
-                    }
+                    throw new InvalidOperationException($"Failed to retrieve enumerable item type of {Type.FullName}.", exception);
                 }
-
-                return null;
             }
         }
 

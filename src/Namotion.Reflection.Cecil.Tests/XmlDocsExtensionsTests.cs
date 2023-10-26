@@ -15,6 +15,11 @@ namespace Namotion.Reflection.Cecil.Tests
         public class MyTest
         {
             /// <summary>
+            /// My field.
+            /// </summary>
+            public string MyField = string.Empty;
+
+            /// <summary>
             /// My constructor.
             /// </summary>
             public MyTest()
@@ -40,7 +45,7 @@ namespace Namotion.Reflection.Cecil.Tests
         [Fact]
         public void When_xml_docs_is_read_for_cecil_type_then_it_works()
         {
-            // Arranage
+            // Arrange
             var assemblyPath = typeof(XmlDocsExtensionsTests).Assembly.CodeBase!.Replace("file:///", string.Empty);
             var xmlPath = assemblyPath.Replace(".dll", ".xml");
 
@@ -54,6 +59,7 @@ namespace Namotion.Reflection.Cecil.Tests
             var typeSummary = type.GetXmlDocsTag("summary", document, XmlDocsOptions.Default);
             var constructorSummary = type.Methods.First(m => m.IsConstructor).GetXmlDocsTag("summary", document, XmlDocsOptions.Default);
             var property = type.Properties.First().GetXmlDocsSummary(document, XmlDocsOptions.Default);
+            var field = type.Fields.First().GetXmlDocsSummary(document, XmlDocsOptions.Default);
             var methodSummary = method.GetXmlDocsTag("summary", document, XmlDocsOptions.Default);
             var parameter = method.Parameters.Last().GetXmlDocs(document, XmlDocsOptions.Default);
             var returnParameter = method.MethodReturnType.GetXmlDocs(document, XmlDocsOptions.Default);
@@ -62,9 +68,46 @@ namespace Namotion.Reflection.Cecil.Tests
             Assert.Equal("My class.", typeSummary);
             Assert.Equal("My constructor.", constructorSummary);
             Assert.Equal("My property.", property);
+            Assert.Equal("My field.", field);
             Assert.Equal("My method.", methodSummary);
             Assert.Equal("My param.", parameter);
             Assert.Equal("My return.", returnParameter);
+        }
+
+        public enum MyEnum
+        {
+            /// <summary>
+            /// My foo.
+            /// </summary>
+            Foo,
+
+            /// <summary>
+            /// My bar.
+            /// </summary>
+            Bar
+        }
+
+        [Fact]
+        public void When_xml_docs_is_enum_then_field_xml_docs_are_read()
+        {
+            // Arrange
+            var assemblyPath = typeof(XmlDocsExtensionsTests).Assembly.CodeBase!.Replace("file:///", string.Empty);
+            var xmlPath = assemblyPath.Replace(".dll", ".xml");
+
+            var assembly = AssemblyDefinition.ReadAssembly(assemblyPath);
+            var module = assembly.Modules.Last();
+            var type = module.GetTypes().Single(t => t.Name.Contains(nameof(MyEnum)));
+            var document = XmlDocs.LoadDocument(xmlPath);
+
+            // Act
+            var f1 = type.Fields[1]!;
+            var f2 = type.Fields[2]!;
+            var s1 = f1.GetXmlDocsSummary(document, XmlDocsOptions.Default);
+            var s2 = f2.GetXmlDocsSummary(document, XmlDocsOptions.Default);
+
+            // Assert
+            Assert.Equal("My foo.", s1);
+            Assert.Equal("My bar.", s2);
         }
 
         public class BaseGenericClass<T1, T2>
@@ -96,7 +139,7 @@ namespace Namotion.Reflection.Cecil.Tests
         [Fact]
         public void WhenTypeInheritsFromGenericType_ThenMethodAndPropertyWithGenericParametersResolvesCorrectXml()
         {
-            // Arranage
+            // Arrange
             var assemblyPath = typeof(XmlDocsExtensionsTests).Assembly.CodeBase!.Replace("file:///", string.Empty);
             var xmlPath = assemblyPath.Replace(".dll", ".xml");
 

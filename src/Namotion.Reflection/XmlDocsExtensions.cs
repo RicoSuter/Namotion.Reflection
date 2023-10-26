@@ -623,6 +623,7 @@ namespace Namotion.Reflection
                 memberTypeName =
                     TypeExtensions.IsAssignableToTypeName(memberType, "MethodDefinition", TypeNameStyle.Name) ? (memberName.EndsWith("..ctor") ? "Constructor" : "Method") :
                     TypeExtensions.IsAssignableToTypeName(memberType, "PropertyDefinition", TypeNameStyle.Name) ? "Property" :
+                    TypeExtensions.IsAssignableToTypeName(memberType, "FieldDefinition", TypeNameStyle.Name) ? "Field" :
                     "TypeInfo";
             }
             else

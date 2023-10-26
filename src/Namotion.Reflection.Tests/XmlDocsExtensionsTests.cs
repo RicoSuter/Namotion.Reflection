@@ -832,5 +832,57 @@ namespace Namotion.Reflection.Tests
             //// Assert
             Assert.False(string.IsNullOrWhiteSpace(s));
         }
+
+        public class FieldClass
+        {
+            /// <summary>
+            /// My field.
+            /// </summary>
+            public string MyField = string.Empty;
+        }
+
+        [Fact]
+        public void When_parameter_has_xml_docs_then_it_is_found()
+        {
+            //// Arrange
+            var t = typeof(FieldClass);
+
+            //// Act
+            var f = t.GetFields().First();
+            var s = f.GetXmlDocsSummary();
+
+            //// Assert
+            Assert.False(string.IsNullOrWhiteSpace(s));
+        }
+
+        public enum MyEnum
+        {
+            /// <summary>
+            /// My foo.
+            /// </summary>
+            Foo,
+
+            /// <summary>
+            /// My bar.
+            /// </summary>
+            Bar
+        }
+
+        [Fact]
+        public void When_enum_values_have_xml_docs_then_they_are_read()
+        {
+            //// Arrange
+            var t = typeof(MyEnum);
+
+            //// Act
+            var f1 = t.GetFields()[1];
+            var f2 = t.GetFields()[2];
+            var s1 = f1.GetXmlDocsSummary();
+            var s2 = f2.GetXmlDocsSummary();
+
+            //// Assert
+            Assert.Equal("My foo.", s1);
+            Assert.Equal("My bar.", s2);
+        }
     }
 }

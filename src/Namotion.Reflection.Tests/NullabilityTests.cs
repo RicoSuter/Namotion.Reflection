@@ -34,14 +34,14 @@ namespace Namotion.Reflection.Tests
             // Assert
             Assert.Equal(Nullability.NotNullable, typeWithContext.Nullability);
 
-            Assert.Equal(Nullability.NotNullable, typeWithContext.GenericArguments[0].Nullability);
-            Assert.Equal(Nullability.NotNullable, typeWithContext.GenericArguments[1].Nullability);
+            Assert.Equal(Nullability.NotNullable, typeWithContext.ParameterType.GenericArguments[0].Nullability);
+            Assert.Equal(Nullability.NotNullable, typeWithContext.ParameterType.GenericArguments[1].Nullability);
 
-            Assert.Equal(Nullability.NotNullable, typeWithContext.GenericArguments[2].OriginalNullability);
-            Assert.Equal(Nullability.Nullable, typeWithContext.GenericArguments[2].Nullability);
+            Assert.Equal(Nullability.NotNullable, typeWithContext.ParameterType.GenericArguments[2].OriginalNullability);
+            Assert.Equal(Nullability.Nullable, typeWithContext.ParameterType.GenericArguments[2].Nullability);
 
-            Assert.Equal(Nullability.NotNullable, typeWithContext.GenericArguments[3].Nullability);
-            Assert.Equal(Nullability.Nullable, typeWithContext.GenericArguments[4].Nullability);
+            Assert.Equal(Nullability.NotNullable, typeWithContext.ParameterType.GenericArguments[3].Nullability);
+            Assert.Equal(Nullability.Nullable, typeWithContext.ParameterType.GenericArguments[4].Nullability);
         }
 
         class MultiDimensionalArrayTest
@@ -63,9 +63,9 @@ namespace Namotion.Reflection.Tests
 
             // Assert
             Assert.Equal(Nullability.NotNullable, typeWithContext.Nullability);
-            Assert.Equal(Nullability.Nullable, typeWithContext!.ElementType!.Nullability);
-            Assert.Equal(Nullability.NotNullable, typeWithContext!.ElementType!.ElementType!.Nullability);
-            Assert.Equal(Nullability.NotNullable, typeWithContext!.ElementType!.ElementType!.ElementType!.Nullability);
+            Assert.Equal(Nullability.Nullable, typeWithContext.ParameterType.ElementType!.Nullability);
+            Assert.Equal(Nullability.NotNullable, typeWithContext.ParameterType.ElementType!.ElementType!.Nullability);
+            Assert.Equal(Nullability.NotNullable, typeWithContext.ParameterType.ElementType!.ElementType!.ElementType!.Nullability);
         }
 
 
@@ -88,7 +88,7 @@ namespace Namotion.Reflection.Tests
 
             // Assert
             Assert.Equal(Nullability.NotNullable, typeWithContext.Nullability);
-            Assert.Equal(Nullability.Nullable, typeWithContext.ElementType!.Nullability);
+            Assert.Equal(Nullability.Nullable, typeWithContext.ParameterType.ElementType!.Nullability);
         }
 
         class NotNullableArrayItemTest
@@ -110,7 +110,7 @@ namespace Namotion.Reflection.Tests
 
             // Assert
             Assert.Equal(Nullability.NotNullable, typeWithContext.Nullability);
-            Assert.Equal(Nullability.NotNullable, typeWithContext.ElementType!.Nullability);
+            Assert.Equal(Nullability.NotNullable, typeWithContext.ParameterType.ElementType!.Nullability);
         }
 
         class TestFunction
@@ -143,8 +143,8 @@ namespace Namotion.Reflection.Tests
 
             // Assert
             Assert.Equal(Nullability.NotNullable, typeWithContext.Nullability);
-            Assert.Equal(Nullability.NotNullable, typeWithContext.GenericArguments[0].Nullability);
-            Assert.Equal(Nullability.Nullable, typeWithContext.GenericArguments[1].Nullability);
+            Assert.Equal(Nullability.NotNullable, typeWithContext.ParameterType.GenericArguments[0].Nullability);
+            Assert.Equal(Nullability.Nullable, typeWithContext.ParameterType.GenericArguments[1].Nullability);
         }
 
         [Fact]
@@ -159,8 +159,8 @@ namespace Namotion.Reflection.Tests
 
             // Assert
             Assert.Equal(Nullability.NotNullable, typeWithContext.Nullability);
-            Assert.Equal(Nullability.NotNullable, typeWithContext.GenericArguments[0].Nullability);
-            Assert.Equal(Nullability.Nullable, typeWithContext.GenericArguments[1].Nullability);
+            Assert.Equal(Nullability.NotNullable, typeWithContext.ParameterType.GenericArguments[0].Nullability);
+            Assert.Equal(Nullability.Nullable, typeWithContext.ParameterType.GenericArguments[1].Nullability);
         }
 
         [Fact]
@@ -175,26 +175,26 @@ namespace Namotion.Reflection.Tests
 
             // Assert
             Assert.Equal(Nullability.NotNullable, typeWithContext.Nullability);
-            Assert.Equal(Nullability.NotNullable, typeWithContext.GenericArguments[0].Nullability);
-            Assert.Equal(Nullability.Nullable,    typeWithContext.GenericArguments[1].Nullability);
-            Assert.Equal(Nullability.NotNullable, typeWithContext.GenericArguments[2].Nullability);
+            Assert.Equal(Nullability.NotNullable, typeWithContext.ParameterType.GenericArguments[0].Nullability);
+            Assert.Equal(Nullability.Nullable,    typeWithContext.ParameterType.GenericArguments[1].Nullability);
+            Assert.Equal(Nullability.NotNullable, typeWithContext.ParameterType.GenericArguments[2].Nullability);
 
-            Assert.Equal(Nullability.Nullable,    typeWithContext.GenericArguments[1].GenericArguments[0].Nullability);
-            Assert.Equal(Nullability.NotNullable, typeWithContext.GenericArguments[1].GenericArguments[1].Nullability);
-            Assert.Equal(Nullability.Nullable,    typeWithContext.GenericArguments[1].GenericArguments[2].Nullability);
+            Assert.Equal(Nullability.Nullable,    typeWithContext.ParameterType.GenericArguments[1].GenericArguments[0].Nullability);
+            Assert.Equal(Nullability.NotNullable, typeWithContext.ParameterType.GenericArguments[1].GenericArguments[1].Nullability);
+            Assert.Equal(Nullability.Nullable,    typeWithContext.ParameterType.GenericArguments[1].GenericArguments[2].Nullability);
 
-            Assert.Equal(Nullability.Nullable,    typeWithContext.GenericArguments[2].GenericArguments[0].Nullability);
-            Assert.Equal(Nullability.NotNullable, typeWithContext.GenericArguments[2].GenericArguments[1].Nullability);
-            Assert.Equal(Nullability.Nullable,    typeWithContext.GenericArguments[2].GenericArguments[2].Nullability);
+            Assert.Equal(Nullability.Nullable,    typeWithContext.ParameterType.GenericArguments[2].GenericArguments[0].Nullability);
+            Assert.Equal(Nullability.NotNullable, typeWithContext.ParameterType.GenericArguments[2].GenericArguments[1].Nullability);
+            Assert.Equal(Nullability.Nullable,    typeWithContext.ParameterType.GenericArguments[2].GenericArguments[2].Nullability);
 
-            Assert.Equal(Nullability.NotNullable, typeWithContext.GenericArguments[1].GenericArguments[1].GenericArguments[0].Nullability);
-            Assert.Equal(Nullability.NotNullable, typeWithContext.GenericArguments[1].GenericArguments[1].GenericArguments[1].Nullability);
+            Assert.Equal(Nullability.NotNullable, typeWithContext.ParameterType.GenericArguments[1].GenericArguments[1].GenericArguments[0].Nullability);
+            Assert.Equal(Nullability.NotNullable, typeWithContext.ParameterType.GenericArguments[1].GenericArguments[1].GenericArguments[1].Nullability);
 
-            Assert.Equal(Nullability.NotNullable, typeWithContext.GenericArguments[1].GenericArguments[2].GenericArguments[0].Nullability);
-            Assert.Equal(Nullability.Nullable,    typeWithContext.GenericArguments[1].GenericArguments[2].GenericArguments[1].Nullability);
+            Assert.Equal(Nullability.NotNullable, typeWithContext.ParameterType.GenericArguments[1].GenericArguments[2].GenericArguments[0].Nullability);
+            Assert.Equal(Nullability.Nullable,    typeWithContext.ParameterType.GenericArguments[1].GenericArguments[2].GenericArguments[1].Nullability);
 
-            Assert.Equal(Nullability.NotNullable, typeWithContext.GenericArguments[1].GenericArguments[1].GenericArguments[0].GenericArguments[0].Nullability);
-            Assert.Equal(Nullability.Nullable,    typeWithContext.GenericArguments[1].GenericArguments[1].GenericArguments[0].GenericArguments[1].Nullability);
+            Assert.Equal(Nullability.NotNullable, typeWithContext.ParameterType.GenericArguments[1].GenericArguments[1].GenericArguments[0].GenericArguments[0].Nullability);
+            Assert.Equal(Nullability.Nullable,    typeWithContext.ParameterType.GenericArguments[1].GenericArguments[1].GenericArguments[0].GenericArguments[1].Nullability);
         }
 
         class TestProperty
@@ -225,11 +225,11 @@ namespace Namotion.Reflection.Tests
 
             // Act & Assert
             Assert.Equal(Nullability.NotNullable, parameters[0].ToContextualParameter().Nullability);
-            Assert.Equal(Nullability.Nullable, parameters[1].ToContextualParameter().Nullability);
-            Assert.Equal(Nullability.NotNullable, parameters[2].ToContextualParameter().Nullability);
-            Assert.Equal(Nullability.Nullable, parameters[3].ToContextualParameter().Nullability);
-            Assert.Equal(Nullability.NotNullable, parameters[4].ToContextualParameter().Nullability);
-            Assert.Equal(Nullability.Nullable, parameters[5].ToContextualParameter().Nullability);
+            Assert.Equal(Nullability.Nullable, parameters[1].ToContextualParameter().ParameterType.Nullability);
+            Assert.Equal(Nullability.NotNullable, parameters[2].ToContextualParameter().ParameterType.Nullability);
+            Assert.Equal(Nullability.Nullable, parameters[3].ToContextualParameter().ParameterType.Nullability);
+            Assert.Equal(Nullability.NotNullable, parameters[4].ToContextualParameter().ParameterType.Nullability);
+            Assert.Equal(Nullability.Nullable, parameters[5].ToContextualParameter().ParameterType.Nullability);
         }
 
         [Fact]
@@ -242,12 +242,12 @@ namespace Namotion.Reflection.Tests
             // Act & Assert
             Assert.Equal(Nullability.NotNullable, returnType.Nullability);
 
-            Assert.Equal(Nullability.NotNullable, returnType.GenericArguments[0].Nullability);
-            Assert.Equal(Nullability.Nullable, returnType.GenericArguments[1].Nullability);
-            Assert.Equal(Nullability.NotNullable, returnType.GenericArguments[2].Nullability);
-            Assert.Equal(Nullability.Nullable, returnType.GenericArguments[3].Nullability);
-            Assert.Equal(Nullability.NotNullable, returnType.GenericArguments[4].Nullability);
-            Assert.Equal(Nullability.Nullable, returnType.GenericArguments[5].Nullability);
+            Assert.Equal(Nullability.NotNullable, returnType.ParameterType.GenericArguments[0].Nullability);
+            Assert.Equal(Nullability.Nullable, returnType.ParameterType.GenericArguments[1].Nullability);
+            Assert.Equal(Nullability.NotNullable, returnType.ParameterType.GenericArguments[2].Nullability);
+            Assert.Equal(Nullability.Nullable, returnType.ParameterType.GenericArguments[3].Nullability);
+            Assert.Equal(Nullability.NotNullable, returnType.ParameterType.GenericArguments[4].Nullability);
+            Assert.Equal(Nullability.Nullable, returnType.ParameterType.GenericArguments[5].Nullability);
         }
 
         [Fact]
@@ -270,7 +270,7 @@ namespace Namotion.Reflection.Tests
 
             // Act & Assert
             Assert.Equal(Nullability.NotNullable, returnType.Nullability);
-            Assert.Equal(Nullability.NotNullable, returnType.GenericArguments[0].Nullability);
+            Assert.Equal(Nullability.NotNullable, returnType.ParameterType.GenericArguments[0].Nullability);
         }
 
         [Fact]
@@ -293,7 +293,7 @@ namespace Namotion.Reflection.Tests
 
             // Act & Assert
             Assert.Equal(Nullability.Nullable, returnType.Nullability);
-            Assert.Equal(Nullability.Nullable, returnType.GenericArguments[0].Nullability);
+            Assert.Equal(Nullability.Nullable, returnType.ParameterType.GenericArguments[0].Nullability);
         }
 
         [Fact]
@@ -425,7 +425,7 @@ namespace Namotion.Reflection.Tests
             foreach (var prop in properties)
             {
                 var itemType = prop.ToContextualProperty().PropertyType.EnumerableItemType;
-                Assert.Equal("String", itemType!.TypeName);
+                Assert.Equal("String", itemType!.Name);
                 Assert.Equal(Nullability.Nullable, itemType!.Nullability);
             }
         }

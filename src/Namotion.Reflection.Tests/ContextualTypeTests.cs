@@ -27,8 +27,8 @@ namespace Namotion.Reflection.Tests
                 !.GetParameters().First();
 
             // Act
-            var type1 = param1.ToContextualParameter().TypeName;
-            var type2 = param2.ToContextualParameter().TypeName;
+            var type1 = param1.ToContextualParameter().ParameterType.Name;
+            var type2 = param2.ToContextualParameter().ParameterType.Name;
 
             // Assert
             Assert.Equal("String", type1);

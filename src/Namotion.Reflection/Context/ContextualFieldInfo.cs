@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Reflection;
 
 namespace Namotion.Reflection
@@ -21,7 +20,7 @@ namespace Namotion.Reflection
 
             FieldType = new ContextualType(
                fieldInfo.FieldType,
-               fieldInfo.GetCustomAttributes(true).OfType<Attribute>().ToArray(),
+               this,
                null,
                ref nullableFlagsIndex,
                nullableFlags,
@@ -69,6 +68,24 @@ namespace Namotion.Reflection
         public override void SetValue(object? obj, object? value)
         {
             FieldInfo.SetValue(obj, value);
+        }
+
+        /// <inheritdoc />
+        public override object[] GetCustomAttributes(Type attributeType, bool inherit)
+        {
+            return FieldInfo.GetCustomAttributes(attributeType, inherit);
+        }
+
+        /// <inheritdoc />
+        public override object[] GetCustomAttributes(bool inherit)
+        {
+            return FieldInfo.GetCustomAttributes(inherit);
+        }
+
+        /// <inheritdoc />
+        public override bool IsDefined(Type attributeType, bool inherit)
+        {
+            return FieldInfo.IsDefined(attributeType, inherit);
         }
     }
 }

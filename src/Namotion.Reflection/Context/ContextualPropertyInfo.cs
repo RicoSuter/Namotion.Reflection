@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -13,6 +12,7 @@ namespace Namotion.Reflection
         private string? _name;
         private bool? _canWrite;
         private bool? _canRead;
+        private IPropertyWriter? _propertyWriter;
 
         internal ContextualPropertyInfo(PropertyInfo propertyInfo, ref int nullableFlagsIndex, byte[]? nullableFlags)
         {
@@ -24,7 +24,7 @@ namespace Namotion.Reflection
 
             PropertyType = new ContextualType(
                 propertyInfo.PropertyType,
-                propertyInfo.GetCustomAttributes(true).OfType<Attribute>().ToArray(),
+                this,
                 null,
                 ref nullableFlagsIndex,
                 nullableFlags,
@@ -110,6 +110,22 @@ namespace Namotion.Reflection
             _propertyWriter.SetValue(obj, value);
         }
 
-        private IPropertyWriter? _propertyWriter;
+        /// <inheritdoc />
+        public override object[] GetCustomAttributes(Type attributeType, bool inherit)
+        {
+            return PropertyInfo.GetCustomAttributes(attributeType, inherit);
+        }
+
+        /// <inheritdoc />
+        public override object[] GetCustomAttributes(bool inherit)
+        {
+            return PropertyInfo.GetCustomAttributes(inherit);
+        }
+
+        /// <inheritdoc />
+        public override bool IsDefined(Type attributeType, bool inherit)
+        {
+            return PropertyInfo.IsDefined(attributeType, inherit);
+        }
     }
 }

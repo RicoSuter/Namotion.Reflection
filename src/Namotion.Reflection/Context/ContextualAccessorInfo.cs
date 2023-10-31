@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Namotion.Reflection
+﻿namespace Namotion.Reflection
 {
     /// <summary>Base class for a contextual property or field.</summary>
     public abstract class ContextualAccessorInfo : ContextualMemberInfo
@@ -18,11 +14,6 @@ namespace Namotion.Reflection
         public Nullability Nullability => AccessorType.Nullability;
 
         /// <summary>
-        /// Gets the accessor's contextual attributes (e.g. attributes on property or field).
-        /// </summary>
-        public Attribute[] ContextAttributes => AccessorType.ContextAttributes;
-
-        /// <summary>
         /// Returns the value of a field supported by a given object.
         /// </summary>
         /// <param name="obj">The object.</param>
@@ -35,25 +26,5 @@ namespace Namotion.Reflection
         /// <param name="obj">The object.</param>
         /// <param name="value">The value.</param>
         public abstract void SetValue(object? obj, object? value);
-
-        /// <summary>
-        /// Gets an attribute of the given type which is defined on the context (property, field, parameter or contextual generic argument type).
-        /// </summary>
-        /// <typeparam name="T">The attribute type.</typeparam>
-        /// <returns>The attribute or null.</returns>
-        public T? GetContextAttribute<T>()
-        {
-            return ContextAttributes.GetSingleOrDefault<T>();
-        }
-
-        /// <summary>
-        /// Gets the attributes of the given type which are defined on the context (property, field, parameter or contextual generic argument type).
-        /// </summary>
-        /// <typeparam name="T">The attribute type.</typeparam>
-        /// <returns>The attributes.</returns>
-        public IEnumerable<T> GetContextAttributes<T>()
-        {
-            return ContextAttributes.OfType<T>();
-        }
     }
 }

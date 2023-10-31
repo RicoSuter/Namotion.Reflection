@@ -99,9 +99,9 @@ namespace Namotion.Reflection
                 }
 
                 var returnParam = getEnumeratorMethod.ReturnParameter;
-                if (returnParam?.GenericArguments.Length == 1)
+                if (returnParam?.ParameterType.GenericArguments.Length == 1)
                 {
-                    return returnParam.GenericArguments[0];
+                    return returnParam.ParameterType.GenericArguments[0];
                 }
             }
 
@@ -145,10 +145,10 @@ namespace Namotion.Reflection
         private static string GetName(CachedType cType)
         {
             return
-                cType.TypeName == "Int16" ? GetNullableDisplayName(cType, "Short") :
-                cType.TypeName == "Int32" ? GetNullableDisplayName(cType, "Integer") :
-                cType.TypeName == "Int64" ? GetNullableDisplayName(cType, "Long") :
-                GetNullableDisplayName(cType, cType.TypeName);
+                cType.Name == "Int16" ? GetNullableDisplayName(cType, "Short") :
+                cType.Name == "Int32" ? GetNullableDisplayName(cType, "Integer") :
+                cType.Name == "Int64" ? GetNullableDisplayName(cType, "Long") :
+                GetNullableDisplayName(cType, cType.Name);
         }
 
         private static string GetNullableDisplayName(CachedType type, string actual)

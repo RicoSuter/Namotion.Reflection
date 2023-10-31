@@ -658,7 +658,7 @@ namespace Namotion.Reflection.Tests
         }
 
         [Fact]
-        public void When_inheritdocs_is_availble_in_inheritance_chain_then_it_is_resolved()
+        public void When_inheritdoc_is_availble_in_inheritance_chain_then_it_is_resolved()
         {
             //// Arrange
             XmlDocs.ClearCache();

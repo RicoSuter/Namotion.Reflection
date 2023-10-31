@@ -10,7 +10,7 @@ namespace Namotion.Reflection
     /// <summary>
     /// A cached type object without context.
     /// </summary>
-    public class CachedType
+    public class CachedType : ICustomAttributeProvider
     {
         /// <summary>
         /// Clears the cache.
@@ -23,8 +23,7 @@ namespace Namotion.Reflection
         private Type? _type;
         private bool _isNullableType;
         private string? _typeName;
-
-        private Attribute[]? _inheritedAttributes;
+        private TypeInfo? _typeInfo;
 
         /// <summary>
         /// Internal generic arguments.
@@ -60,53 +59,16 @@ namespace Namotion.Reflection
         /// </summary>
         public Type OriginalType { get; }
 
-        /// <summary>
-        /// Gets all type attributes.
-        /// </summary>
-        public virtual IEnumerable<Attribute> Attributes => InheritedAttributes;
 
         /// <summary>
         /// Gets the type name.
         /// </summary>
-        public string TypeName => _typeName ??= Type.Name;
+        public string Name => _typeName ??= Type.Name;
 
         /// <summary>
         /// Gest the original's type info.
         /// </summary>
         public TypeInfo TypeInfo => _typeInfo ??= Type.GetTypeInfo();
-
-        private TypeInfo? _typeInfo;
-
-        /// <summary>
-        /// Gets the type's associated attributes of the type (inherited).
-        /// </summary>
-        public Attribute[] InheritedAttributes
-        {
-            get
-            {
-                // TODO: Add type attributes property (only direct attributes without inherit)
-
-                if (_inheritedAttributes != null)
-                {
-                    return _inheritedAttributes;
-                }
-
-                UpdateOriginalGenericArguments();
-                lock (this)
-                {
-                    if (_inheritedAttributes == null)
-                    {
-                        _inheritedAttributes = _type!
-                            .GetTypeInfo()
-                            .GetCustomAttributes(true)
-                            .OfType<Attribute>()
-                            .ToArray();
-                    }
-
-                    return _inheritedAttributes;
-                }
-            }
-        }
 
         /// <summary>
         /// Gets the actual unwrapped type (e.g. gets T of a Nullable{T} type).
@@ -168,28 +130,7 @@ namespace Namotion.Reflection
             }
         }
 
-        /// <summary>
-        /// Gets an attribute of the given type which is defined on the type.
-        /// </summary>
-        /// <typeparam name="T">The attribute type.</typeparam>
-        /// <returns>The attribute or null.</returns>
-        public T? GetInheritedAttribute<T>()
-            where T : Attribute
-        {
-            return InheritedAttributes.GetSingleOrDefault<T>();
-        }
-
-        /// <summary>
-        /// Gets the attributes of the given type which are defined on the type.
-        /// </summary>
-        /// <typeparam name="T">The attribute type.</typeparam>
-        /// <returns>The attributes.</returns>
-        public IEnumerable<T> GetInheritedAttributes<T>()
-        {
-            return InheritedAttributes.OfType<T>();
-        }
-
-        /// <inheritdocs />
+        /// <inheritdoc />
         public override string ToString()
         {
             var result = Type.Name.FirstToken('`') + "\n  " +
@@ -214,20 +155,38 @@ namespace Namotion.Reflection
         protected void UpdateOriginalGenericArguments()
         {
             var nullableFlagsIndex = 0;
-            UpdateOriginalGenericArguments(ref nullableFlagsIndex);
+            Initialize(ref nullableFlagsIndex);
+        }
+
+        /// <inheritdoc />
+        public virtual object[] GetCustomAttributes(bool inherit)
+        {
+            return OriginalType.GetCustomAttributes(inherit);
+        }
+
+        /// <inheritdoc />
+        public virtual object[] GetCustomAttributes(Type attributeType, bool inherit)
+        {
+            return OriginalType.GetCustomAttributes(attributeType, inherit);
+        }
+
+        /// <inheritdoc />
+        public virtual bool IsDefined(Type attributeType, bool inherit)
+        {
+            return OriginalType.IsDefined(attributeType, inherit);
         }
 
         /// <summary>
         /// Updates the original generic arguments.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected void UpdateOriginalGenericArguments(ref int nullableFlagsIndex)
+        protected void Initialize(ref int nullableFlagsIndex)
         {
-            if (_originalGenericArguments == null)
+            if (_type == null)
             {
                 lock (this)
                 {
-                    if (_originalGenericArguments == null)
+                    if (_type == null)
                     {
                         var arguments = new List<CachedType>();
                         foreach (var type in OriginalType.GenericTypeArguments)

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -14,6 +13,7 @@ namespace Namotion.Reflection
         private static readonly byte[] _emptyNullableFlags = { 0 };
 
         private readonly int _nullableFlagsIndex;
+
         private byte[]? _nullableFlags;
         private Nullability? nullability;
 
@@ -22,19 +22,19 @@ namespace Namotion.Reflection
         private ContextualFieldInfo[]? _fields;
         private bool? _isValueType;
 
-        internal static ContextualType ForType(Type type, IEnumerable<Attribute> contextAttributes)
+        internal static ContextualType ForType(Type type, ICustomAttributeProvider? contextualAttributeProvider)
         {
             var index = 0;
-            return new ContextualType(type, contextAttributes, null, ref index, null, null);
+            return new ContextualType(type, contextualAttributeProvider ?? new GenericTypeContext(Array.Empty<Attribute>()), null, ref index, null, null);
         }
 
-        internal ContextualType(Type type, IEnumerable<Attribute> contextAttributes, ContextualType? parent,
-            ref int nullableFlagsIndex, byte[]? nullableFlags, NullableFlagsSource[] customAttributeProviders)
+        internal ContextualType(Type type, ICustomAttributeProvider contextualAttributeProvider, ContextualType? parent,
+            ref int nullableFlagsIndex, byte[]? nullableFlags, NullableFlagsSource[]? customAttributeProviders)
             : base(type)
         {
             Parent = parent;
-            ContextAttributes = contextAttributes is Attribute[] attributesArray ?
-                attributesArray : contextAttributes?.ToArray() ?? ArrayExt.Empty<Attribute>();
+
+            Context = contextualAttributeProvider;
 
             _nullableFlags = nullableFlags;
             _nullableFlagsIndex = nullableFlagsIndex;
@@ -43,9 +43,14 @@ namespace Namotion.Reflection
 
             if (_nullableFlags != null)
             {
-                UpdateOriginalGenericArguments(ref nullableFlagsIndex);
+                Initialize(ref nullableFlagsIndex);
             }
         }
+
+        /// <summary>
+        /// Gets the context (property, field, parameter).
+        /// </summary>
+        public ICustomAttributeProvider Context { get; }
 
         /// <summary>
         /// Gets the parent type with context.
@@ -53,19 +58,9 @@ namespace Namotion.Reflection
         public ContextualType? Parent { get; }
 
         /// <summary>
-        /// Gets the type's associated attributes of the given context (inherited).
-        /// </summary>
-        public Attribute[] ContextAttributes { get; private set; }
-
-        /// <summary>
         /// Gets the original nullability information of this type in the given context (i.e. without unwrapping Nullable{T}).
         /// </summary>
         public Nullability OriginalNullability { get; private set; }
-
-        /// <summary>
-        /// Gets all contextual and type attributes (in this order).
-        /// </summary>
-        public override IEnumerable<Attribute> Attributes => ContextAttributes.Concat(base.Attributes);
 
         /// <summary>
         /// Gets the generic type arguments of the type in the given context (empty when unwrapped from Nullable{T}).
@@ -159,9 +154,9 @@ namespace Namotion.Reflection
                         }
 
                         var returnParam = getEnumeratorMethod.ReturnParameter;
-                        if (returnParam?.GenericArguments.Length == 1)
+                        if (returnParam?.ParameterType.GenericArguments.Length == 1)
                         {
-                            _enumerableItemType = returnParam.GenericArguments[0];
+                            _enumerableItemType = returnParam.ParameterType.GenericArguments[0];
                             return _enumerableItemType;
                         }
                     }
@@ -211,45 +206,6 @@ namespace Namotion.Reflection
         /// </summary>
         public bool IsValueType => _isValueType ?? ((bool)(_isValueType = TypeInfo.IsValueType));
 
-        /// <summary>
-        /// Gets an attribute of the given type which is defined on the context (property, field, parameter or contextual generic argument type).
-        /// </summary>
-        /// <typeparam name="T">The attribute type.</typeparam>
-        /// <returns>The attribute or null.</returns>
-        public T? GetContextAttribute<T>() where T : Attribute
-        {
-            return ContextAttributes.GetSingleOrDefault<T>();
-        }
-
-        /// <summary>
-        /// Gets the attributes of the given type which are defined on the context (property, field, parameter or contextual generic argument type).
-        /// </summary>
-        /// <typeparam name="T">The attribute type.</typeparam>
-        /// <returns>The attributes.</returns>
-        public IEnumerable<T> GetContextAttributes<T>()
-        {
-            return ContextAttributes.OfType<T>();
-        }
-
-        /// <summary>
-        /// Gets an attribute of the given type which is defined on the context or on the type.
-        /// </summary>
-        /// <typeparam name="T">The attribute type.</typeparam>
-        /// <returns>The attribute or null.</returns>
-        public T? GetAttribute<T>()
-        {
-            return ContextAttributes.GetSingleOrDefault<T>() ?? InheritedAttributes.GetSingleOrDefault<T>();
-        }
-
-        /// <summary>
-        /// Gets the attributes of the given type which are defined on the context or on the type.
-        /// </summary>
-        /// <typeparam name="T">The attribute type.</typeparam>
-        /// <returns>The attributes.</returns>
-        public IEnumerable<T> GetAttributes<T>()
-        {
-            return ContextAttributes.OfType<T>().Concat(InheritedAttributes.OfType<T>());
-        }
 
         /// <summary>
         /// Gets the contextual properties of this type.
@@ -407,7 +363,7 @@ namespace Namotion.Reflection
             return Fields.FirstOrDefault(p => p.Name == fieldName);
         }
 
-        /// <inheritdocs />
+        /// <inheritdoc />
         public override string ToString()
         {
             var result = Type.Name.FirstToken('`') + ": " + Nullability + "\n  " +
@@ -422,17 +378,20 @@ namespace Namotion.Reflection
         /// <returns>The cached type.</returns>
         protected override CachedType GetCachedType(Type type, ref int nullableFlagsIndex)
         {
-            return new ContextualType(type, ContextAttributes, this, ref nullableFlagsIndex, _nullableFlags, null);
+            return new ContextualType(type, Context, this, ref nullableFlagsIndex, _nullableFlags, null);
         }
 
-        private void InitializeNullableFlagsAndOriginalNullability(ref int nullableFlagsIndex, NullableFlagsSource[] customAttributeProviders)
+        private void InitializeNullableFlagsAndOriginalNullability(ref int nullableFlagsIndex, NullableFlagsSource[]? customAttributeProviders)
         {
             var typeInfo = OriginalType.GetTypeInfo();
             try
             {
                 if (_nullableFlags == null)
                 {
-                    var nullableAttribute = ContextAttributes.FirstOrDefault(a => a.GetType().FullName == "System.Runtime.CompilerServices.NullableAttribute");
+                    var nullableAttribute = Context?
+                        .GetCustomAttributes(true)
+                        .FirstOrDefault(a => a.GetType().FullName == "System.Runtime.CompilerServices.NullableAttribute");
+
                     if (nullableAttribute is not null)
                     {
                         _nullableFlags = GetFlagsFromNullableAttribute(nullableAttribute);
@@ -501,7 +460,7 @@ namespace Namotion.Reflection
             }
             else
             {
-                var nullableFlag = _nullableFlags.Length > nullableFlagsIndex ? _nullableFlags[nullableFlagsIndex] : _nullableFlags.Last();
+                var nullableFlag = _nullableFlags!.Length > nullableFlagsIndex ? _nullableFlags[nullableFlagsIndex] : _nullableFlags.Last();
                 nullableFlagsIndex++;
 
                 OriginalNullability = nullableFlag == 0 ? Nullability.Unknown :
@@ -511,7 +470,7 @@ namespace Namotion.Reflection
             }
         }
 
-        private byte[] GetFlagsFromNullableAttribute(Attribute nullableAttribute)
+        private byte[] GetFlagsFromNullableAttribute(object nullableAttribute)
         {
             return (byte[]?)nullableAttribute?.GetType().GetRuntimeField("NullableFlags")?.GetValue(nullableAttribute) ?? _emptyNullableFlags;
         }

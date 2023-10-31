@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -39,13 +40,31 @@ namespace Namotion.Reflection
         /// </summary>
         public ContextualParameterInfo ReturnParameter { get; }
 
-        /// <inheritdocs />
+        /// <inheritdoc />
         public override MemberInfo MemberInfo => MethodInfo;
 
-        /// <inheritdocs />
+        /// <inheritdoc />
         public override string ToString()
         {
             return Name + " (" + GetType().Name.Replace("Contextual", "").Replace("Info", "") + ") - " + base.ToString();
+        }
+
+        /// <inheritdoc />
+        public override object[] GetCustomAttributes(Type attributeType, bool inherit)
+        {
+            return MethodInfo.GetCustomAttributes(attributeType, inherit);
+        }
+
+        /// <inheritdoc />
+        public override object[] GetCustomAttributes(bool inherit)
+        {
+            return MethodInfo.GetCustomAttributes(inherit);
+        }
+
+        /// <inheritdoc />
+        public override bool IsDefined(Type attributeType, bool inherit)
+        {
+            return MethodInfo.IsDefined(attributeType, inherit);
         }
     }
 }

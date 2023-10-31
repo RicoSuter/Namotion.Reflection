@@ -135,7 +135,8 @@ namespace Namotion.Reflection
                 for (int i = 0; i < properties.Length; i++)
                 {
                     var property = properties[i];
-                    if (!property.PropertyType.IsValueType && property.CanRead && property.GetContextAttribute<CompilerGeneratedAttribute>() is null)
+                    if (!property.PropertyType.IsValueType && property.CanRead && 
+                        !property.IsAttributeDefined<CompilerGeneratedAttribute>(true))
                     {
                         var value = property.GetValue(obj);
                         if (value == null)

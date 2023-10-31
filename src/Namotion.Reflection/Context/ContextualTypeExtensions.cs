@@ -41,11 +41,11 @@ namespace Namotion.Reflection
         {
             if (type.FullName == null)
             {
-                return ContextualType.ForType(type, ArrayExt.Empty<Attribute>());
+                return ContextualType.ForType(type, null);
             }
 
             var key = new CacheKey("Type:Context", type.FullName);
-            return (ContextualType) Cache.GetOrAdd(key, k => ContextualType.ForType(type, ArrayExt.Empty<Attribute>()));
+            return (ContextualType) Cache.GetOrAdd(key, k => ContextualType.ForType(type, null));
         }
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace Namotion.Reflection
         /// <returns>The <see cref="CachedType"/>.</returns>
         public static ContextualType ToContextualType(this Type type, IEnumerable<Attribute> attributes)
         {
-            return ContextualType.ForType(type, attributes);
+            return ContextualType.ForType(type, new GenericTypeContext(attributes));
         }
 
         /// <summary>

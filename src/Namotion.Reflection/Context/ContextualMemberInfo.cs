@@ -1,11 +1,12 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 
 namespace Namotion.Reflection
 {
     /// <summary>
     /// A member info with contextual information.
     /// </summary>
-    public abstract class ContextualMemberInfo
+    public abstract class ContextualMemberInfo : ICustomAttributeProvider
     {
         /// <summary>
         /// Gets the type context's member info.
@@ -17,10 +18,19 @@ namespace Namotion.Reflection
         /// </summary>
         public abstract string Name { get; }
 
-        /// <inheritdocs />
+        /// <inheritdoc />
         public override string ToString()
         {
             return Name + " (" + GetType().Name.Replace("Contextual", "").Replace("Info", "") + ") - " + base.ToString();
         }
+
+        /// <inheritdoc />
+        public abstract object[] GetCustomAttributes(Type attributeType, bool inherit);
+
+        /// <inheritdoc />
+        public abstract object[] GetCustomAttributes(bool inherit);
+
+        /// <inheritdoc />
+        public abstract bool IsDefined(Type attributeType, bool inherit);
     }
 }

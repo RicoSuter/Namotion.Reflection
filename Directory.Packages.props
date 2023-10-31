@@ -1,0 +1,24 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>false</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="BenchmarkDotNet" Version="0.13.9" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
+    <PackageVersion Include="Microsoft.AspNetCore.OData" Version="8.0.4" />
+    <PackageVersion Include="Microsoft.CSharp" Version="4.3.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
+    <PackageVersion Include="Mono.Cecil" Version="0.10.3" />
+    <PackageVersion Include="NBench" Version="1.0.4" />
+    <PackageVersion Include="NJsonSchema" Version="10.1.5" />
+    <PackageVersion Include="Pro.NBench.xUnit" Version="1.0.4" />
+    <PackageVersion Include="xunit" Version="2.5.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.3" PrivateAssets="all" />
+  </ItemGroup>
+  <ItemGroup>
+    <GlobalPackageReference Include="GitHubActionsTestLogger" Version="2.3.3" />
+    <GlobalPackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" />
+    <GlobalPackageReference Include="PolySharp" Version="1.13.2" />
+  </ItemGroup>
+</Project>

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>latest</LangVersion>
@@ -14,7 +14,7 @@
     <PackageProjectUrl>https://github.com/RicoSuter/Namotion.Reflection</PackageProjectUrl>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Mono.Cecil" Version="0.10.3" />
+    <PackageReference Include="Mono.Cecil" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Namotion.Reflection\Namotion.Reflection.csproj" />

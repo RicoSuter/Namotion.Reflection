@@ -234,7 +234,7 @@ namespace Namotion.Reflection.Tests
 
         public class WithGenericTagsInXmlDoc
         {
-            /// <summary>This <c>are</c> <strong>some</strong> tags.</summary>
+            /// <summary>This <c>are</c> <strong>some</strong> tags with <a href="https://github.com/">link</a> and <see href="https://www.microsoft.com/">here</see>.</summary>
             public string Foo { get; set; }
         }
 
@@ -248,7 +248,7 @@ namespace Namotion.Reflection.Tests
             var summary = typeof(WithGenericTagsInXmlDoc).GetProperty("Foo").GetXmlDocsSummary();
 
             //// Assert
-            Assert.Equal("This are some tags.", summary);
+            Assert.Equal("This are some tags with link and here.", summary);
         }
 
         [Fact]
@@ -265,7 +265,7 @@ namespace Namotion.Reflection.Tests
             var summary = typeof(WithGenericTagsInXmlDoc).GetProperty("Foo").GetXmlDocsSummary(options);
 
             //// Assert
-            Assert.Equal("This <pre>are</pre> <strong>some</strong> tags.", summary);
+            Assert.Equal("This <pre>are</pre> <strong>some</strong> tags with <a href=\"https://github.com/\">link</a> and <a href=\"https://www.microsoft.com/\">here</a>.", summary);
         }
 
         [Fact]
@@ -282,7 +282,7 @@ namespace Namotion.Reflection.Tests
             var summary = typeof(WithGenericTagsInXmlDoc).GetProperty("Foo").GetXmlDocsSummary(options);
 
             //// Assert
-            Assert.Equal("This `are` **some** tags.", summary);
+            Assert.Equal("This `are` **some** tags with [link](https://github.com/) and [here](https://www.microsoft.com/).", summary);
         }
 
         public abstract class BaseBaseClass

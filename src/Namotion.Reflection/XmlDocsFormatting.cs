@@ -49,6 +49,8 @@ namespace Namotion.Reflection
         private static readonly Dictionary<string, Func<StringBuilder, XElement, StringBuilder>> htmlTagMap =
             new Dictionary<string, Func<StringBuilder, XElement, StringBuilder>>()
             {
+                { "a", AppendHtmlLink },
+                { "see", AppendHtmlLink },
                 { "c", (sb, e) => AppendSimpleTaggedElement(sb, e, "<pre>", "</pre>") },
                 { "b", (sb, e) => AppendSimpleTaggedElement(sb, e, "<strong>", "</strong>") },
                 { "strong", (sb, e) => AppendSimpleTaggedElement(sb, e, "<strong>", "</strong>") },
@@ -70,6 +72,8 @@ namespace Namotion.Reflection
         private static readonly Dictionary<string, Func<StringBuilder, XElement, StringBuilder>> markdownTagMap =
             new Dictionary<string, Func<StringBuilder, XElement, StringBuilder>>()
             {
+                { "a", AppendMarkdownLink },
+                { "see", AppendMarkdownLink },
                 { "c", (sb, e) => AppendSimpleTaggedElement(sb, e, "`", "`") },
                 { "b", (sb, e) => AppendSimpleTaggedElement(sb, e, "**", "**") },
                 { "strong", (sb, e) => AppendSimpleTaggedElement(sb, e, "**", "**") },
@@ -121,6 +125,30 @@ namespace Namotion.Reflection
         private static StringBuilder AppendSimpleTaggedElement(StringBuilder stringBuilder, XElement element, string startTag, string endTag)
         {
             stringBuilder.Append(startTag, element.Value, endTag);
+            return stringBuilder;
+        }
+
+        /// <summary>
+        /// Appends the value of <paramref name="element"/> as an html link.
+        /// </summary>
+        /// <param name="stringBuilder">The current <see cref="StringBuilder"/>.</param>
+        /// <param name="element">The <see cref="XElement"/> to append.</param>
+        /// <returns>The value of <paramref name="stringBuilder"/>.</returns>
+        private static StringBuilder AppendHtmlLink(StringBuilder stringBuilder, XElement element)
+        {
+            stringBuilder.Append("<a href=\"", element.Attribute("href")?.Value, "\">", element.Value, "</a>");
+            return stringBuilder;
+        }
+
+        /// <summary>
+        /// Appends the value of <paramref name="element"/> as a markdown link.
+        /// </summary>
+        /// <param name="stringBuilder">The current <see cref="StringBuilder"/>.</param>
+        /// <param name="element">The <see cref="XElement"/> to append.</param>
+        /// <returns>The value of <paramref name="stringBuilder"/>.</returns>
+        private static StringBuilder AppendMarkdownLink(StringBuilder stringBuilder, XElement element)
+        {
+            stringBuilder.Append("[", element.Value, "](", element.Attribute("href")?.Value, ")");
             return stringBuilder;
         }
     }

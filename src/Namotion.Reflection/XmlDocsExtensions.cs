@@ -252,7 +252,7 @@ namespace Namotion.Reflection
 
             var documentationPath = GetXmlDocsPath(member.Module.Assembly, options);
             var element = GetXmlDocsElement(member, documentationPath!, options);
-            return ToXmlDocsContent(element?.Element(tagName), options);
+            return ToXmlDocsContent(element?.Element(tagName), options.FormattingMode);
         }
 
         /// <summary>Returns the property summary of a Record type which is read from the param tag on the type.</summary>
@@ -283,7 +283,7 @@ namespace Namotion.Reflection
                 .FirstOrDefault(x => x.Attribute(XmlDocsKeys.ParamNameAttribute)?
                 .Value == member.Name);
 
-            return paramElement != null ? ToXmlDocsContent(paramElement, options) : string.Empty;
+            return paramElement != null ? ToXmlDocsContent(paramElement, options.FormattingMode) : string.Empty;
         }
 
         /// <summary>Returns the contents of the "returns" or "param" XML documentation tag for the specified parameter.</summary>
@@ -307,7 +307,7 @@ namespace Namotion.Reflection
 
             var documentationPath = GetXmlDocsPath(parameter.Member.Module.Assembly, options);
             var element = GetXmlDocs(parameter, documentationPath, options);
-            return ToXmlDocsContent(element, options);
+            return ToXmlDocsContent(element, options.FormattingMode);
         }
 
         /// <summary>Returns the contents of the "returns" or "param" XML documentation tag for the specified parameter.</summary>
@@ -337,11 +337,11 @@ namespace Namotion.Reflection
 
         /// <summary>Converts the given XML documentation <see cref="XElement"/> to text.</summary>
         /// <param name="element">The XML element.</param>
-        /// <param name="options">The XML docs reading and formatting options.</param>
+        /// <param name="formattingMode">The XML docs formatting options.</param>
         /// <returns>The text</returns>
-        public static string ToXmlDocsContent(this XElement? element, XmlDocsOptions? options = null)
+        public static string ToXmlDocsContent(this XElement? element, XmlDocsFormattingMode? formattingMode = null)
         {
-            options ??= XmlDocsOptions.Default;
+            var mode = formattingMode ?? XmlDocsFormattingMode.None;
 
             if (element != null)
             {
@@ -361,7 +361,7 @@ namespace Namotion.Reflection
                             {
                                 if (!string.IsNullOrEmpty(e.Value))
                                 {
-                                    value.AppendFormattedElement(e, options.FormattingMode);
+                                    value.AppendFormattedElement(e, mode);
                                 }
                                 else
                                 {
@@ -391,7 +391,7 @@ namespace Namotion.Reflection
                         }
                         else
                         {
-                            value.AppendFormattedElement(e, options.FormattingMode);
+                            value.AppendFormattedElement(e, mode);
                         }
                     }
                     else if (node is XText text)

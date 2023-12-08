@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net6.0;net462</TargetFrameworks>
     <IsPackable>false</IsPackable>
@@ -8,15 +8,14 @@
     <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="IsExternalInit" Version="1.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
-    <PackageReference Include="NJsonSchema" Version="10.1.5" />
-    <PackageReference Include="xunit" Version="2.4.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="NJsonSchema" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' != 'net462'">
-    <PackageReference Include="Microsoft.AspNetCore.OData" Version="8.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.OData" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Namotion.Reflection.Tests.FullAssembly\Namotion.Reflection.Tests.FullAssembly.csproj" />

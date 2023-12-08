@@ -68,7 +68,7 @@ namespace Namotion.Reflection.Cecil
 
             var name = GetMemberElementName(member);
             var element = document.GetXmlDocsElement(name);
-            return element?.Element(tagName).ToXmlDocsContent(options);
+            return element?.Element(tagName).ToXmlDocsContent(options?.FormattingMode);
         }
 
         /// <summary>Returns the contents of an XML documentation for the specified member.</summary>
@@ -99,7 +99,7 @@ namespace Namotion.Reflection.Cecil
             }
 
             var element = parameter.GetXmlDocsElement(document);
-            return element.ToXmlDocsContent(options);
+            return element.ToXmlDocsContent(options?.FormattingMode);
         }
 
         /// <summary>Returns the contents of an XML documentation for the specified member.</summary>
@@ -114,7 +114,7 @@ namespace Namotion.Reflection.Cecil
             }
 
             var element = methodReturnType.GetXmlDocsElement(document);
-            return element.ToXmlDocsContent(options);
+            return element.ToXmlDocsContent(options?.FormattingMode);
         }
 
         private static XElement? GetXmlDocsElement(this MethodReturnType parameter, XDocument xml)

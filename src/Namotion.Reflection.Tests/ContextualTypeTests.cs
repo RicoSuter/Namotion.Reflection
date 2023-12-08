@@ -49,7 +49,7 @@ namespace Namotion.Reflection.Tests
         {
             // Arrange
             var ct = typeof(GenericChildClass<string>).ToContextualType();
-          
+
             // Act
             var properties = ct.Properties;
 
@@ -57,9 +57,34 @@ namespace Namotion.Reflection.Tests
             Assert.NotNull(properties);
         }
 
-        public void Repro()
+        readonly struct Point2D<T>
+            where T : unmanaged
         {
-          
+            // THIS BREAKS NSWAG
+            public static readonly Point2D<T> Zero = new();
+
+            public T X { get; init; }
+
+            public T Y { get; init; }
+
+            public Point2D(T x, T y)
+            {
+                X = x;
+                Y = y;
+            }
+        }
+
+        [Fact]
+        public void WhenConvertingTypeWithStaticFields_ThenItDoesNotFail()
+        {
+            // Arrange
+            var ct = typeof(Point2D<double>).ToContextualType();
+
+            // Act
+            var fs = ct.Fields;
+
+            // Assert
+            Assert.NotNull(fs);
         }
     }
 }

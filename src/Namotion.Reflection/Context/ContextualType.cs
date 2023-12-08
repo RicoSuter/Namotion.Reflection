@@ -206,6 +206,43 @@ namespace Namotion.Reflection
         /// </summary>
         public bool IsValueType => _isValueType ?? ((bool)(_isValueType = TypeInfo.IsValueType));
 
+        /// <summary>
+        /// Gets the contextual properties of this type.
+        /// </summary>
+        public ContextualFieldInfo[] Fields
+        {
+            get
+            {
+                if (_fields == null)
+                {
+                    lock (this)
+                    {
+                        if (_fields == null)
+                        {
+                            _fields = Type.GetRuntimeFields().Select(field =>
+                            {
+                                if (TypeInfo.IsGenericType && !TypeInfo.ContainsGenericParameters)
+                                {
+                                    var genericType = field.DeclaringType.GetGenericTypeDefinition();
+                                    var genericField = genericType.GetRuntimeField(field.Name);
+                                    if (genericField != null && genericField.FieldType.IsGenericParameter)
+                                    {
+                                        var actualType = GenericArguments[genericField.FieldType.GenericParameterPosition];
+                                        var actualIndex = actualType._nullableFlagsIndex;
+                                        return new ContextualFieldInfo(field, ref actualIndex, actualType._nullableFlags);
+                                    }
+                                }
+
+                                var index = 0;
+                                return new ContextualFieldInfo(field, ref index, null);
+                            }).ToArray();
+                        }
+                    }
+                }
+
+                return _fields;
+            }
+        }
 
         /// <summary>
         /// Gets the contextual properties of this type.
@@ -302,44 +339,6 @@ namespace Namotion.Reflection
                 }
 
                 return _methods;
-            }
-        }
-
-        /// <summary>
-        /// Gets the contextual properties of this type.
-        /// </summary>
-        public ContextualFieldInfo[] Fields
-        {
-            get
-            {
-                if (_fields == null)
-                {
-                    lock (this)
-                    {
-                        if (_fields == null)
-                        {
-                            _fields = Type.GetRuntimeFields().Select(field =>
-                            {
-                                if (TypeInfo.IsGenericType && !TypeInfo.ContainsGenericParameters)
-                                {
-                                    var genericType = field.DeclaringType.GetGenericTypeDefinition();
-                                    var genericField = genericType.GetRuntimeField(field.Name);
-                                    if (genericField != null)
-                                    {
-                                        var actualType = GenericArguments[genericField.FieldType.GenericParameterPosition];
-                                        var actualIndex = actualType._nullableFlagsIndex;
-                                        return new ContextualFieldInfo(field, ref actualIndex, actualType._nullableFlags);
-                                    }
-                                }
-
-                                var index = 0;
-                                return new ContextualFieldInfo(field, ref index, null);
-                            }).ToArray();
-                        }
-                    }
-                }
-
-                return _fields;
             }
         }
 

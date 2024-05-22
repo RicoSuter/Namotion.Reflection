@@ -758,6 +758,15 @@ namespace Namotion.Reflection
                                 .Replace("file:///", string.Empty)), assemblyName.Name + ".xml")
                                 .Replace("file:\\", string.Empty);
 
+#if NETSTANDARD2_0_OR_GREATER
+                            // If running on non-windows platform and path is not rooted, an extra path separator
+                            // has been removed and must be added on again.
+                            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && !Path.IsPathRooted(path))
+                            {
+                                path = Path.PathSeparator + path;
+                            }
+#endif
+
                             if (DynamicApis.FileExists(path))
                             {
                                 return path;

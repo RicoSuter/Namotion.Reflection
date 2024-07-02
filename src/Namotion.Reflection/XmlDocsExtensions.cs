@@ -361,7 +361,7 @@ namespace Namotion.Reflection
                             {
                                 if (!string.IsNullOrEmpty(e.Value))
                                 {
-                                    value.Append(e.Value);
+                                    value.AppendFormattedElement(e, options.FormattingMode);
                                 }
                                 else
                                 {

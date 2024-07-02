@@ -234,7 +234,10 @@ namespace Namotion.Reflection.Tests
 
         public class WithGenericTagsInXmlDoc
         {
-            /// <summary>This <c>are</c> <strong>some</strong> tags.</summary>
+            /// <summary>
+            /// <para>Supported tags: <c>c</c>, <b>b</b>, <strong>strong</strong> and <i>i</i>.</para>
+            /// <para>And links to <a href="https://github.com/">GitHub</a> and <see href="https://www.microsoft.com/">Microsoft</see>.</para>
+            /// </summary>
             public string Foo { get; set; }
         }
 
@@ -248,7 +251,7 @@ namespace Namotion.Reflection.Tests
             var summary = typeof(WithGenericTagsInXmlDoc).GetProperty("Foo").GetXmlDocsSummary();
 
             //// Assert
-            Assert.Equal("This are some tags.", summary);
+            Assert.Equal("Supported tags: c, b, strong and i.\nAnd links to GitHub and Microsoft.", summary);
         }
 
         [Fact]
@@ -265,7 +268,8 @@ namespace Namotion.Reflection.Tests
             var summary = typeof(WithGenericTagsInXmlDoc).GetProperty("Foo").GetXmlDocsSummary(options);
 
             //// Assert
-            Assert.Equal("This <pre>are</pre> <strong>some</strong> tags.", summary);
+            Assert.Equal("<p>Supported tags: <pre>c</pre>, <strong>b</strong>, <strong>strong</strong> and <i>i</i>.</p>\n" +
+                         "<p>And links to <a href=\"https://github.com/\">GitHub</a> and <a href=\"https://www.microsoft.com/\">Microsoft</a>.</p>", summary);
         }
 
         [Fact]
@@ -282,7 +286,8 @@ namespace Namotion.Reflection.Tests
             var summary = typeof(WithGenericTagsInXmlDoc).GetProperty("Foo").GetXmlDocsSummary(options);
 
             //// Assert
-            Assert.Equal("This `are` **some** tags.", summary);
+            Assert.Equal("Supported tags: `c`, **b**, **strong** and *i*.\n\n" +
+                         "And links to [GitHub](https://github.com/) and [Microsoft](https://www.microsoft.com/).", summary);
         }
 
         public abstract class BaseBaseClass

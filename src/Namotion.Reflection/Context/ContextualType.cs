@@ -221,7 +221,7 @@ namespace Namotion.Reflection
                         {
                             _fields = Type.GetRuntimeFields().Select(field =>
                             {
-                                if (TypeInfo.IsGenericType && !TypeInfo.ContainsGenericParameters)
+                                if (field.DeclaringType is { IsGenericType: true })
                                 {
                                     var genericType = field.DeclaringType.GetGenericTypeDefinition();
                                     var genericField = genericType.GetRuntimeField(field.Name);

@@ -884,5 +884,25 @@ namespace Namotion.Reflection.Tests
             Assert.Equal("My foo.", s1);
             Assert.Equal("My bar.", s2);
         }
+
+        [Fact]
+        public void When_inheritdoc_is_used_on_namespace_base_class_then_it_is_ignored()
+        {
+            //// Arrange
+            var t = typeof(InheritDocClass);
+
+            //// Act
+            var s = t.GetXmlDocsSummary();
+
+            //// Assert
+            Assert.False(string.IsNullOrWhiteSpace(s));
+        }
     }
+
+    /// <inheritdoc/>
+    /// <summary>
+    /// Foo.
+    /// </summary>
+    public class InheritDocClass
+    { }
 }

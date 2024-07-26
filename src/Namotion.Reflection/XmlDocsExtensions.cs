@@ -520,7 +520,7 @@ namespace Namotion.Reflection
                         continue;
                     }
 
-                    var baseType = member.DeclaringType.GetTypeInfo().BaseType;
+                    var baseType = member.DeclaringType?.GetTypeInfo().BaseType;
                     var baseMember = baseType?.GetTypeInfo().DeclaredMembers.SingleOrDefault(m => m.Name == member.Name);
                     if (baseMember != null)
                     {
@@ -545,7 +545,7 @@ namespace Namotion.Reflection
 
         private static void ProcessInheritdocInterfaceElements(this MemberInfo member, XElement child, XmlDocsOptions options)
         {
-            if (member.DeclaringType.GetTypeInfo().ImplementedInterfaces == null)
+            if (member.DeclaringType?.GetTypeInfo().ImplementedInterfaces == null)
             {
                 return;
             }

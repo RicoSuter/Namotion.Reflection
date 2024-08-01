@@ -3,11 +3,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 
-namespace System.Runtime.CompilerServices
-{
-    internal static class IsExternalInit {}
-}
-
 namespace Namotion.Reflection
 {
     internal readonly struct NullableFlagsSource

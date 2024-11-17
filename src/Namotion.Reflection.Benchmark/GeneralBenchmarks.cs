@@ -2,9 +2,7 @@
 using Pro.NBench.xUnit.XunitExtensions;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading.Tasks;
-using Xunit.Abstractions;
 
 namespace Namotion.Reflection.Benchmark
 {
@@ -31,12 +29,6 @@ namespace Namotion.Reflection.Benchmark
         }
 
         private Counter _counter = default!;
-
-        public GeneralBenchmarks(ITestOutputHelper output)
-        {
-            Trace.Listeners.Clear();
-            Trace.Listeners.Add(new XunitTraceListener(output));
-        }
 
         [PerfSetup]
         public void Setup(BenchmarkContext context)

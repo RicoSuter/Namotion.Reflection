@@ -991,12 +991,6 @@ namespace Namotion.Reflection
             return null;
         }
 
-        private static string GetXmlAssemblyFilePathForWindows(dynamic? assembly, AssemblyName assemblyName)
-        {
-            var assemblyDirectory = DynamicApis.PathGetDirectoryName((string)assembly.Location);
-            return DynamicApis.PathCombine(assemblyDirectory, assemblyName.Name + ".xml");
-        }
-
         private static readonly Regex runtimeConfigRegex = new Regex("\"((.*?)((\\\\\\\\)|(////))(.*?))\"", RegexOptions.IgnoreCase);
 
         private static string? GetXmlDocsPathFromNuGetCacheOrDotNetSdk(string assemblyDirectory, AssemblyName assemblyName)

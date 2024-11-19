@@ -1,0 +1,24 @@
+<Project>
+
+  <PropertyGroup>
+
+    <Version>3.2.0</Version>
+
+    <RepositoryUrl>https://github.com/RicoSuter/Namotion.Reflection.git</RepositoryUrl>
+
+    <PackageProjectUrl>https://github.com/RicoSuter/Namotion.Reflection</PackageProjectUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/RicoSuter/Namotion.Reflection/master/assets/NuGetIcon.png</PackageIconUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Description>.NET library with advanced reflection APIs like XML documentation reading, Null Reference Types (C# 8) reflection and string based type checks.</Description>
+
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+
+  </PropertyGroup>
+
+</Project>

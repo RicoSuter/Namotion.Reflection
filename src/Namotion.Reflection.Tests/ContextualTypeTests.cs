@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Xunit;
 
 #nullable enable
@@ -85,6 +86,19 @@ namespace Namotion.Reflection.Tests
 
             // Assert
             Assert.NotNull(fs);
+        }
+
+        [Fact]
+        public void WhenReadingFieldsOfGenericFunc_ThenNoExceptionIsThrown()
+        {
+            // Arrange
+            var ct = typeof(Func<object>).ToContextualType();
+
+            // Act
+            var fields = ct.Fields;
+
+            // Assert
+            Assert.NotNull(fields);
         }
     }
 }

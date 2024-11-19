@@ -361,7 +361,7 @@ namespace Namotion.Reflection
                             {
                                 if (!string.IsNullOrEmpty(e.Value))
                                 {
-                                    value.Append(e.Value);
+                                    value.AppendFormattedElement(e, options.FormattingMode);
                                 }
                                 else
                                 {
@@ -520,7 +520,7 @@ namespace Namotion.Reflection
                         continue;
                     }
 
-                    var baseType = member.DeclaringType.GetTypeInfo().BaseType;
+                    var baseType = member.DeclaringType?.GetTypeInfo().BaseType;
                     var baseMember = baseType?.GetTypeInfo().DeclaredMembers.SingleOrDefault(m => m.Name == member.Name);
                     if (baseMember != null)
                     {
@@ -545,7 +545,7 @@ namespace Namotion.Reflection
 
         private static void ProcessInheritdocInterfaceElements(this MemberInfo member, XElement child, XmlDocsOptions options)
         {
-            if (member.DeclaringType.GetTypeInfo().ImplementedInterfaces == null)
+            if (member.DeclaringType?.GetTypeInfo().ImplementedInterfaces == null)
             {
                 return;
             }
@@ -1104,9 +1104,7 @@ namespace Namotion.Reflection
             }
         }
 
-#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         private static string GetCacheKey(string assemblyFullName, bool resolveExternalXmlDocs)
         {
             return $"{assemblyFullName}:{resolveExternalXmlDocs}";

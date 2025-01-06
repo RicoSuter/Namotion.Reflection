@@ -119,8 +119,18 @@ namespace Namotion.Reflection
                     {
                         if (itemType.Nullability == Nullability.NotNullable)
                         {
-                            throw new InvalidOperationException(
-                                "The object's nullability is invalid, item in enumerable.");
+                            if (errors != null)
+                            {
+                                errors.Add(itemType.Type.Name);
+                                if (stopFirstFail)
+                                {
+                                    return;
+                                }
+                            }
+                            else
+                            {
+                                throw new InvalidOperationException("The object's nullability is invalid, item in enumerable.");
+                            }
                         }
                     }
                     else

@@ -142,6 +142,17 @@ namespace Namotion.Reflection.Tests
             objectWithItemsListContainingSingleNonNullEntry.EnsureValidNullability();
         }
 
+        [Fact]
+        public void When_property_list_of_non_nullable_strings_contains_null_string_then_ValidateNullability_should_have_errors()
+        {
+            //// Arrange
+            var objectWithItemsListContainingSingleNullEntry = JsonConvert.DeserializeObject<SomethingWithListOfNonNullableStringItems>("{ \"Items\": [ null ] }");
+
+            //// Act and assert
+            Assert.NotNull(objectWithItemsListContainingSingleNullEntry);
+            Assert.NotEmpty(objectWithItemsListContainingSingleNullEntry.ValidateNullability());
+        }
+
         /// <summary>
         /// One of the reproduce cases for issue 39 - should not throw anything because a non-null string value is being deserialised into a property that is a list of non-nullable strings
         /// </summary>
@@ -152,6 +163,8 @@ namespace Namotion.Reflection.Tests
             var objectWithItemsListContainingSingleNullEntry = JsonConvert.DeserializeObject<SomethingWithListOfNonNullableStringItems>("{ \"Items\": [ null ] }");
 
             //// Act and assert
+            Assert.NotNull(objectWithItemsListContainingSingleNullEntry);
+            Assert.NotEmpty(objectWithItemsListContainingSingleNullEntry.ValidateNullability());
             Assert.Throws<InvalidOperationException>(() => objectWithItemsListContainingSingleNullEntry.EnsureValidNullability());
         }
 

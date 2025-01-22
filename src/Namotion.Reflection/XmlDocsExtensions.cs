@@ -1086,7 +1086,7 @@ namespace Namotion.Reflection
             try
             {
                 var json = DynamicApis.FileReadAllText(nuGetCacheFile);
-                var matches = Regex.Matches(json, $"\"((.*?){assemblyName.Name}((\\\\\\\\)|(////)){assemblyName.Version.ToString(3)})((\\\\\\\\)|(////))(.*?)\"", RegexOptions.IgnoreCase);
+                var matches = Regex.Matches(json, $"\"((.*?){assemblyName.Name}((\\\\\\\\)|/){assemblyName.Version.ToString(3)})((\\\\\\\\)|/)(.*?)\"", RegexOptions.IgnoreCase);
                 if (matches.Count > 0)
                 {
                     var files = DynamicApis.DirectoryGetAllFiles(matches[0].Groups[1].Value.Replace("\\\\", "\\").Replace("//", "/"), assemblyName.Name + ".xml");

@@ -46,7 +46,7 @@ namespace Namotion.Reflection.Cecil.Tests
         public void When_xml_docs_is_read_for_cecil_type_then_it_works()
         {
             // Arrange
-            var assemblyPath = typeof(XmlDocsExtensionsTests).Assembly.CodeBase!.Replace("file:///", string.Empty);
+            var assemblyPath = typeof(XmlDocsExtensionsTests).Assembly.Location;
             var xmlPath = assemblyPath.Replace(".dll", ".xml");
 
             var assembly = AssemblyDefinition.ReadAssembly(assemblyPath);
@@ -91,7 +91,7 @@ namespace Namotion.Reflection.Cecil.Tests
         public void When_xml_docs_is_enum_then_field_xml_docs_are_read()
         {
             // Arrange
-            var assemblyPath = typeof(XmlDocsExtensionsTests).Assembly.CodeBase!.Replace("file:///", string.Empty);
+            var assemblyPath = typeof(XmlDocsExtensionsTests).Assembly.Location;
             var xmlPath = assemblyPath.Replace(".dll", ".xml");
 
             var assembly = AssemblyDefinition.ReadAssembly(assemblyPath);
@@ -140,7 +140,7 @@ namespace Namotion.Reflection.Cecil.Tests
         public void WhenTypeInheritsFromGenericType_ThenMethodAndPropertyWithGenericParametersResolvesCorrectXml()
         {
             // Arrange
-            var assemblyPath = typeof(XmlDocsExtensionsTests).Assembly.CodeBase!.Replace("file:///", string.Empty);
+            var assemblyPath = typeof(XmlDocsExtensionsTests).Assembly.Location;
             var xmlPath = assemblyPath.Replace(".dll", ".xml");
 
             var assembly = AssemblyDefinition.ReadAssembly(assemblyPath);

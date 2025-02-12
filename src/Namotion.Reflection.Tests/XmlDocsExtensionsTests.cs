@@ -542,6 +542,14 @@ namespace Namotion.Reflection.Tests
             }
 
             /// <summary>
+            /// MultiGenericArrayParameter
+            /// </summary>
+            public IDictionary<string, string> MultiGenericArrayParameter(IDictionary<string[], string[]> input)
+            {
+                throw new NotImplementedException();
+            }
+
+            /// <summary>
             /// NestedGenericParameter
             /// </summary>
             public IDictionary<string, IDictionary<string, IDictionary<string, string>>> NestedGenericParameter(IDictionary<string, IDictionary<string, IDictionary<string, string>>> input)
@@ -597,6 +605,7 @@ namespace Namotion.Reflection.Tests
             var singleSummary = typeof(InheritedGenericClass2).GetMethod(nameof(InheritedGenericClass2.Single)).GetXmlDocsSummary();
             var multiSummary = typeof(InheritedGenericClass2).GetMethod(nameof(InheritedGenericClass2.Multi)).GetXmlDocsSummary();
             var multiGenericParameterSummary = typeof(InheritedGenericClass2).GetMethod(nameof(InheritedGenericClass2.MultiGenericParameter)).GetXmlDocsSummary();
+            var multiGenericArrayParameterSummary = typeof(InheritedGenericClass2).GetMethod(nameof(InheritedGenericClass2.MultiGenericArrayParameter)).GetXmlDocsSummary();
             var nestedGenericParameterSummary = typeof(InheritedGenericClass2).GetMethod(nameof(InheritedGenericClass2.NestedGenericParameter)).GetXmlDocsSummary();
             var singleAsyncSummary = typeof(InheritedGenericClass2).GetMethod(nameof(InheritedGenericClass2.SingleAsync)).GetXmlDocsSummary();
             var multiAsyncSummary = typeof(InheritedGenericClass2).GetMethod(nameof(InheritedGenericClass2.MultiAsync)).GetXmlDocsSummary();
@@ -607,6 +616,7 @@ namespace Namotion.Reflection.Tests
             Assert.Equal("Single", singleSummary);
             Assert.Equal("Multi", multiSummary);
             Assert.Equal("MultiGenericParameter", multiGenericParameterSummary);
+            Assert.Equal("MultiGenericArrayParameter", multiGenericArrayParameterSummary);
             Assert.Equal("NestedGenericParameter", nestedGenericParameterSummary);
             Assert.Equal("SingleAsync", singleAsyncSummary);
             Assert.Equal("MultiAsync", multiAsyncSummary);

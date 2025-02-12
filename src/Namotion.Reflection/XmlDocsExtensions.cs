@@ -669,6 +669,7 @@ namespace Namotion.Reflection
                             .Replace("],[", ",")
                             .Replace("||", "`")
                             .Replace("[[", "{")
+                            .Replace("[]]]", "[]}")
                             .Replace("]]", "}"))
                         .ToArray());
 

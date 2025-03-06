@@ -227,7 +227,15 @@ namespace Namotion.Reflection
                                     var genericField = genericType.GetRuntimeField(field.Name);
                                     if (genericField != null && genericField.FieldType.IsGenericParameter)
                                     {
-                                        var actualType = field.DeclaringType.ToContextualType().GenericArguments[genericField.FieldType.GenericParameterPosition];
+                                        var nullableFlagsIndex = _nullableFlagsIndex;
+                                        var declaringContextualType = new ContextualType(
+                                            field.DeclaringType,
+                                            Context,
+                                            Parent,
+                                            ref nullableFlagsIndex,
+                                            _nullableFlags,
+                                            null);
+                                        var actualType = declaringContextualType.GenericArguments[genericField.FieldType.GenericParameterPosition];
                                         var actualIndex = actualType._nullableFlagsIndex;
                                         return new ContextualFieldInfo(field, ref actualIndex, actualType._nullableFlags);
                                     }

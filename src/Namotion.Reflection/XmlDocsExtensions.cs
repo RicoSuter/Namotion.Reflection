@@ -741,7 +741,8 @@ namespace Namotion.Reflection
                     string? path;
                     if (!string.IsNullOrEmpty(assembly.Location))
                     {
-                        path = GetPathByOs(assembly, assemblyName);
+                        var assemblyDirectory = DynamicApis.PathGetDirectoryName((string)assembly.Location);
+                        path = DynamicApis.PathCombine(assemblyDirectory, assemblyName.Name + ".xml");
 
                         if (DynamicApis.FileExists(path))
                         {
@@ -757,6 +758,15 @@ namespace Namotion.Reflection
                             path = DynamicApis.PathCombine(DynamicApis.PathGetDirectoryName(codeBase
                                 .Replace("file:///", string.Empty)), assemblyName.Name + ".xml")
                                 .Replace("file:\\", string.Empty);
+
+#if NETSTANDARD2_0_OR_GREATER
+                            // If running on non-windows platform and path is not rooted, an extra path separator
+                            // has been removed and must be added on again.
+                            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && !Path.IsPathRooted(path))
+                            {
+                                path = Path.PathSeparator + path;
+                            }
+#endif
 
                             if (DynamicApis.FileExists(path))
                             {
@@ -800,6 +810,12 @@ namespace Namotion.Reflection
 
                     if (options.ResolveExternalXmlDocs)
                     {
+                        path = GetXmlDocsPathFromOSXNuGetCache(assembly, assemblyName);
+                        if (DynamicApis.FileExists(path))
+                        {
+                            return path;
+                        }
+
                         dynamic? executingAssembly = typeof(Assembly)
                             .GetRuntimeMethod("GetExecutingAssembly", new Type[0])?
                             .Invoke(null, new object[0]);
@@ -944,7 +960,7 @@ namespace Namotion.Reflection
                 .Replace("+", string.Empty);
         }
 
-        private static string? GetPathByOs(dynamic? assembly, AssemblyName assemblyName)
+        private static string? GetXmlDocsPathFromOSXNuGetCache(dynamic? assembly, AssemblyName assemblyName)
         {
 #if NETSTANDARD2_0_OR_GREATER
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
@@ -973,13 +989,7 @@ namespace Namotion.Reflection
                 return file;
             }
 #endif
-            return GetXmlAssemblyFilePathForWindows(assembly, assemblyName);
-        }
-
-        private static string GetXmlAssemblyFilePathForWindows(dynamic? assembly, AssemblyName assemblyName)
-        {
-            var assemblyDirectory = DynamicApis.PathGetDirectoryName((string)assembly.Location);
-            return DynamicApis.PathCombine(assemblyDirectory, assemblyName.Name + ".xml");
+            return null;
         }
 
         private static readonly Regex runtimeConfigRegex = new Regex("\"((.*?)((\\\\\\\\)|(////))(.*?))\"", RegexOptions.IgnoreCase);

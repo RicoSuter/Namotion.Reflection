@@ -100,5 +100,15 @@ namespace Namotion.Reflection.Tests
             // Assert
             Assert.NotNull(fields);
         }
+
+        private class Base<T> { public T? GenericField; }
+        private class Derived : Base<bool>;
+
+        [Fact]
+        public void WhenReadGenericFieldFromDerivedNonGenericClass_ThenItDoesNotThrow()
+        {
+            var fields = typeof(Derived).ToContextualType().Fields;
+            Assert.Equal(fields.Length, 1);
+        }
     }
 }

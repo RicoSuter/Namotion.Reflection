@@ -14,6 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\azure-pipelines.yml = ..\azure-pipelines.yml
 		..\README.md = ..\README.md
 		..\Directory.Packages.props = ..\Directory.Packages.props
+		..\Directory.Build.props = ..\Directory.Build.props
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Namotion.Reflection.Demo", "Namotion.Reflection.Demo\Namotion.Reflection.Demo.csproj", "{A6268E5A-0AA1-452D-BCAC-BCF0C38B6DFC}"

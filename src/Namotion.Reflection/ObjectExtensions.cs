@@ -92,13 +92,9 @@ namespace Namotion.Reflection
 
             if (checkedObjects != null)
             {
-                if (checkedObjects.Contains(obj))
+                if (!checkedObjects.Add(obj))
                 {
                     return;
-                }
-                else
-                {
-                    checkedObjects.Add(obj);
                 }
             }
 
@@ -119,8 +115,18 @@ namespace Namotion.Reflection
                     {
                         if (itemType.Nullability == Nullability.NotNullable)
                         {
-                            throw new InvalidOperationException(
-                                "The object's nullability is invalid, item in enumerable.");
+                            if (errors != null)
+                            {
+                                errors.Add(itemType.Type.Name);
+                                if (stopFirstFail)
+                                {
+                                    return;
+                                }
+                            }
+                            else
+                            {
+                                throw new InvalidOperationException("The object's nullability is invalid, item in enumerable.");
+                            }
                         }
                     }
                     else
@@ -132,9 +138,8 @@ namespace Namotion.Reflection
             else if (!type.TypeInfo.IsValueType)
             {
                 var properties = type.Type.GetContextualProperties();
-                for (int i = 0; i < properties.Length; i++)
+                foreach (var property in properties)
                 {
-                    var property = properties[i];
                     if (!property.PropertyType.IsValueType && property.CanRead && 
                         !property.IsAttributeDefined<CompilerGeneratedAttribute>(true))
                     {
@@ -154,7 +159,7 @@ namespace Namotion.Reflection
                                 else
                                 {
                                     throw new InvalidOperationException(
-                                        "The object's nullability is invalid, property: " + property.PropertyType.Type.FullName + "." + property.Name);
+                                                                        "The object's nullability is invalid, property: " + property.PropertyType.Type.FullName + "." + property.Name);
                                 }
                             }
                         }

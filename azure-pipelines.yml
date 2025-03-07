@@ -41,7 +41,7 @@ steps:
   inputs:
     command: 'build'
     projects: '$(Projects)'
-    arguments: '--configuration $(BuildConfiguration)'
+    arguments: '--configuration $(BuildConfiguration) -p:ContinuousIntegrationBuild=true'
     feedsToUse: 'select'
     versioningScheme: 'off'
 - task: DotNetCoreCLI@2
@@ -49,7 +49,7 @@ steps:
   inputs:
     command: 'test'
     projects: '$(Projects)'
-    arguments: '--configuration $(BuildConfiguration) --collect "Code Coverage"'
+    arguments: '--configuration $(BuildConfiguration) --no-build --collect "Code Coverage"'
     publishTestResults: true
     feedsToUse: 'select'
     versioningScheme: 'off'
@@ -59,7 +59,7 @@ steps:
   displayName: 'Copy packages'
   condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
   inputs:
-    Contents: '**/*.nupkg'
+    Contents: '**/*.*nupkg'
     TargetFolder: '$(Build.ArtifactStagingDirectory)'
     flattenFolders: true
 - task: PublishBuildArtifacts@1

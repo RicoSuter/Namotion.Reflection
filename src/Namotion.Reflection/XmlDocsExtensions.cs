@@ -1078,6 +1078,14 @@ namespace Namotion.Reflection
             {
                 return GetXmlDocsPathFromNuGetCacheFile(nuGetCacheFile, assemblyName);
             }
+    
+            // This works for projects that have the artifacts output layout enabled:
+            // https://learn.microsoft.com/en-us/dotnet/core/sdk/artifacts-output
+            nuGetCacheFile = DynamicApis.PathCombine(assemblyDirectory.Replace("/bin/", "/obj/"), "../project.nuget.cache");
+            if (DynamicApis.FileExists(nuGetCacheFile))
+            {
+                return GetXmlDocsPathFromNuGetCacheFile(nuGetCacheFile, assemblyName);
+            }
 
             return null;
         }
@@ -1087,7 +1095,7 @@ namespace Namotion.Reflection
             try
             {
                 var json = DynamicApis.FileReadAllText(nuGetCacheFile);
-                var matches = Regex.Matches(json, $"\"((.*?){assemblyName.Name}((\\\\\\\\)|(////)){assemblyName.Version.ToString(3)})((\\\\\\\\)|(////))(.*?)\"", RegexOptions.IgnoreCase);
+                var matches = Regex.Matches(json, $"\"((.*?){assemblyName.Name}((\\\\\\\\)|/).*?)((\\\\\\\\)|/)(.*?)\"", RegexOptions.IgnoreCase);
                 if (matches.Count > 0)
                 {
                     var files = DynamicApis.DirectoryGetAllFiles(matches[0].Groups[1].Value.Replace("\\\\", "\\").Replace("//", "/"), assemblyName.Name + ".xml");

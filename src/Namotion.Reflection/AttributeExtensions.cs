@@ -15,10 +15,22 @@ namespace Namotion.Reflection
         /// </summary>
         /// <typeparam name="T">The attribute type.</typeparam>
         /// <returns>The attribute or null.</returns>
-        public static T? GetContextOrTypeAttribute<T>(this ContextualType contextualType, bool inherit)
+        public static T? GetContextOrTypeAttribute<T>(this ContextualType contextualType, bool inherit) where T : Attribute
         {
-            return (T?)contextualType.Context.GetCustomAttributes(typeof(T), inherit).SingleOrDefault() ??
-                (T?)contextualType.GetCustomAttributes(typeof(T), inherit).SingleOrDefault();
+            var attributes = contextualType.Context.GetCustomAttributes(typeof(T), inherit);
+            if (attributes.Length == 1)
+            {
+                return (T)attributes[0];
+            }
+
+            attributes = contextualType.GetCustomAttributes(typeof(T), inherit);
+
+            if (attributes.Length == 1)
+            {
+                return (T)attributes[0];
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -26,7 +38,7 @@ namespace Namotion.Reflection
         /// </summary>
         /// <typeparam name="T">The attribute type.</typeparam>
         /// <returns>The attributes.</returns>
-        public static IEnumerable<T> GetContextOrTypeAttributes<T>(this ContextualType contextualType, bool inherit)
+        public static IEnumerable<T> GetContextOrTypeAttributes<T>(this ContextualType contextualType, bool inherit) where T : Attribute
         {
             return contextualType.Context.GetCustomAttributes(typeof(T), inherit)
                 .Concat(contextualType.GetCustomAttributes(typeof(T), inherit))
@@ -43,15 +55,20 @@ namespace Namotion.Reflection
             return contextualType.GetContextOrTypeAttributes<Attribute>(inherit);
         }
 
-
         /// <summary>
         /// Gets an attribute of the given type which is defined on the context or on the type.
         /// </summary>
         /// <typeparam name="T">The attribute type.</typeparam>
         /// <returns>The attribute or null.</returns>
-        public static T? GetContextAttribute<T>(this ContextualType contextualType, bool inherit)
+        public static T? GetContextAttribute<T>(this ContextualType contextualType, bool inherit) where T : Attribute
         {
-            return (T?)contextualType.Context.GetCustomAttributes(typeof(T), inherit).SingleOrDefault();
+            var attributes = contextualType.Context.GetCustomAttributes(typeof(T), inherit);
+            if (attributes.Length == 1)
+            {
+                return (T)attributes[0];
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -59,7 +76,7 @@ namespace Namotion.Reflection
         /// </summary>
         /// <typeparam name="T">The attribute type.</typeparam>
         /// <returns>The attributes.</returns>
-        public static IEnumerable<T> GetContextAttributes<T>(this ContextualType contextualType, bool inherit)
+        public static IEnumerable<T> GetContextAttributes<T>(this ContextualType contextualType, bool inherit) where T : Attribute
         {
             return contextualType.Context.GetCustomAttributes(typeof(T), inherit).OfType<T>();
         }
@@ -79,18 +96,17 @@ namespace Namotion.Reflection
         /// </summary>
         /// <typeparam name="T">The attribute type.</typeparam>
         /// <returns>The attributes.</returns>
-        public static bool IsContextAttributeDefined<T>(this ContextualType contextualType, bool inherit)
+        public static bool IsContextAttributeDefined<T>(this ContextualType contextualType, bool inherit) where T : Attribute
         {
             return contextualType.Context.IsDefined(typeof(T), inherit);
         }
-
 
         /// <summary>
         /// Gets an attribute of the given type which is defined on the context or on the type.
         /// </summary>
         /// <typeparam name="T">The attribute type.</typeparam>
         /// <returns>The attribute or null.</returns>
-        public static T? GetAttribute<T>(this ContextualMemberInfo info, bool inherit)
+        public static T? GetAttribute<T>(this ContextualMemberInfo info, bool inherit) where T : Attribute
         {
             return ((ICustomAttributeProvider)info).GetAttribute<T>(inherit);
         }
@@ -100,7 +116,7 @@ namespace Namotion.Reflection
         /// </summary>
         /// <typeparam name="T">The attribute type.</typeparam>
         /// <returns>The attributes.</returns>
-        public static IEnumerable<T> GetAttributes<T>(this ContextualMemberInfo info, bool inherit)
+        public static IEnumerable<T> GetAttributes<T>(this ContextualMemberInfo info, bool inherit) where T : Attribute
         {
             return ((ICustomAttributeProvider)info).GetAttributes<T>(inherit);
         }
@@ -120,18 +136,17 @@ namespace Namotion.Reflection
         /// </summary>
         /// <typeparam name="T">The attribute type.</typeparam>
         /// <returns>The attributes.</returns>
-        public static bool IsAttributeDefined<T>(this ContextualMemberInfo info, bool inherit)
+        public static bool IsAttributeDefined<T>(this ContextualMemberInfo info, bool inherit) where T : Attribute
         {
             return ((ICustomAttributeProvider)info).IsAttributeDefined<T>(inherit);
         }
-
 
         /// <summary>
         /// Gets an attribute of the given type which is defined on the context or on the type.
         /// </summary>
         /// <typeparam name="T">The attribute type.</typeparam>
         /// <returns>The attribute or null.</returns>
-        public static T? GetAttribute<T>(this ContextualParameterInfo info, bool inherit)
+        public static T? GetAttribute<T>(this ContextualParameterInfo info, bool inherit) where T : Attribute
         {
             return ((ICustomAttributeProvider)info).GetAttribute<T>(inherit);
         }
@@ -141,7 +156,7 @@ namespace Namotion.Reflection
         /// </summary>
         /// <typeparam name="T">The attribute type.</typeparam>
         /// <returns>The attributes.</returns>
-        public static IEnumerable<T> GetAttributes<T>(this ContextualParameterInfo info, bool inherit)
+        public static IEnumerable<T> GetAttributes<T>(this ContextualParameterInfo info, bool inherit) where T : Attribute
         {
             return ((ICustomAttributeProvider)info).GetAttributes<T>(inherit);
         }
@@ -161,18 +176,17 @@ namespace Namotion.Reflection
         /// </summary>
         /// <typeparam name="T">The attribute type.</typeparam>
         /// <returns>The attributes.</returns>
-        public static bool IsAttributeDefined<T>(this ContextualParameterInfo info, bool inherit)
+        public static bool IsAttributeDefined<T>(this ContextualParameterInfo info, bool inherit) where T : Attribute
         {
             return ((ICustomAttributeProvider)info).IsAttributeDefined<T>(inherit);
         }
-
 
         /// <summary>
         /// Gets an attribute of the given type which is defined on the context or on the type.
         /// </summary>
         /// <typeparam name="T">The attribute type.</typeparam>
         /// <returns>The attribute or null.</returns>
-        public static T? GetAttribute<T>(this CachedType info, bool inherit)
+        public static T? GetAttribute<T>(this CachedType info, bool inherit) where T : Attribute
         {
             return ((ICustomAttributeProvider)info).GetAttribute<T>(inherit);
         }
@@ -182,7 +196,7 @@ namespace Namotion.Reflection
         /// </summary>
         /// <typeparam name="T">The attribute type.</typeparam>
         /// <returns>The attributes.</returns>
-        public static IEnumerable<T> GetAttributes<T>(this CachedType info, bool inherit)
+        public static IEnumerable<T> GetAttributes<T>(this CachedType info, bool inherit) where T : Attribute
         {
             return ((ICustomAttributeProvider)info).GetAttributes<T>(inherit);
         }
@@ -202,28 +216,33 @@ namespace Namotion.Reflection
         /// </summary>
         /// <typeparam name="T">The attribute type.</typeparam>
         /// <returns>The attributes.</returns>
-        public static bool IsAttributeDefined<T>(this CachedType info, bool inherit)
+        public static bool IsAttributeDefined<T>(this CachedType info, bool inherit) where T : Attribute
         {
             return ((ICustomAttributeProvider)info).IsAttributeDefined<T>(inherit);
         }
 
-
-        internal static T? GetAttribute<T>(this ICustomAttributeProvider provider, bool inherit)
+        private static T? GetAttribute<T>(this ICustomAttributeProvider provider, bool inherit) where T : Attribute
         {
-            return (T?)provider.GetCustomAttributes(typeof(T), inherit).SingleOrDefault();
+            var attributes = provider.GetCustomAttributes(typeof(T), inherit);
+            if (attributes.Length == 1)
+            {
+                return (T)attributes[0];
+            }
+
+            return null;
         }
 
-        internal static IEnumerable<T> GetAttributes<T>(this ICustomAttributeProvider provider, bool inherit)
+        private static IEnumerable<T> GetAttributes<T>(this ICustomAttributeProvider provider, bool inherit) where T : Attribute
         {
             return provider.GetCustomAttributes(typeof(T), inherit).OfType<T>();
         }
 
-        internal static IEnumerable<Attribute> GetAttributes(this ICustomAttributeProvider provider, bool inherit)
+        private static IEnumerable<Attribute> GetAttributes(this ICustomAttributeProvider provider, bool inherit)
         {
             return provider.GetAttributes<Attribute>(inherit);
         }
 
-        internal static bool IsAttributeDefined<T>(this ICustomAttributeProvider provider, bool inherit)
+        private static bool IsAttributeDefined<T>(this ICustomAttributeProvider provider, bool inherit) where T : Attribute
         {
             return provider.IsDefined(typeof(T), inherit);
         }

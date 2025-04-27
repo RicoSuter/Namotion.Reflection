@@ -195,8 +195,33 @@ namespace Namotion.Reflection.Tests
 
         public class WithSeeTagInXmlDoc
         {
+            // <see> tags used at top level inside <summary> and <remarks>
+
             /// <summary><see langword="null"/> for the default <see cref="Record"/>. See <see cref="Record">this</see> and <see href="https://github.com/rsuter/njsonschema">this</see> at <see href="https://github.com/rsuter/njsonschema"/>.</summary>
+            /// <remarks><see langword="false"/> for the default <see cref="bool"/>. See <see cref="bool">this</see> and <see href="https://github.com/rsuter/njsonschema">this</see> at <see href="https://github.com/rsuter/njsonschema"/>.</remarks>
             public string Foo { get; set; }
+
+            // <see> tags nested within <para> inside <summary> and <remarks>
+
+            /// <summary>
+            /// <para>
+            /// <see langword="null"/> for the default <see cref="Record"/>.
+            /// See <see cref="Record">this</see> and <see href="https://github.com/rsuter/njsonschema">this</see> at <see href="https://github.com/rsuter/njsonschema"/>.
+            /// </para>
+            /// <para>
+            /// Second paragraph in summary.
+            /// </para>
+            /// </summary>
+            /// <remarks>
+            /// <para>
+            /// <see langword="false"/> for the default <see cref="bool"/>.
+            /// See <see cref="bool">this</see> and <see href="https://github.com/rsuter/njsonschema">this</see> at <see href="https://github.com/rsuter/njsonschema"/>.
+            /// </para>
+            /// <para>
+            /// Second paragraph in remarks.
+            /// </para>
+            /// </remarks>
+            public string Bar { get; set; }
         }
 
         [Fact]
@@ -212,11 +237,89 @@ namespace Namotion.Reflection.Tests
             Assert.Equal("null for the default Record. See this and this at https://github.com/rsuter/njsonschema.", summary);
         }
 
+        [Fact]
+        public void When_summary_has_see_tag_nested_inside_paragraph_then_it_is_converted()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            var summary = typeof(WithSeeTagInXmlDoc).GetProperty("Bar").GetXmlDocsSummary();
+
+            //// Assert
+            Assert.Equal("null for the default Record.\n" +
+                "See this and this at https://github.com/rsuter/njsonschema.\n" +
+                "Second paragraph in summary.", summary);
+        }
+
+        [Fact]
+        public void When_remarks_has_see_tag_then_it_is_converted()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            var remarks = typeof(WithSeeTagInXmlDoc).GetProperty("Foo").GetXmlDocsRemarks();
+
+            //// Assert
+            Assert.Equal("false for the default Boolean. See this and this at https://github.com/rsuter/njsonschema.", remarks);
+        }
+
+        [Fact]
+        public void When_remarks_has_see_tag_nested_inside_paragraph_then_it_is_converted()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            var remarks = typeof(WithSeeTagInXmlDoc).GetProperty("Bar").GetXmlDocsRemarks();
+
+            //// Assert
+            Assert.Equal("false for the default Boolean.\n" +
+                "See this and this at https://github.com/rsuter/njsonschema.\n" +
+                "Second paragraph in remarks.", remarks);
+        }
+
         public class WithParamrefTagInXmlDoc
         {
-            /// <summary>Returns <paramref name="name"/>.</summary>
-            /// <param name="name">The name to return.</param>
-            public string Foo(string name) => name;
+            // <paramref> tags used at top level inside <summary>, <param>, <remarks>, and <returns>
+
+            /// <summary>Returns <paramref name="param1"/> followed by <paramref name="param2"/>.</summary>
+            /// <param name="param1">First part.</param>
+            /// <param name="param2">Second part, which follows <paramref name="param1"/>.</param>
+            /// <remarks>Concatenates <paramref name="param1"/> and <paramref name="param2"/>.</remarks>
+            /// <returns>New string combining <paramref name="param1"/> and <paramref name="param2"/>.</returns>
+            public string Foo(string param1, string param2) => param1 + param2;
+
+            // <paramref> tags nested within <para> inside <summary>, <remarks>, and <returns>
+
+            /// <summary>
+            /// <para>
+            /// Returns <paramref name="param1"/> followed by <paramref name="param2"/>.
+            /// </para>
+            /// <para>
+            /// Second paragraph in summary.
+            /// </para>
+            /// </summary>
+            /// <param name="param1">First part.</param>
+            /// <param name="param2">Second part.</param>
+            /// <remarks>
+            /// <para>
+            /// Concatenates <paramref name="param1"/> and <paramref name="param2"/>.
+            /// </para>
+            /// <para>
+            /// Second paragraph in remarks.
+            /// </para>
+            /// </remarks>
+            /// <returns>
+            /// <para>
+            /// Combined string from <paramref name="param1"/> and <paramref name="param2"/>.
+            /// </para>
+            /// <para>
+            /// Second paragraph in returns.
+            /// </para>
+            /// </returns>
+            public string Bar(string param1, string param2) => param1 + param2;
         }
 
         [Fact]
@@ -229,7 +332,201 @@ namespace Namotion.Reflection.Tests
             var summary = typeof(WithParamrefTagInXmlDoc).GetMethod("Foo").GetXmlDocsSummary();
 
             //// Assert
-            Assert.Equal("Returns name.", summary);
+            Assert.Equal("Returns param1 followed by param2.", summary);
+        }
+
+        [Fact]
+        public void When_remarks_has_paramref_tag_then_it_is_converted()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            var remarks = typeof(WithParamrefTagInXmlDoc).GetMethod("Foo").GetXmlDocsRemarks();
+
+            //// Assert
+            Assert.Equal("Concatenates param1 and param2.", remarks);
+        }
+
+        [Fact]
+        public void When_parameter_has_paramref_tag_then_it_is_converted()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            var parameterXmlDoc = typeof(WithParamrefTagInXmlDoc).GetMethod("Foo").GetParameters()
+                .Single(p => p.Name == "param2").GetXmlDocs();
+
+            //// Assert
+            Assert.Equal("Second part, which follows param1.", parameterXmlDoc);
+        }
+
+        [Fact]
+        public void When_method_return_has_paramref_tag_then_it_is_converted()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            var returnsTagXmlDoc = typeof(WithParamrefTagInXmlDoc).GetMethod("Foo")
+                .ReturnParameter.GetXmlDocs();
+
+            //// Assert
+            Assert.Equal("New string combining param1 and param2.", returnsTagXmlDoc);
+        }
+
+        [Fact]
+        public void When_summary_has_paramref_tag_nested_inside_paragraph_then_it_is_converted()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            var summary = typeof(WithParamrefTagInXmlDoc).GetMethod("Bar").GetXmlDocsSummary();
+
+            //// Assert
+            Assert.Equal("Returns param1 followed by param2.\n" +
+                "Second paragraph in summary.", summary);
+        }
+
+        [Fact]
+        public void When_summary_has_paramref_tag_nested_inside_paragraph_then_it_is_converted_to_html()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            XmlDocsOptions options = new XmlDocsOptions()
+            {
+                FormattingMode = XmlDocsFormattingMode.Html
+            };
+            var summary = typeof(WithParamrefTagInXmlDoc).GetMethod("Bar").GetXmlDocsSummary(options);
+
+            //// Assert
+            Assert.Equal("<p>Returns param1 followed by param2.</p>\n" +
+                "<p>Second paragraph in summary.</p>", summary);
+        }
+
+        [Fact]
+        public void When_summary_has_paramref_tag_nested_inside_paragraph_then_it_is_converted_to_markdown()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            XmlDocsOptions options = new XmlDocsOptions()
+            {
+                FormattingMode = XmlDocsFormattingMode.Markdown
+            };
+            var summary = typeof(WithParamrefTagInXmlDoc).GetMethod("Bar").GetXmlDocsSummary(options);
+
+            //// Assert
+            Assert.Equal("Returns param1 followed by param2.\n\n" +
+                "Second paragraph in summary.", summary);
+        }
+        
+        [Fact]
+        public void When_remarks_has_paramref_tag_nested_inside_paragraph_then_it_is_converted()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            var remarks = typeof(WithParamrefTagInXmlDoc).GetMethod("Bar").GetXmlDocsRemarks();
+
+            //// Assert
+            Assert.Equal("Concatenates param1 and param2.\n" +
+                "Second paragraph in remarks.", remarks);
+        }
+
+        [Fact]
+        public void When_remarks_has_paramref_tag_nested_inside_paragraph_then_it_is_converted_to_html()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            XmlDocsOptions options = new XmlDocsOptions()
+            {
+                FormattingMode = XmlDocsFormattingMode.Html
+            };
+            var remarks = typeof(WithParamrefTagInXmlDoc).GetMethod("Bar").GetXmlDocsRemarks(options);
+
+            //// Assert
+            Assert.Equal("<p>Concatenates param1 and param2.</p>\n" +
+                "<p>Second paragraph in remarks.</p>", remarks);
+        }
+
+        [Fact]
+        public void When_remarks_has_paramref_tag_nested_inside_paragraph_then_it_is_converted_to_markdown()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            XmlDocsOptions options = new XmlDocsOptions()
+            {
+                FormattingMode = XmlDocsFormattingMode.Markdown
+            };
+            var remarks = typeof(WithParamrefTagInXmlDoc).GetMethod("Bar").GetXmlDocsRemarks(options);
+
+            //// Assert
+            Assert.Equal("Concatenates param1 and param2.\n\n" +
+                "Second paragraph in remarks.", remarks);
+        }
+        
+        [Fact]
+        public void When_method_return_has_paramref_tag_nested_inside_paragraph_then_it_is_converted()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            var returnsTagXmlDoc = typeof(WithParamrefTagInXmlDoc).GetMethod("Bar")
+                .ReturnParameter.GetXmlDocs();
+
+            //// Assert
+            Assert.Equal("Combined string from param1 and param2.\n" +
+                "Second paragraph in returns.", returnsTagXmlDoc);
+        }
+
+        [Fact]
+        public void When_method_return_has_paramref_tag_nested_inside_paragraph_then_it_is_converted_to_html()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            XmlDocsOptions options = new XmlDocsOptions()
+            {
+                FormattingMode = XmlDocsFormattingMode.Html
+            };
+            var returnsTagXmlDoc = typeof(WithParamrefTagInXmlDoc).GetMethod("Bar")
+                .ReturnParameter.GetXmlDocs(options);
+
+            //// Assert
+            Assert.Equal("<p>Combined string from param1 and param2.</p>\n" +
+                "<p>Second paragraph in returns.</p>", returnsTagXmlDoc);
+        }
+
+        [Fact]
+        public void When_method_return_has_paramref_tag_nested_inside_paragraph_then_it_is_converted_to_markdown()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            XmlDocsOptions options = new XmlDocsOptions()
+            {
+                FormattingMode = XmlDocsFormattingMode.Markdown
+            };
+            var returnsTagXmlDoc = typeof(WithParamrefTagInXmlDoc).GetMethod("Bar")
+                .ReturnParameter.GetXmlDocs(options);
+
+            //// Assert
+            Assert.Equal("Combined string from param1 and param2.\n\n" +
+                "Second paragraph in returns.", returnsTagXmlDoc);
         }
 
         public class WithGenericTagsInXmlDoc

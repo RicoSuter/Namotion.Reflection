@@ -535,6 +535,10 @@ namespace Namotion.Reflection.Tests
             /// <para>Supported tags: <c>c</c>, <b>b</b>, <strong>strong</strong> and <i>i</i>.</para>
             /// <para>And links to <a href="https://github.com/">GitHub</a> and <see href="https://www.microsoft.com/">Microsoft</see>.</para>
             /// </summary>
+            /// <remarks>
+            /// <para>Supported tags: <c>c</c>, <b>b</b>, <strong>strong</strong> and <i>i</i>.</para>
+            /// <para>And links to <a href="https://github.com/">GitHub</a> and <see href="https://www.microsoft.com/">Microsoft</see>.</para>
+            /// </remarks>
             public string Foo { get; set; }
         }
 
@@ -585,6 +589,55 @@ namespace Namotion.Reflection.Tests
             //// Assert
             Assert.Equal("Supported tags: `c`, **b**, **strong** and *i*.\n\n" +
                          "And links to [GitHub](https://github.com/) and [Microsoft](https://www.microsoft.com/).", summary);
+        }
+
+        [Fact]
+        public void When_remarks_has_generic_tags_then_it_is_converted()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            var remarks = typeof(WithGenericTagsInXmlDoc).GetProperty("Foo").GetXmlDocsRemarks();
+
+            //// Assert
+            Assert.Equal("Supported tags: c, b, strong and i.\nAnd links to GitHub and Microsoft.", remarks);
+        }
+
+        [Fact]
+        public void When_remarks_has_generic_tags_then_it_is_converted_to_html()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            XmlDocsOptions options = new XmlDocsOptions()
+            {
+                FormattingMode = XmlDocsFormattingMode.Html
+            };
+            var remarks = typeof(WithGenericTagsInXmlDoc).GetProperty("Foo").GetXmlDocsRemarks(options);
+
+            //// Assert
+            Assert.Equal("<p>Supported tags: <pre>c</pre>, <strong>b</strong>, <strong>strong</strong> and <i>i</i>.</p>\n" +
+                         "<p>And links to <a href=\"https://github.com/\">GitHub</a> and <a href=\"https://www.microsoft.com/\">Microsoft</a>.</p>", remarks);
+        }
+
+        [Fact]
+        public void When_remarks_has_generic_tags_then_it_is_converted_to_markdown()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            XmlDocsOptions options = new XmlDocsOptions()
+            {
+                FormattingMode = XmlDocsFormattingMode.Markdown
+            };
+            var remarks = typeof(WithGenericTagsInXmlDoc).GetProperty("Foo").GetXmlDocsRemarks(options);
+
+            //// Assert
+            Assert.Equal("Supported tags: `c`, **b**, **strong** and *i*.\n\n" +
+                         "And links to [GitHub](https://github.com/) and [Microsoft](https://www.microsoft.com/).", remarks);
         }
 
         public abstract class BaseBaseClass

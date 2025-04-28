@@ -116,7 +116,7 @@ namespace Namotion.Reflection
         /// </summary>
         /// <typeparam name="T">The attribute type.</typeparam>
         /// <returns>The attributes.</returns>
-        public static IEnumerable<T> GetAttributes<T>(this ContextualMemberInfo info, bool inherit) where T : Attribute
+        public static IEnumerable<T> GetAttributes<T>(this ContextualMemberInfo info, bool inherit)
         {
             return ((ICustomAttributeProvider)info).GetAttributes<T>(inherit);
         }
@@ -232,7 +232,7 @@ namespace Namotion.Reflection
             return null;
         }
 
-        private static IEnumerable<T> GetAttributes<T>(this ICustomAttributeProvider provider, bool inherit) where T : Attribute
+        private static IEnumerable<T> GetAttributes<T>(this ICustomAttributeProvider provider, bool inherit)
         {
             return provider.GetCustomAttributes(typeof(T), inherit).OfType<T>();
         }

@@ -41,7 +41,7 @@ namespace Namotion.Reflection
         /// <returns>The value of <paramref name="stringBuilder"/>.</returns>
         private static StringBuilder AppendUnformattedElement(this StringBuilder stringBuilder, XElement element)
         {
-            stringBuilder.Append(element.Value);
+            stringBuilder.Append(element.ToXmlDocsContent(new XmlDocsOptions { FormattingMode = XmlDocsFormattingMode.None }).Trim());
             return stringBuilder;
         }
 

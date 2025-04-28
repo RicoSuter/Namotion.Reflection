@@ -759,7 +759,7 @@ namespace Namotion.Reflection
                                 .Replace("file:///", string.Empty)), assemblyName.Name + ".xml")
                                 .Replace("file:\\", string.Empty);
 
-#if NETSTANDARD2_0_OR_GREATER
+#if !NETFRAMEWORK
                             // If running on non-windows platform and path is not rooted, an extra path separator
                             // has been removed and must be added on again.
                             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && !Path.IsPathRooted(path))
@@ -962,7 +962,7 @@ namespace Namotion.Reflection
 
         private static string? GetXmlDocsPathFromOSXNuGetCache(dynamic? assembly, AssemblyName assemblyName)
         {
-#if NETSTANDARD2_0_OR_GREATER
+#if !NETFRAMEWORK
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
                 var fullAssemblyVersion = (assembly as Assembly)?.GetCustomAttribute<AssemblyFileVersionAttribute>()?.Version;

@@ -9,6 +9,7 @@
     <PackageProjectUrl>https://github.com/RicoSuter/Namotion.Reflection</PackageProjectUrl>
     <PackageIconUrl>https://raw.githubusercontent.com/RicoSuter/Namotion.Reflection/master/assets/NuGetIcon.png</PackageIconUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Copyright>Copyright © Rico Suter, 2025</Copyright>
     <Description>.NET library with advanced reflection APIs like XML documentation reading, Null Reference Types (C# 8) reflection and string based type checks.</Description>
 
     <PublishRepositoryUrl>true</PublishRepositoryUrl>

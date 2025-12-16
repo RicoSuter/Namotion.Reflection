@@ -1,4 +1,6 @@
-﻿namespace Namotion.Reflection
+﻿using System;
+
+namespace Namotion.Reflection
 {
     /// <summary>
     /// Contains all options to control generation of XML-docs.
@@ -19,5 +21,20 @@
         /// Specifies how formatting tags should be processed.
         /// </summary>
         public XmlDocsFormattingMode FormattingMode { get; set; } = XmlDocsFormattingMode.None;
+
+        /// <summary>
+        /// Optional function to convert a cref value to a URL.
+        /// </summary>
+        public Func<string, string>? CrefToUrl { get; set; }
+
+        /// <summary>
+        /// Optional function to convert a langword value to a URL.
+        /// </summary>
+        public Func<string, string>? LangwordToUrl { get; set; }
+
+        /// <summary>
+        /// Optional function to convert a href value to a URL.
+        /// </summary>
+        public Func<string, string>? HrefToUrl { get; set; }
     }
 }

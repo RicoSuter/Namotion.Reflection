@@ -12,6 +12,21 @@ using Xunit;
 
 namespace Namotion.Reflection.Tests
 {
+    internal static class StringExtensions
+    {
+        public static string FirstToken(this string s, char splitChar)
+        {
+            var idx = s.IndexOf(splitChar);
+            return idx != -1 ? s.Substring(0, idx) : s;
+        }
+
+        public static string LastToken(this string s, char splitChar)
+        {
+            var idx = s.LastIndexOf(splitChar);
+            return idx != -1 ? s.Substring(idx + 1) : s;
+        }
+    }
+
     public class XmlDocsExtensionsTests
     {
         /// <summary>WithSummary</summary>
@@ -235,6 +250,33 @@ namespace Namotion.Reflection.Tests
 
             //// Assert
             Assert.Equal("null for the default Record. See this and this at https://github.com/rsuter/njsonschema.", summary);
+        }
+
+        [Fact]
+        public void When_summary_has_see_tag_nested_inside_paragraph_customized_then_it_is_converted()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            XmlDocsOptions options = new XmlDocsOptions()
+            {
+                FormattingMode = XmlDocsFormattingMode.Markdown,
+                CrefToUrl = cref =>
+                {
+                    var trimmedCref = cref.FirstToken('(');
+                    trimmedCref = trimmedCref.LastToken('.');
+                    return $"https://some-url-{trimmedCref}";
+                } ,
+                HrefToUrl = href => $"{href}#add-anchor",
+                LangwordToUrl = langword => $"https://langword-url-{langword}"
+            };
+            var summary = typeof(WithSeeTagInXmlDoc).GetProperty("Bar").GetXmlDocsSummary(options);
+
+            //// Assert
+            Assert.Equal("[null](https://langword-url-null) for the default [Record](https://some-url-Record).\n" +
+            "See [this](https://some-url-Record) and [this](https://github.com/rsuter/njsonschema#add-anchor) at [https://github.com/rsuter/njsonschema](https://github.com/rsuter/njsonschema#add-anchor).\n\n" +
+            "Second paragraph in summary.", summary);
         }
 
         [Fact]

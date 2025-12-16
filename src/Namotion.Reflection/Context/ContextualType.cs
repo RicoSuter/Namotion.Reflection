@@ -219,17 +219,17 @@ namespace Namotion.Reflection
                     {
                         if (_fields == null)
                         {
-                            _fields = Type.GetRuntimeFields().Select(field =>
+                            _fields = Type.GetRuntimeFields().Select(fieldInfo =>
                             {
-                                if (field.DeclaringType is { IsGenericType: true })
+                                if (fieldInfo.DeclaringType is { IsGenericType: true })
                                 {
-                                    var genericType = field.DeclaringType.GetGenericTypeDefinition();
-                                    var genericField = genericType.GetRuntimeField(field.Name);
+                                    var genericType = fieldInfo.DeclaringType.GetGenericTypeDefinition();
+                                    var genericField = genericType.GetRuntimeField(fieldInfo.Name);
                                     if (genericField != null && genericField.FieldType.IsGenericParameter)
                                     {
                                         var nullableFlagsIndex = _nullableFlagsIndex;
                                         var declaringContextualType = new ContextualType(
-                                            field.DeclaringType,
+                                            fieldInfo.DeclaringType,
                                             Context,
                                             Parent,
                                             ref nullableFlagsIndex,
@@ -237,12 +237,12 @@ namespace Namotion.Reflection
                                             null);
                                         var actualType = declaringContextualType.GenericArguments[genericField.FieldType.GenericParameterPosition];
                                         var actualIndex = actualType._nullableFlagsIndex;
-                                        return new ContextualFieldInfo(field, ref actualIndex, actualType._nullableFlags);
+                                        return new ContextualFieldInfo(fieldInfo, ref actualIndex, actualType._nullableFlags);
                                     }
                                 }
 
                                 var index = 0;
-                                return new ContextualFieldInfo(field, ref index, null);
+                                return new ContextualFieldInfo(fieldInfo, ref index, null);
                             }).ToArray();
                         }
                     }

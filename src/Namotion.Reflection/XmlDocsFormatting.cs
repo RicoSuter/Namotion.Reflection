@@ -53,20 +53,12 @@ namespace Namotion.Reflection
         /// <returns>The <see cref="StringBuilder"/> instance with the formatted link appended.</returns>
         public static StringBuilder AppendFormattedLink(this StringBuilder stringBuilder, string linkText, string linkUrl, XmlDocsFormattingMode formattingMode)
         {
-            switch (formattingMode)
+            return formattingMode switch
             {
-                case XmlDocsFormattingMode.Html:
-                    stringBuilder.Append("<a href=\"", linkUrl, "\">", linkText, "</a>");
-                    break;
-                case XmlDocsFormattingMode.Markdown:
-                    stringBuilder.Append("[", linkText, "](", linkUrl, ")");
-                    break;
-                case XmlDocsFormattingMode.None:
-                default:
-                    stringBuilder.Append(linkText);
-                    break;
-            }
-            return stringBuilder;
+                XmlDocsFormattingMode.Html => stringBuilder.Append("<a href=\"", linkUrl, "\">", linkText, "</a>"),
+                XmlDocsFormattingMode.Markdown => stringBuilder.Append("[", linkText, "](", linkUrl, ")"),
+                _ => stringBuilder.Append(linkText)
+            };
         }
 
         /// <summary>
@@ -74,7 +66,6 @@ namespace Namotion.Reflection
         /// </summary>
         /// <param name="stringBuilder">The current <see cref="StringBuilder"/>.</param>
         /// <param name="element">The <see cref="XElement"/> to append.</param>
-        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The value of <paramref name="stringBuilder"/>.</returns>
         public static StringBuilder AppendUnformattedElement(this StringBuilder stringBuilder, XElement element)
         {

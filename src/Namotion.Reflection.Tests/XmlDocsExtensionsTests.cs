@@ -280,6 +280,31 @@ namespace Namotion.Reflection.Tests
         }
 
         [Fact]
+        public void When_CrefToUrl_or_HrefToUrl_or_LangwordToUrl_throws_it_fallbacks_to_default_behavior()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            XmlDocsOptions options = new XmlDocsOptions()
+            {
+                FormattingMode = XmlDocsFormattingMode.Markdown,
+                CrefToUrl = cref =>
+                {
+                    throw new Exception("CrefToUrl throws Error");
+                },
+                HrefToUrl = href => throw new Exception("HrefToUrl throws Error"),
+                LangwordToUrl = langword => throw new Exception("LangwordToUrl throws Error")
+            };
+            var summary = typeof(WithSeeTagInXmlDoc).GetProperty("Bar").GetXmlDocsSummary(options);
+
+            //// Assert
+            Assert.Equal("[null](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null) for the default Record.\n" +
+            "See this and [this](https://github.com/rsuter/njsonschema) at [https://github.com/rsuter/njsonschema](https://github.com/rsuter/njsonschema).\n\n" +
+            "Second paragraph in summary.", summary);
+        }
+
+        [Fact]
         public void When_summary_has_see_tag_nested_inside_paragraph_then_it_is_converted()
         {
             //// Arrange

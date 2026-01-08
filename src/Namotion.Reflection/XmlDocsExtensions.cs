@@ -335,7 +335,12 @@ namespace Namotion.Reflection
         // prevent array allocations on old runtimes
         private static readonly char[] ToXmlDocsContentTrimChars = { '!', ':' };
 
-        private static readonly string LearnMicrosoftComLink = "https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/";
+        private static string TrimCrefValue(string crefValue)
+        {
+            return crefValue.Trim(ToXmlDocsContentTrimChars).Trim();
+        }
+
+        private const string LearnMicrosoftComLink = "https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/";
 
         /// <summary>
         /// Processes See element and converts it to a formatted link.
@@ -365,55 +370,79 @@ namespace Namotion.Reflection
         /// <param name="options">The XML docs reading and formatting options.</param>
         private static void ProcessSeeElement(XElement element, StringBuilder value, XmlDocsOptions options)
         {
+            if (element == null || value == null)
+                return;
+
             var langwordAttribute = element.Attribute(XmlDocsKeys.SeeLangwordAttribute);
             var hrefAttribute = element.Attribute(XmlDocsKeys.SeeHrefAttribute);
             var crefAttribute = element.Attribute(XmlDocsKeys.SeeCrefAttribute);
 
             // Determine URL
             var url = string.Empty;
-            if (langwordAttribute != null)
+            if (langwordAttribute is not null)
             {
-                if (options.LangwordToUrl != null)
+                if (options.LangwordToUrl is not null)
                 {
-                    url = options.LangwordToUrl(langwordAttribute.Value);
+                    try
+                    {
+                        url = options.LangwordToUrl(langwordAttribute.Value);
+                    }
+                    catch
+                    {
+                        url = $"{LearnMicrosoftComLink}{langwordAttribute.Value}";
+                    }
                 }
                 else
                 {
                     url = $"{LearnMicrosoftComLink}{langwordAttribute.Value}";
                 }
             }
-            else if (hrefAttribute != null)
+            else if (hrefAttribute is not null)
             {
-                if (options.HrefToUrl != null)
+                if (options.HrefToUrl is not null)
                 {
-                    url = options.HrefToUrl(hrefAttribute.Value);
+                    try
+                    {
+                        url = options.HrefToUrl(hrefAttribute.Value);
+                    }
+                    catch
+                    {
+                        url = hrefAttribute.Value;
+                    }
                 }
                 else
                 {
                     url = hrefAttribute.Value;
                 }
             }
-            else if (crefAttribute != null && options.CrefToUrl != null)
+            else if (crefAttribute is not null && options.CrefToUrl is not null)
             {
-                url = options.CrefToUrl(crefAttribute.Value.Trim(ToXmlDocsContentTrimChars).Trim());
+                try
+                {
+                    url = options.CrefToUrl(TrimCrefValue(crefAttribute.Value));
+                }
+                catch
+                {
+                    url = string.Empty;
+                }
             }
 
             // Determine Text
             var text = element.Value;
             if (string.IsNullOrEmpty(text))
             {
-                if (langwordAttribute != null)
+                if (langwordAttribute is not null)
                 {
                     text = langwordAttribute.Value;
                 }
-                else if (crefAttribute != null)
+                else if (crefAttribute is not null)
                 {
-                    var trimmedCref = crefAttribute.Value.Trim(ToXmlDocsContentTrimChars).Trim();
+                    var trimmedCref = TrimCrefValue(crefAttribute.Value);
                     trimmedCref = trimmedCref.FirstToken('(');
                     trimmedCref = trimmedCref.LastToken('.');
                     text = trimmedCref;
                 }
-                else if (hrefAttribute != null)
+                else if (hrefAttribute is not null)
                 {
                     text = hrefAttribute.Value;
                 }

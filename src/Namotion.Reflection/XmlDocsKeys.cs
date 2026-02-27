@@ -31,6 +31,11 @@
         public const string ParamRefElement = "paramref";
 
         /// <summary>
+        /// Name of the paragraph element.
+        /// </summary>
+        public const string ParagraphElement = "para";
+
+        /// <summary>
         /// Name of the name attribute used in conjunction with the <see cref="ParamRefElement"/>.
         /// </summary>
         public const string ParamRefNameAttribute = "name";

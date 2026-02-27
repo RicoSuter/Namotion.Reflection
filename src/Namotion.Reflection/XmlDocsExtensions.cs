@@ -335,6 +335,147 @@ namespace Namotion.Reflection
         // prevent array allocations on old runtimes
         private static readonly char[] ToXmlDocsContentTrimChars = { '!', ':' };
 
+        private static string TrimCrefValue(string crefValue)
+        {
+            return crefValue.Trim(ToXmlDocsContentTrimChars).Trim();
+        }
+
+        private const string LearnMicrosoftComLink = "https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/";
+
+        /// <summary>
+        /// Processes See element and converts it to a formatted link.
+        /// </summary>
+        ///
+        /// <remarks>
+        /// There are 3 supported attributes:
+        /// - langword
+        /// - href
+        /// - cref
+        ///
+        /// This method calculates the URL and the text to display based on the attributes and appends the result to the StringBuilder:
+        ///
+        /// Text:
+        /// If the Attribute contains Value, it would be used as a text, otherwise:
+        /// langword would use the word itself as text.
+        /// href would use the URL as text.
+        /// cref would use the last token after '.' as text.
+        ///
+        /// Url:
+        /// By default, langword would use a link to learn.microsoft.com. Can be overriden with LangwordToUrl option.
+        /// By default, href would use the URL as is. Can be overriden with HrefToUrl option.
+        /// Cref requires CrefToUrl option to convert the cref to a URL. If not provided, no link is created.
+        /// </remarks>
+        /// <param name="element">The XML element.</param>
+        /// <param name="value">StringBuilder to append processed link.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
+        private static void ProcessSeeElement(XElement element, StringBuilder value, XmlDocsOptions options)
+        {
+            if (element == null || value == null)
+                return;
+
+            var langwordAttribute = element.Attribute(XmlDocsKeys.SeeLangwordAttribute);
+            var hrefAttribute = element.Attribute(XmlDocsKeys.SeeHrefAttribute);
+            var crefAttribute = element.Attribute(XmlDocsKeys.SeeCrefAttribute);
+
+            // Determine URL
+            var url = string.Empty;
+            if (langwordAttribute is not null)
+            {
+                if (options.LangwordToUrl is not null)
+                {
+                    try
+                    {
+                        url = options.LangwordToUrl(langwordAttribute.Value);
+                    }
+                    catch (Exception)
+                    {
+                        url = $"{LearnMicrosoftComLink}{langwordAttribute.Value}";
+                    }
+                }
+                else
+                {
+                    url = $"{LearnMicrosoftComLink}{langwordAttribute.Value}";
+                }
+            }
+            else if (hrefAttribute is not null)
+            {
+                if (options.HrefToUrl is not null)
+                {
+                    try
+                    {
+                        url = options.HrefToUrl(hrefAttribute.Value);
+                    }
+                    catch (Exception)
+                    {
+                        url = hrefAttribute.Value;
+                    }
+                }
+                else
+                {
+                    url = hrefAttribute.Value;
+                }
+            }
+            else if (crefAttribute is not null && options.CrefToUrl is not null)
+            {
+                try
+                {
+                    url = options.CrefToUrl(TrimCrefValue(crefAttribute.Value));
+                }
+                catch (Exception)
+                {
+                    url = string.Empty;
+                }
+            }
+
+            // Determine Text
+            var text = element.Value;
+            if (string.IsNullOrEmpty(text))
+            {
+                if (langwordAttribute is not null)
+                {
+                    text = langwordAttribute.Value;
+                }
+                else if (crefAttribute is not null)
+                {
+                    var trimmedCref = TrimCrefValue(crefAttribute.Value);
+                    trimmedCref = trimmedCref.FirstToken('(');
+                    trimmedCref = trimmedCref.LastToken('.');
+                    text = trimmedCref;
+                }
+                else if (hrefAttribute is not null)
+                {
+                    text = hrefAttribute.Value;
+                }
+            }
+
+            // If both text and url are available, create a link
+            if (!string.IsNullOrEmpty(text) && !string.IsNullOrEmpty(url))
+            {
+                value.AppendFormattedLink(text, url, options.FormattingMode);
+            }
+            else
+            {
+                value.Append(text);
+            }
+        }
+
+        private static void ProcessParagraph(XElement element, StringBuilder stringBuilder, XmlDocsOptions options)
+        {
+            switch (options.FormattingMode)
+            {
+                case XmlDocsFormattingMode.Html:
+                    stringBuilder.AppendHtmlParagraph(element, options);
+                    break;
+                case XmlDocsFormattingMode.Markdown:
+                    stringBuilder.AppendMarkdownParagraph(element, options);
+                    break;
+                case XmlDocsFormattingMode.None:
+                default:
+                    stringBuilder.AppendUnformattedElement(element);
+                    break;
+            }
+        }
+
         /// <summary>Converts the given XML documentation <see cref="XElement"/> to text.</summary>
         /// <param name="element">The XML element.</param>
         /// <param name="options">The XML docs reading and formatting options.</param>
@@ -352,42 +493,16 @@ namespace Namotion.Reflection
                     {
                         if (e.Name == XmlDocsKeys.SeeElement)
                         {
-                            var attribute = e.Attribute(XmlDocsKeys.SeeLangwordAttribute);
-                            if (attribute != null)
-                            {
-                                value.Append(attribute.Value);
-                            }
-                            else
-                            {
-                                if (!string.IsNullOrEmpty(e.Value))
-                                {
-                                    value.AppendFormattedElement(e, options.FormattingMode);
-                                }
-                                else
-                                {
-                                    attribute = e.Attribute(XmlDocsKeys.SeeCrefAttribute);
-                                    if (attribute != null)
-                                    {
-                                        var trimmed = attribute.Value.Trim(ToXmlDocsContentTrimChars).Trim();
-                                        trimmed = trimmed.FirstToken('(');
-                                        trimmed = trimmed.LastToken('.');
-                                        value.Append(trimmed);
-                                    }
-                                    else
-                                    {
-                                        attribute = e.Attribute(XmlDocsKeys.SeeHrefAttribute);
-                                        if (attribute != null)
-                                        {
-                                            value.Append(attribute.Value);
-                                        }
-                                    }
-                                }
-                            }
+                            ProcessSeeElement(e, value, options);
                         }
                         else if (e.Name == XmlDocsKeys.ParamRefElement)
                         {
                             var nameAttribute = e.Attribute(XmlDocsKeys.ParamRefNameAttribute);
                             value.Append(nameAttribute?.Value ?? e.Value);
+                        }
+                        else if (e.Name.LocalName == XmlDocsKeys.ParagraphElement)
+                        {
+                            ProcessParagraph(e, value, options);
                         }
                         else
                         {

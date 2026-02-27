@@ -280,6 +280,33 @@ namespace Namotion.Reflection.Tests
         }
 
         [Fact]
+        public void When_summary_has_see_tag_with_html_formatting_then_it_is_converted()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            XmlDocsOptions options = new XmlDocsOptions()
+            {
+                FormattingMode = XmlDocsFormattingMode.Html,
+                CrefToUrl = cref =>
+                {
+                    var trimmedCref = cref.FirstToken('(');
+                    trimmedCref = trimmedCref.LastToken('.');
+                    return $"https://some-url-{trimmedCref}";
+                },
+                HrefToUrl = href => $"{href}#add-anchor",
+                LangwordToUrl = langword => $"https://langword-url-{langword}"
+            };
+            var summary = typeof(WithSeeTagInXmlDoc).GetProperty("Bar").GetXmlDocsSummary(options);
+
+            //// Assert
+            Assert.Equal("<p><a href=\"https://langword-url-null\">null</a> for the default <a href=\"https://some-url-Record\">Record</a>.\n" +
+            "See <a href=\"https://some-url-Record\">this</a> and <a href=\"https://github.com/rsuter/njsonschema#add-anchor\">this</a> at <a href=\"https://github.com/rsuter/njsonschema#add-anchor\">https://github.com/rsuter/njsonschema</a>.</p>\n" +
+            "<p>Second paragraph in summary.</p>", summary);
+        }
+
+        [Fact]
         public void When_CrefToUrl_or_HrefToUrl_or_LangwordToUrl_throws_it_fallbacks_to_default_behavior()
         {
             //// Arrange

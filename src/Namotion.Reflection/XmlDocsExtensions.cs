@@ -387,7 +387,7 @@ namespace Namotion.Reflection
                     {
                         url = options.LangwordToUrl(langwordAttribute.Value);
                     }
-                    catch
+                    catch (Exception)
                     {
                         url = $"{LearnMicrosoftComLink}{langwordAttribute.Value}";
                     }
@@ -405,7 +405,7 @@ namespace Namotion.Reflection
                     {
                         url = options.HrefToUrl(hrefAttribute.Value);
                     }
-                    catch
+                    catch (Exception)
                     {
                         url = hrefAttribute.Value;
                     }
@@ -421,7 +421,7 @@ namespace Namotion.Reflection
                 {
                     url = options.CrefToUrl(TrimCrefValue(crefAttribute.Value));
                 }
-                catch
+                catch (Exception)
                 {
                     url = string.Empty;
                 }

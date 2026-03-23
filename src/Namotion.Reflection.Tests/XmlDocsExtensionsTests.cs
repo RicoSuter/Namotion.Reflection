@@ -12,6 +12,21 @@ using Xunit;
 
 namespace Namotion.Reflection.Tests
 {
+    internal static class StringExtensions
+    {
+        public static string FirstToken(this string s, char splitChar)
+        {
+            var idx = s.IndexOf(splitChar);
+            return idx != -1 ? s.Substring(0, idx) : s;
+        }
+
+        public static string LastToken(this string s, char splitChar)
+        {
+            var idx = s.LastIndexOf(splitChar);
+            return idx != -1 ? s.Substring(idx + 1) : s;
+        }
+    }
+
     public class XmlDocsExtensionsTests
     {
         /// <summary>WithSummary</summary>
@@ -235,6 +250,85 @@ namespace Namotion.Reflection.Tests
 
             //// Assert
             Assert.Equal("null for the default Record. See this and this at https://github.com/rsuter/njsonschema.", summary);
+        }
+
+        [Fact]
+        public void When_summary_has_see_tag_nested_inside_paragraph_customized_then_it_is_converted()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            XmlDocsOptions options = new XmlDocsOptions()
+            {
+                FormattingMode = XmlDocsFormattingMode.Markdown,
+                CrefToUrl = cref =>
+                {
+                    var trimmedCref = cref.FirstToken('(');
+                    trimmedCref = trimmedCref.LastToken('.');
+                    return $"https://some-url-{trimmedCref}";
+                } ,
+                HrefToUrl = href => $"{href}#add-anchor",
+                LangwordToUrl = langword => $"https://langword-url-{langword}"
+            };
+            var summary = typeof(WithSeeTagInXmlDoc).GetProperty("Bar").GetXmlDocsSummary(options);
+
+            //// Assert
+            Assert.Equal("[null](https://langword-url-null) for the default [Record](https://some-url-Record).\n" +
+            "See [this](https://some-url-Record) and [this](https://github.com/rsuter/njsonschema#add-anchor) at [https://github.com/rsuter/njsonschema](https://github.com/rsuter/njsonschema#add-anchor).\n\n" +
+            "Second paragraph in summary.", summary);
+        }
+
+        [Fact]
+        public void When_summary_has_see_tag_with_html_formatting_then_it_is_converted()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            XmlDocsOptions options = new XmlDocsOptions()
+            {
+                FormattingMode = XmlDocsFormattingMode.Html,
+                CrefToUrl = cref =>
+                {
+                    var trimmedCref = cref.FirstToken('(');
+                    trimmedCref = trimmedCref.LastToken('.');
+                    return $"https://some-url-{trimmedCref}";
+                },
+                HrefToUrl = href => $"{href}#add-anchor",
+                LangwordToUrl = langword => $"https://langword-url-{langword}"
+            };
+            var summary = typeof(WithSeeTagInXmlDoc).GetProperty("Bar").GetXmlDocsSummary(options);
+
+            //// Assert
+            Assert.Equal("<p><a href=\"https://langword-url-null\">null</a> for the default <a href=\"https://some-url-Record\">Record</a>.\n" +
+            "See <a href=\"https://some-url-Record\">this</a> and <a href=\"https://github.com/rsuter/njsonschema#add-anchor\">this</a> at <a href=\"https://github.com/rsuter/njsonschema#add-anchor\">https://github.com/rsuter/njsonschema</a>.</p>\n" +
+            "<p>Second paragraph in summary.</p>", summary);
+        }
+
+        [Fact]
+        public void When_CrefToUrl_or_HrefToUrl_or_LangwordToUrl_throws_it_fallbacks_to_default_behavior()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            XmlDocsOptions options = new XmlDocsOptions()
+            {
+                FormattingMode = XmlDocsFormattingMode.Markdown,
+                CrefToUrl = cref =>
+                {
+                    throw new Exception("CrefToUrl throws Error");
+                },
+                HrefToUrl = href => throw new Exception("HrefToUrl throws Error"),
+                LangwordToUrl = langword => throw new Exception("LangwordToUrl throws Error")
+            };
+            var summary = typeof(WithSeeTagInXmlDoc).GetProperty("Bar").GetXmlDocsSummary(options);
+
+            //// Assert
+            Assert.Equal("[null](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null) for the default Record.\n" +
+            "See this and [this](https://github.com/rsuter/njsonschema) at [https://github.com/rsuter/njsonschema](https://github.com/rsuter/njsonschema).\n\n" +
+            "Second paragraph in summary.", summary);
         }
 
         [Fact]

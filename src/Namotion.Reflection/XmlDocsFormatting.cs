@@ -34,12 +34,40 @@ namespace Namotion.Reflection
         }
 
         /// <summary>
+        /// Appends a formatted hyperlink to the specified <see cref="StringBuilder"/>, using the given link text, URL,
+        /// and formatting mode.
+        /// </summary>
+        /// <remarks>When <paramref name="formattingMode"/> is <see cref="XmlDocsFormattingMode.Html"/>,
+        /// the link is appended as an HTML a element.
+        /// When set to <see cref="XmlDocsFormattingMode.Markdown"/>, the link is appended in Markdown link syntax.
+        /// If <see cref="XmlDocsFormattingMode.None"/> is specified, only the link text is appended with no formatting.
+        /// </remarks>
+        /// <param name="stringBuilder">The <see cref="StringBuilder"/> to which the formatted link will be appended. Cannot be null.</param>
+        /// <param name="linkText">The text to display for the link. If <paramref name="formattingMode"/> is
+        /// <see cref="XmlDocsFormattingMode.None"/>, this text is appended without formatting.</param>
+        /// <param name="linkUrl">The URL to use for the hyperlink. Ignored if <paramref name="formattingMode"/> is
+        /// <see cref="XmlDocsFormattingMode.None"/>.</param>
+        /// <param name="formattingMode">The formatting mode that determines how the link is rendered. Supported values are
+        /// <see cref="XmlDocsFormattingMode.Html"/>, <see cref="XmlDocsFormattingMode.Markdown"/>, and
+        /// <see cref="XmlDocsFormattingMode.None"/>.</param>
+        /// <returns>The <see cref="StringBuilder"/> instance with the formatted link appended.</returns>
+        public static StringBuilder AppendFormattedLink(this StringBuilder stringBuilder, string linkText, string linkUrl, XmlDocsFormattingMode formattingMode)
+        {
+            return formattingMode switch
+            {
+                XmlDocsFormattingMode.Html => stringBuilder.Append("<a href=\"", linkUrl, "\">", linkText, "</a>"),
+                XmlDocsFormattingMode.Markdown => stringBuilder.Append("[", linkText, "](", linkUrl, ")"),
+                _ => stringBuilder.Append(linkText)
+            };
+        }
+
+        /// <summary>
         /// Appends the value of <paramref name="element"/> without any formatting information.
         /// </summary>
         /// <param name="stringBuilder">The current <see cref="StringBuilder"/>.</param>
         /// <param name="element">The <see cref="XElement"/> to append.</param>
         /// <returns>The value of <paramref name="stringBuilder"/>.</returns>
-        private static StringBuilder AppendUnformattedElement(this StringBuilder stringBuilder, XElement element)
+        public static StringBuilder AppendUnformattedElement(this StringBuilder stringBuilder, XElement element)
         {
             stringBuilder.Append(element.ToXmlDocsContent(new XmlDocsOptions { FormattingMode = XmlDocsFormattingMode.None }).Trim());
             return stringBuilder;
@@ -50,8 +78,6 @@ namespace Namotion.Reflection
             new Dictionary<string, Func<StringBuilder, XElement, StringBuilder>>()
             {
                 { "a", AppendHtmlLink },
-                { "see", AppendHtmlLink },
-                { "para", AppendHtmlParagraph },
                 { "c", (sb, e) => AppendSimpleTaggedElement(sb, e, "<pre>", "</pre>") },
                 { "b", (sb, e) => AppendSimpleTaggedElement(sb, e, "<strong>", "</strong>") },
                 { "strong", (sb, e) => AppendSimpleTaggedElement(sb, e, "<strong>", "</strong>") },
@@ -74,8 +100,6 @@ namespace Namotion.Reflection
             new Dictionary<string, Func<StringBuilder, XElement, StringBuilder>>()
             {
                 { "a", AppendMarkdownLink },
-                { "see", AppendMarkdownLink },
-                { "para", AppendMarkdownParagraph },
                 { "c", (sb, e) => AppendSimpleTaggedElement(sb, e, "`", "`") },
                 { "b", (sb, e) => AppendSimpleTaggedElement(sb, e, "**", "**") },
                 { "strong", (sb, e) => AppendSimpleTaggedElement(sb, e, "**", "**") },
@@ -135,11 +159,29 @@ namespace Namotion.Reflection
         /// </summary>
         /// <param name="stringBuilder">The current <see cref="StringBuilder"/>.</param>
         /// <param name="element">The <see cref="XElement"/> to append.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
         /// <returns>The value of <paramref name="stringBuilder"/>.</returns>
-        private static StringBuilder AppendHtmlParagraph(StringBuilder stringBuilder, XElement element)
+        public static StringBuilder AppendHtmlParagraph(this StringBuilder stringBuilder, XElement element, XmlDocsOptions options)
         {
-            var paragraph = element.ToXmlDocsContent(new XmlDocsOptions { FormattingMode = XmlDocsFormattingMode.Html }).Trim();
+            var paragraph = element.ToXmlDocsContent(options).Trim();
             stringBuilder.Append("<p>", paragraph, "</p>");
+            return stringBuilder;
+        }
+
+        /// <summary>
+        /// Appends the value of <paramref name="element"/> as a markdown paragraph.
+        /// </summary>
+        /// <param name="stringBuilder">The current <see cref="StringBuilder"/>.</param>
+        /// <param name="element">The <see cref="XElement"/> to append.</param>
+        /// <param name="options">The XML docs reading and formatting options.</param>
+        /// <returns>The value of <paramref name="stringBuilder"/>.</returns>
+        public static StringBuilder AppendMarkdownParagraph(this StringBuilder stringBuilder, XElement element, XmlDocsOptions options)
+        {
+            if (stringBuilder.Length > 0)
+            {
+                stringBuilder.AppendLine();
+            }
+            stringBuilder.Append(element.ToXmlDocsContent(options).Trim());
             return stringBuilder;
         }
 
@@ -152,22 +194,6 @@ namespace Namotion.Reflection
         private static StringBuilder AppendHtmlLink(StringBuilder stringBuilder, XElement element)
         {
             stringBuilder.Append("<a href=\"", element.Attribute("href")?.Value, "\">", element.Value, "</a>");
-            return stringBuilder;
-        }
-
-        /// <summary>
-        /// Appends the value of <paramref name="element"/> as a markdown paragraph.
-        /// </summary>
-        /// <param name="stringBuilder">The current <see cref="StringBuilder"/>.</param>
-        /// <param name="element">The <see cref="XElement"/> to append.</param>
-        /// <returns>The value of <paramref name="stringBuilder"/>.</returns>
-        private static StringBuilder AppendMarkdownParagraph(StringBuilder stringBuilder, XElement element)
-        {
-            if (stringBuilder.Length > 0)
-            {
-                stringBuilder.AppendLine();
-            }
-            stringBuilder.Append(element.ToXmlDocsContent(new XmlDocsOptions { FormattingMode = XmlDocsFormattingMode.Markdown }).Trim());
             return stringBuilder;
         }
 

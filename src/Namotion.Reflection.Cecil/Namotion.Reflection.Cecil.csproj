@@ -12,4 +12,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Namotion.Reflection\Namotion.Reflection.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 </Project>

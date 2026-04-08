@@ -491,7 +491,7 @@ namespace Namotion.Reflection
                 {
                     if (node is XElement e)
                     {
-                        if (e.Name == XmlDocsKeys.SeeElement)
+                        if (e.Name == XmlDocsKeys.SeeElement || e.Name == XmlDocsKeys.SeeAlsoElement)
                         {
                             ProcessSeeElement(e, value, options);
                         }

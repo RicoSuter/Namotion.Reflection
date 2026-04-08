@@ -374,6 +374,41 @@ namespace Namotion.Reflection.Tests
                 "Second paragraph in remarks.", remarks);
         }
 
+        public class WithSeeAlsoTagInXmlDoc
+        {
+            /// <summary>When not specified, <seealso cref="Record"/> is used.</summary>
+            public string Foo { get; set; }
+
+            /// <summary>When not specified, <seealso cref="Record">custom text</seealso> is used.</summary>
+            public string Bar { get; set; }
+        }
+
+        [Fact]
+        public void When_summary_has_seealso_tag_then_it_is_converted()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            var summary = typeof(WithSeeAlsoTagInXmlDoc).GetProperty("Foo").GetXmlDocsSummary();
+
+            //// Assert
+            Assert.Equal("When not specified, Record is used.", summary);
+        }
+
+        [Fact]
+        public void When_summary_has_seealso_tag_with_content_then_it_is_converted()
+        {
+            //// Arrange
+            XmlDocs.ClearCache();
+
+            //// Act
+            var summary = typeof(WithSeeAlsoTagInXmlDoc).GetProperty("Bar").GetXmlDocsSummary();
+
+            //// Assert
+            Assert.Equal("When not specified, custom text is used.", summary);
+        }
+
         public class WithParamrefTagInXmlDoc
         {
             // <paramref> tags used at top level inside <summary>, <param>, <remarks>, and <returns>

@@ -46,6 +46,11 @@
         public const string SeeElement = "see";
 
         /// <summary>
+        /// Name of the seealso element.
+        /// </summary>
+        public const string SeeAlsoElement = "seealso";
+
+        /// <summary>
         /// Name of the langword attribute used in conjunction with the <see cref="SeeElement"/>.
         /// </summary>
         public const string SeeLangwordAttribute = "langword";

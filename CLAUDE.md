@@ -6,10 +6,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 # Build the solution
-dotnet build src/Namotion.Reflection.sln
+dotnet build src/Namotion.Reflection.slnx
 
 # Run all tests
-dotnet test src/Namotion.Reflection.sln
+dotnet test src/Namotion.Reflection.slnx
 
 # Run a specific test class
 dotnet test src/Namotion.Reflection.Tests --filter "FullyQualifiedName~ClassName"
@@ -18,7 +18,7 @@ dotnet test src/Namotion.Reflection.Tests --filter "FullyQualifiedName~ClassName
 dotnet test src/Namotion.Reflection.Tests --filter "FullyQualifiedName~MethodName"
 
 # Build in Release mode
-dotnet build src/Namotion.Reflection.sln --configuration Release
+dotnet build src/Namotion.Reflection.slnx --configuration Release
 ```
 
 ## Project Overview

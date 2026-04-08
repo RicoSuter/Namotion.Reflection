@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="../.github/workflows/build.yml" />
+    <File Path="../Directory.Build.props" />
+    <File Path="../Directory.Packages.props" />
+    <File Path="../README.md" />
+  </Folder>
+  <Project Path="Namotion.Reflection.Benchmark/Namotion.Reflection.Benchmark.csproj" />
+  <Project Path="Namotion.Reflection.Cecil.Tests/Namotion.Reflection.Cecil.Tests.csproj" />
+  <Project Path="Namotion.Reflection.Cecil/Namotion.Reflection.Cecil.csproj" />
+  <Project Path="Namotion.Reflection.Demo/Namotion.Reflection.Demo.csproj" />
+  <Project Path="Namotion.Reflection.Tests.FullAssembly/Namotion.Reflection.Tests.FullAssembly.csproj" />
+  <Project Path="Namotion.Reflection.Tests/Namotion.Reflection.Tests.csproj" />
+  <Project Path="Namotion.Reflection/Namotion.Reflection.csproj" />
+</Solution>

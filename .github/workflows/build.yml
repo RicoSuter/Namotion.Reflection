@@ -40,7 +40,12 @@ jobs:
         run: dotnet build src/Namotion.Reflection.slnx --configuration Release
 
       - name: Run tests
-        run: dotnet test src/Namotion.Reflection.slnx --configuration Release --no-build --logger GitHubActions
+        run: dotnet test src/Namotion.Reflection.slnx --configuration Release --no-build --logger GitHubActions -- RunConfiguration.TargetPlatform=x64
+        if: matrix.os == 'windows-latest'
+
+      - name: Run tests (.NET only)
+        run: dotnet test src/Namotion.Reflection.slnx --configuration Release --no-build --logger GitHubActions --framework net8.0
+        if: matrix.os == 'ubuntu-latest'
 
   pack:
     if: github.event_name == 'release'

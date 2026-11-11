@@ -104,6 +104,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     needs: [ validate, build ]
+    permissions:
+      contents: read
+      id-token: write # Required for NuGet trusted publishing (OIDC token exchange)
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -115,8 +118,16 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
+      # Exchange the GitHub OIDC token for a short-lived (1 hour) NuGet API key via trusted publishing.
+      # Requires a matching trusted publishing policy on nuget.org (repository, workflow file build.yml).
+      - name: NuGet login
+        uses: NuGet/login@v1
+        id: nuget-login
+        with:
+          user: ${{ secrets.NUGET_USER }} # nuget.org profile name, not the email address
+
       - name: Publish NuGet package
         run: |
           foreach($file in (Get-ChildItem "${{ env.NUGET_DIRECTORY }}" -Recurse -Include *.nupkg)) {
-              dotnet nuget push $file --api-key "${{ secrets.NUGET_APIKEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
+              dotnet nuget push $file --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
           }
